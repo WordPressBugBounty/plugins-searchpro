@@ -96,6 +96,9 @@ if (!class_exists('berqCache')) {
             // Store cache without any need for the rest api
             add_action('init', 'bwp_store_cache_webhook');
 
+            // Handle request new cache request
+            add_action('init', 'bwp_handle_request_cache');
+
             // Flush cache when theme changes
             add_action('switch_theme', [$this, 'delete_cache_files']);
 
@@ -124,7 +127,16 @@ if (!class_exists('berqCache')) {
             // Request cache when a post is published
             add_action( 'transition_post_status', [$this, 'published_post'], 10, 3 );
 
+            add_action('send_headers', [$this, 'brust_cache_for_loggedin']);
 
+
+        }
+
+        function brust_cache_for_loggedin() {
+            if (is_user_logged_in()) {
+                // Add Vary: Cookie header to differentiate cached versions for logged-in users
+                header('Vary: Cookie');
+            }
         }
 
         function published_post( $new_status, $old_status, $post ) {
@@ -139,21 +151,11 @@ if (!class_exists('berqCache')) {
                     
                     // Get the published post URL
                     $post_url = get_permalink( $post );
-        
                     $slug = bwp_url_into_path($post_url);
 		
-					if (berqwp_is_slug_excludable($slug)) {
-						return;
-					}
-
-					// Return if page is excluded from cache
-					$pages_to_exclude = get_option('berq_exclude_urls', []);
-
-					if (in_array($post_url, $pages_to_exclude)) {
-						return;
-					}
-
-                    warmup_cache_by_slug($slug);
+					if (bwp_can_optimize_page_url($post_url)) {
+                        warmup_cache_by_slug($slug);
+                    }
                 }
             }
         }
@@ -174,19 +176,23 @@ if (!class_exists('berqCache')) {
             $berqwp->request_cache_warmup($post_data);
         }
 
-        public static function purge_page($page_path, $flush_criticalcss = false) {
-            
-            $cache_file = bwp_get_cache_dir() . md5($page_path) . '.html';
+        public static function delete_page_cache_files($path) {
+            $cache_file = bwp_get_cache_dir() . md5($path) . '.html';
         
             if (is_file($cache_file)) {
                 unlink($cache_file);
             }
 
-            $cache_file = bwp_get_cache_dir() . md5($page_path) . '.gz';
+            $cache_file = bwp_get_cache_dir() . md5($path) . '.gz';
             
             if (is_file($cache_file)) {
                 unlink($cache_file);
             }
+        }
+
+        public static function purge_page($page_path, $flush_criticalcss = false) {
+            
+            self::delete_page_cache_files($page_path);
             
             do_action('berqwp_flush_page_cache', $page_path);
 
@@ -326,7 +332,8 @@ if (!class_exists('berqCache')) {
                 unlink($wp_content_adv_cache);
             }
 
-            $home_slug = bwp_url_into_path(home_url('/'));
+            // $home_slug = bwp_url_into_path(home_url('/'));
+            $home_slug = bwp_url_into_path(get_home_url(null, '/'));
 
             if (false === as_has_scheduled_action('warmup_cache_quickly') && (bwp_is_home_cached() === false || bwp_is_partial_cache($home_slug)) && function_exists('as_enqueue_async_action')) {
                 as_enqueue_async_action('warmup_cache_quickly', [$home_slug, true]);
@@ -923,6 +930,8 @@ if (!class_exists('berqCache')) {
 
                 }
             }
+
+            self::delete_page_cache_files($slug);
 
             $berqPageOptimizer = new berqPageOptimizer();
             $berqPageOptimizer->set_slug($slug);

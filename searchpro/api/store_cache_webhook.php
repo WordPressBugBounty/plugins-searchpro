@@ -1,6 +1,7 @@
 <?php
 
 use BerqWP\Cache;
+if (!defined('ABSPATH')) exit;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET['berqwp_webhook']) && $_GET['berqwp_webhook'] == 'store_cache') {
 

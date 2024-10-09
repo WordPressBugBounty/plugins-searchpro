@@ -113,7 +113,7 @@ if (!class_exists('berqWP')) {
 			// Add search filtering, if applicable
 			if (!empty($search)) {
 				$args['s'] = $search; // Add the search parameter to the query
-			}
+			}		
 		
 			$query = new WP_Query($args);
 			$total_posts = $query->found_posts; // Get the total number of records
@@ -123,17 +123,10 @@ if (!class_exists('berqWP')) {
 					$query->the_post();
 		
 					$url = get_permalink();
-					// $slug = str_replace(home_url(), '', $url);
+					$url = str_replace(home_url(), bwp_admin_home_url(), $url);
 					$slug = bwp_url_into_path($url);
 		
-					if (berqwp_is_slug_excludable($slug)) {
-						continue;
-					}
-
-					// Return if page is excluded from cache
-					$pages_to_exclude = get_option('berq_exclude_urls', []);
-
-					if (in_array($url, $pages_to_exclude)) {
+					if (!bwp_can_optimize_page_url($url)) {
 						continue;
 					}
 		
@@ -389,7 +382,7 @@ if (!class_exists('berqWP')) {
 			}
 
 			// Check rest api
-			$check_rest = bwp_check_rest_api();
+			/*$check_rest = bwp_check_rest_api();
 			if ( $check_rest['status'] == 'error' ) {
 				?>
 				<div class="notice notice-error">
@@ -397,7 +390,7 @@ if (!class_exists('berqWP')) {
 						REST API. Please enable the REST API for full functionality.</p>
 				</div>
 				<?php
-			}
+			}*/
 
 			// Check connection
 			$check_rest = bwp_check_connection();
@@ -532,8 +525,11 @@ if (!class_exists('berqWP')) {
 
 				$berq_log->info('Checking the license key.');
 
+				$parsed_url = parse_url(home_url());
+                $domain = $parsed_url['host'];
+
 				$api_params = array(
-					'registered_domain' => $_SERVER['SERVER_NAME'],
+					'registered_domain' => $domain,
 					'slm_action' => $action,
 					'secret_key' => BERQ_SECRET,
 					'license_key' => $license_key,
@@ -562,15 +558,16 @@ if (!class_exists('berqWP')) {
 
 				$query_string = http_build_query($api_params);
 				$client = new HttpClient(BERQ_SERVER);
+				$client->setUserAgent('BerqWP');
 				$client->post('?'.$query_string , $api_params);
 
 				if ($client->ok()) {
 					$response = $client->getContent();
 					$JSON = json_decode($response);
 
-					if ($action == 'slm_activate' && isset($JSON->error_code) && $JSON->error_code == 40) {
+					if ($action == 'slm_activate' && isset($JSON->error_code)) {
 						$api_params = array(
-							'registered_domain' => $_SERVER['SERVER_NAME'],
+							'registered_domain' => $domain,
 							'slm_action' => 'slm_check',
 							'secret_key' => BERQ_SECRET,
 							'license_key' => $license_key,
@@ -578,6 +575,7 @@ if (!class_exists('berqWP')) {
 	
 						$query_string = http_build_query($api_params);
 						$client = new HttpClient(BERQ_SERVER);
+						$client->setUserAgent('BerqWP');
 						$client->post('?'.$query_string, $api_params);
 						
 						if ($client->ok()) {

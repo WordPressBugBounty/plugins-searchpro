@@ -93,6 +93,12 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_enable_cdn', 0);
     }
 
+    if (isset($_POST['berqwp_enable_cwv'])) {
+        update_option('berqwp_enable_cwv', 1);
+    } else {
+        update_option('berqwp_enable_cwv', 0);
+    }
+
     if (isset($_POST['berqwp_preload_fontfaces'])) {
         update_option('berqwp_preload_fontfaces', 1);
     } else {

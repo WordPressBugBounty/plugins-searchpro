@@ -155,13 +155,14 @@ function berqwp_get_page_params($slug, $is_forced = false) {
 
     $cache_directory = bwp_get_cache_dir();
     $cache_file = $cache_directory . $slug_md5 . '.html';
-    $key = uniqid();
+    // $key = uniqid();
+    $key = '';
     $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
 
-    if (!file_exists($cache_file) || (file_exists($cache_file) && $cache_max_life < time()) || (file_exists($cache_file) && bwp_is_partial_cache($slug) === true)) {
-        // Priority 1
-        $key = '';
-    }
+    // if (!file_exists($cache_file) || (file_exists($cache_file) && $cache_max_life < time()) || (file_exists($cache_file) && bwp_is_partial_cache($slug) === true)) {
+    //     // Priority 1
+    //     $key = '';
+    // }
 
     $optimization_mode = get_option('berq_opt_mode');
 
@@ -195,6 +196,7 @@ function berqwp_get_page_params($slug, $is_forced = false) {
         'js_css_exclude_urls'           => get_option('berq_exclude_js_css', []),
         'preload_fontfaces'             => get_option('berqwp_preload_fontfaces'),
         'use_cache_webhook'             => true,
+        'enable_cwv'                    => get_option('berqwp_enable_cwv'),
         // 'mobile_lcp'                 => json_encode($mobile_lcp),
         // 'desktop_lcp'                => json_encode($desktop_lcp),
         'version'                       => BERQWP_VERSION
@@ -328,7 +330,7 @@ function warmup_cache_by_slug($slug, $is_forced = false)
 }
 
 function bwp_is_home_cached() {
-    $slug_md5 = md5(bwp_url_into_path(home_url('/')));
+    $slug_md5 = md5(bwp_url_into_path(bwp_admin_home_url('/')));
     $cache_directory = bwp_get_cache_dir();
     $cache_file = $cache_directory . $slug_md5 . '.html';
 
@@ -1113,8 +1115,54 @@ function bwp_store_cache_webhook() {
     require_once optifer_PATH . '/api/store_cache_webhook.php';
 }
 
+function bwp_handle_request_cache() {
+    require_once optifer_PATH . '/api/request_cache.php';
+}
+
+function bwp_get_translatepress_urls($page_url) {
+    $trp = TRP_Translate_Press::get_trp_instance();
+    $trp_settings = get_option('trp_settings', array());
+    $languages = $trp->get_component( 'languages' );
+    $url_converter = $trp->get_component( 'url_converter' );
+    $publish_languages = $languages->get_language_names( $trp_settings['publish-languages'], 'english_name' );
+    $urls = [];
+
+
+    if (!empty($publish_languages)) {
+        foreach($publish_languages as $key => $value) {
+            $translation_url = $url_converter->get_url_for_language( $key, $page_url, '' );
+            $urls[] = $translation_url;
+        }
+    }
+
+    return $urls;
+}
+
+function bwp_can_optimize_page_url($page_url) {
+    $slug = bwp_url_into_path($page_url);
+    if (berqwp_is_slug_excludable($slug)) {
+        return false;
+    }
+
+    // Return if page is excluded from cache
+    $pages_to_exclude = get_option('berq_exclude_urls', []);
+
+    if (in_array($page_url, $pages_to_exclude)) {
+        return false;
+    }
+
+    return true;
+}
+
+// function bwp_url_with_get_home_url($url) {
+//     $url_path = bwp_url_into_path($url);
+//     $url = get_home_url().$url_path;
+//     return $url;
+// }
+
 function bwp_get_sitemap() {
     if (isset($_GET['berqwp_sitemap'])) {
+
         // Get post types to optimize
         $post_types = get_option('berqwp_optimize_post_types');
         
@@ -1147,6 +1195,7 @@ function bwp_get_sitemap() {
         unset($post_params['license_key']);
         unset($post_params['page_slug']);
         unset($post_params['page_url']);
+        $post_params['key'] = '';
 
         if ($query->have_posts()) {
             $sitemap_urls = array();
@@ -1154,17 +1203,23 @@ function bwp_get_sitemap() {
             // Loop through the posts and generate URLs
             while ($query->have_posts()) {
                 $query->the_post();
-
                 $url = get_permalink();
-                $slug = bwp_url_into_path($url);
-                if (berqwp_is_slug_excludable($slug)) {
-                    continue;
-                }
 
-                // Return if page is excluded from cache
-                $pages_to_exclude = get_option('berq_exclude_urls', []);
+                // if (class_exists('TRP_Translate_Press')) {
+                //     $translated_urls = bwp_get_translatepress_urls($url);
 
-                if (in_array($url, $pages_to_exclude)) {
+                //     if (!empty($translated_urls)) {
+                //         foreach ($translated_urls as $translated_url) {
+                //             if (bwp_can_optimize_page_url($translated_url)) {
+                //                 $sitemap_urls[] = $translated_url;
+                //             }
+                //         }
+
+                //         continue;
+                //     }
+                // }
+                
+                if (!bwp_can_optimize_page_url($url)) {
                     continue;
                 }
 		
@@ -1219,3 +1274,21 @@ function bwp_show_docs() {
     
 }
 
+function bwp_admin_home_url($relative_path = '') {
+    $home_url = home_url();
+
+    if (class_exists('TRP_Translate_Press')) {
+        $trp = TRP_Translate_Press::get_trp_instance();
+        $trp_settings = get_option('trp_settings', array());
+        $default_lang = $trp_settings['default-language'];
+        $url_converter = $trp->get_component( 'url_converter' );
+        $url_slugs = $trp_settings['url-slugs'];
+        
+        if (!empty($default_lang) && $trp_settings['add-subdirectory-to-default-language'] == 'yes' && !empty($url_slugs[$default_lang])) {
+            // var_dump($trp_settings);
+            return $home_url . '/' . $url_slugs[$default_lang] . $relative_path;
+        }
+    }
+
+    return $home_url . $relative_path;
+}

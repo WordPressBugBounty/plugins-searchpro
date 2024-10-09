@@ -41,7 +41,7 @@ if ($cached_percentage < 0) {
     <?php } ?>
 
     <?php 
-    if (!bwp_is_home_cached() || (bwp_is_home_cached() && bwp_is_partial_cache('/')) ) {
+    if (!bwp_is_home_cached() || (bwp_is_home_cached() && bwp_is_partial_cache(bwp_url_into_path(bwp_admin_home_url('/')))) ) {
         bwp_dash_notification("We're currently building the cache for this website's homepage, which may take up to 5 minutes. Thank you for your patience, good things are worth the wait.", 'warning');
     }
     ?>
@@ -74,7 +74,8 @@ if ($cached_percentage < 0) {
             <p class="website-url">
                 <?php 
                 $cache_directory = bwp_get_cache_dir();
-                $home_slug = bwp_url_into_path(home_url('/'));
+                // $home_slug = bwp_url_into_path(home_url('/'));
+                $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
                 $is_home_ready = file_exists($cache_directory . md5($home_slug) . '.html') && bwp_is_partial_cache($home_slug) === false;
                 $msg = '';
 
@@ -85,7 +86,7 @@ if ($cached_percentage < 0) {
                 if ($is_home_ready == false) {
                     $msg .= '<br>We\'re currently optimizing this page.';
                 }
-                echo wp_kses_post(home_url() . $msg); ?>
+                echo wp_kses_post(bwp_admin_home_url('/') . $msg); ?>
             </p>
             <h4><?php esc_html_e('Mobile Score', 'searchpro'); ?></h4>
         </div>
@@ -100,7 +101,8 @@ if ($cached_percentage < 0) {
             <p class="website-url">
                 <?php 
                 $cache_directory = bwp_get_cache_dir();
-                $home_slug = bwp_url_into_path(home_url('/'));
+                // $home_slug = bwp_url_into_path(home_url('/'));
+                $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
                 $is_home_ready = file_exists($cache_directory . md5($home_slug) . '.html') && bwp_is_partial_cache($home_slug) === false;
                 $msg = '';
 
@@ -111,7 +113,7 @@ if ($cached_percentage < 0) {
                 if ($is_home_ready == false) {
                     $msg .= '<br>We\'re currently optimizing this page.';
                 }
-                echo wp_kses_post(home_url() . $msg); ?>
+                echo wp_kses_post(bwp_admin_home_url('/') . $msg); ?>
             </p>
             <h4><?php esc_html_e('Desktop Score', 'searchpro'); ?></h4>
         </div>
@@ -229,6 +231,17 @@ if ($cached_percentage < 0) {
             <label class="berq-check">
                 <input type="checkbox" name="berqwp_enable_cdn" <?php checked(1, get_option('berqwp_enable_cdn'), true); ?>>
                 <?php esc_html_e("Enable $plugin_name CDN", 'searchpro'); ?>
+            </label>
+        </div>
+    </div>
+
+    <div class="berq-info-box">
+        <h3 class="berq-box-title"><?php esc_html_e("Monitor Core Web Vitals", 'searchpro'); ?></h3>
+        <div class="berq-box-content">
+            <p><?php esc_html_e("Anonymously track and monitor Core Web Vitals metrics in real time using our Web Vitals Analytics. It may cause a little drop in pagespeed score.", 'searchpro'); ?></p>
+            <label class="berq-check">
+                <input type="checkbox" name="berqwp_enable_cwv" <?php checked(1, get_option('berqwp_enable_cwv'), true); ?>>
+                <?php esc_html_e("Enable Core Web Vitals tracking", 'searchpro'); ?>
             </label>
         </div>
     </div>

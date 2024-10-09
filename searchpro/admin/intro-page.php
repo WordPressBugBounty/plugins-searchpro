@@ -26,7 +26,7 @@ if (!defined('ABSPATH'))
         ?>
         <p class="license-msg">Create an account to obtain a BerqWP license key.</p>
         <div class="cta-btns">
-            <a href="http://berqwp.com/pricing/" class="btn" target="_blank">
+            <a href="https://berqwp.com/pricing/" class="btn" target="_blank">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M12 8L15 13.2L18 10.5L17.3 14H6.7L6 10.5L9 13.2L12 8ZM12 4L8.5 10L3 5L5 16H19L21 5L15.5 10L12 4ZM19 18H5V19C5 19.6 5.4 20 6 20H18C18.6 20 19 19.6 19 19V18Z"

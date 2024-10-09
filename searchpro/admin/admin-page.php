@@ -219,7 +219,8 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
             <?php
             $cache_directory = bwp_get_cache_dir();
-            $home_cache_file = $cache_directory . md5('/') . '.html';
+            $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
+            $home_cache_file = $cache_directory . md5($home_slug) . '.html';
             $is_home_ready = file_exists($home_cache_file);
             if ($is_home_ready && bwp_is_partial_cache('/') === false) { ?>
 
@@ -227,7 +228,7 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                     method: 'GET',
                     url: 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed',
                     data: {
-                        url: '<?php echo get_option('berqwp_enable_sandbox') ? esc_html(home_url() . '/?berqwp') : esc_html(home_url()); ?>',
+                        url: '<?php echo get_option('berqwp_enable_sandbox') ? esc_html(bwp_admin_home_url() . '/?berqwp') : esc_html(bwp_admin_home_url('/')); ?>',
                         strategy: 'mobile'
                     },
                     success: function (data) {
@@ -293,7 +294,7 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                     method: 'GET',
                     url: 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed',
                     data: {
-                        url: '<?php echo get_option('berqwp_enable_sandbox') ? esc_html(home_url() . '/?berqwp') : esc_html(home_url()); ?>',
+                        url: '<?php echo get_option('berqwp_enable_sandbox') ? esc_html(bwp_admin_home_url() . '/?berqwp') : esc_html(bwp_admin_home_url('/')); ?>',
                         strategy: 'desktop'
                     },
                     success: function (data) {
@@ -460,6 +461,12 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
         })
     })(jQuery)
 </script>
+<?php
+    if (function_exists('pll_current_language')) {
+        $lang = !empty(pll_current_language()) ? pll_current_language() : 'all';
+        echo "<script>ajaxurl = ajaxurl + '?lang=$lang';</script>";
+    }
+?>
 <script>
         (function ($) {
             // $(document).ready(function () {

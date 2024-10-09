@@ -25,6 +25,10 @@ if (get_option('berqwp_enable_cdn') == null) {
     update_option('berqwp_enable_cdn', 1);
 }
 
+if (get_option('berqwp_enable_cwv') == null) {
+    update_option('berqwp_enable_cwv', 0);
+}
+
 if (get_option('berqwp_preload_fontfaces') == null) {
     update_option('berqwp_preload_fontfaces', 1);
 }

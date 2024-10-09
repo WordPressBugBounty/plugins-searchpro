@@ -526,8 +526,11 @@ class berqScriptOptimizer {
                                                 bubbles: true,
                                                 cancelable: true
                                             });
+                                            window.dispatchEvent(event);
                                             document.dispatchEvent(event);
+
                                             window.dispatchEvent(new Event('load'));
+                                            document.dispatchEvent(new Event('load'));
 
                                             triggerReadyStateChange('complete');
         
@@ -536,6 +539,7 @@ class berqScriptOptimizer {
         
                                             // Dispatch the resize event
                                             window.dispatchEvent(resizeEvent);
+                                            document.dispatchEvent(resizeEvent);
         
                                             console.log('scripts loaded.')
 
