@@ -20,10 +20,14 @@ $taxonomy_names = get_taxonomies(array(
     'show_in_rest' => true
 ), 'names');
 
+$berqconfigs = new berqConfigs();
+$configs = $berqconfigs->get_configs();
+$excluded_cookies = implode("\n", $configs['exclude_cookies']);
+
 
 
 ?>
-<div id="cache-management" style="display:none">
+<div id="cache-management" <?php bwp_is_tab('cache-management'); ?>>
     <h2 class="berq-tab-title"><?php esc_html_e('Cache Management', 'searchpro'); ?></h2>
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Page exclusions', 'searchpro'); ?></h3>
@@ -72,6 +76,15 @@ $taxonomy_names = get_taxonomies(array(
             ?>
 
             </div>
+        </div>
+    </div>
+    <div class="berq-info-box">
+        <h3 class="berq-box-title"><?php esc_html_e('Exclude cookies', 'searchpro'); ?></h3>
+        <div class="berq-box-content">
+            <p><?php esc_html_e("Avoid serving cache for the following cookie IDs. Enter one cookie ID per line."); ?>  
+
+            </p>
+            <textarea name="berq_exclude_cookies" cols="30" rows="10"><?php echo esc_textarea($excluded_cookies); ?></textarea>
         </div>
     </div>
     <div class="berq-info-box">

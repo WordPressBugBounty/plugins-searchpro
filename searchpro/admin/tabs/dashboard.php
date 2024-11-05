@@ -28,7 +28,7 @@ if ($cached_percentage < 0) {
 }
 
 ?>
-<div id="dashboard">
+<div id="dashboard" <?php bwp_is_tab('dashboard'); ?>>
     <h2 class="berq-tab-title">Dashboard</h2>
 
     <?php if (bwp_show_docs()) { ?>
@@ -80,7 +80,7 @@ if ($cached_percentage < 0) {
                 $msg = '';
 
                 if (get_option('berqwp_enable_sandbox')) {
-                    $msg .= '/?berqwp';
+                    $msg .= '?berqwp';
                 }
 
                 if ($is_home_ready == false) {
@@ -107,7 +107,7 @@ if ($cached_percentage < 0) {
                 $msg = '';
 
                 if (get_option('berqwp_enable_sandbox')) {
-                    $msg .= '/?berqwp';
+                    $msg .= '?berqwp';
                 }
 
                 if ($is_home_ready == false) {

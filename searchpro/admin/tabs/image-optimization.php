@@ -2,7 +2,7 @@
 if (!defined('ABSPATH'))
     exit;
 ?>
-<div id="image-optimization" style="display:none">
+<div id="image-optimization" <?php bwp_is_tab('image-optimization'); ?>>
     <h2 class="berq-tab-title"><?php esc_html_e('Image Optimization', 'searchpro'); ?></h2>
     <div class="berqwp-webp">
         <div class="berqwp-webp-content">

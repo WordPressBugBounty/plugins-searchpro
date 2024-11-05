@@ -29,6 +29,10 @@ class RateLimiter
         $logData = json_decode(file_get_contents($filePath), true);
         $currentTime = time();
 
+        if (!is_array($logData)) {
+            $logData = [];
+        }
+
         // Remove old entries from the time window
         $logData = array_filter($logData, function($timestamp) use ($currentTime) {
             return ($currentTime - $timestamp) <= $this->timeWindow;

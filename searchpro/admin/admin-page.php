@@ -71,31 +71,31 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
         </div>
         <div class="berqwp-dashbord-body">
             <div class="berqwp-tabs">
-                <div class="berqwp-tab active" data-tab="dashboard">
+                <div class="berqwp-tab <?php bwp_is_tab_nav('dashboard'); ?>" data-tab="dashboard">
                     <?php esc_html_e('Dashboard', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('Flush Cache, Sandbox Mode, Cached Pages', 'searchpro'); ?>
                     </p>
                 </div>
-                <div class="berqwp-tab" data-tab="cache-management">
+                <div class="berqwp-tab <?php bwp_is_tab_nav('cache-management'); ?>" data-tab="cache-management">
                     <?php esc_html_e('Cache Management', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('Exclude Pages, Ignore URL Parameters', 'searchpro'); ?>
                     </p>
                 </div>
-                <div class="berqwp-tab" data-tab="image-optimization">
+                <div class="berqwp-tab <?php bwp_is_tab_nav('image-optimization'); ?>" data-tab="image-optimization">
                     <?php esc_html_e('Image Optimization', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('WebP Images, Image Resize, LazyLoad', 'searchpro'); ?>
                     </p>
                 </div>
-                <div class="berqwp-tab" data-tab="script-manager">
+                <div class="berqwp-tab <?php bwp_is_tab_nav('script-manager'); ?>" data-tab="script-manager">
                     <?php esc_html_e('Script Manager', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('JavaScript Modes, Emojis, YouTube', 'searchpro'); ?>
                     </p>
                 </div>
-                <div class="berqwp-tab" data-tab="activate-license">
+                <div class="berqwp-tab <?php bwp_is_tab_nav('activate-license'); ?>" data-tab="activate-license">
                     <?php esc_html_e('License', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('Deactivate License Key', 'searchpro'); ?>
@@ -106,6 +106,9 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                 <form action="" method="post">
                     <?php
                     wp_nonce_field('berqwp_save_settings', 'berqwp_save_nonce');
+                    ?>
+                    <input type="hidden" name="bwp_current_tab_id" value="<?php echo !empty($_GET['tab_id']) ? sanitize_text_field( $_GET['tab_id'] ) : 'dashboard'; ?>">
+                    <?php
                     require_once optifer_PATH . '/admin/tabs/dashboard.php';
                     require_once optifer_PATH . '/admin/tabs/cache-management.php';
                     require_once optifer_PATH . '/admin/tabs/image-optimization.php';
@@ -144,85 +147,111 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                 })
             }
 
-            let opt_slider = new Slider('#berq_opt_mode', {
-                // min: 5, 
-                // max: 30, 
-                value: '<?php echo esc_html(get_option('berq_opt_mode', 4)); ?>',
-                ticks_labels: ['Basic', 'Medium', 'Blaze', 'Aggressive'],
-                ticks: [1, 2, 3, 4],
-                // ticks_positions: [0, 50, 100],
-                ticks_snap_bounds: 20,
-                tooltip_position: 'bottom',
-                // formatter: function (value) {
-                //     if (value == 1) {
-                //         // return '<div class="tooltip-title">Basic (stable)</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>';
-                //         $("div.tooltip-inner").html('<div class="tooltip-title">Basic (stable)</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
+            function init_opt_slider() {
+                let opt_slider = new Slider('#berq_opt_mode', {
+                    // min: 5, 
+                    // max: 30, 
+                    value: '<?php echo esc_html(get_option('berq_opt_mode', 4)); ?>',
+                    ticks_labels: ['Basic', 'Medium', 'Blaze', 'Aggressive'],
+                    ticks: [1, 2, 3, 4],
+                    // ticks_positions: [0, 50, 100],
+                    ticks_snap_bounds: 20,
+                    tooltip_position: 'bottom',
+                    // formatter: function (value) {
+                    //     if (value == 1) {
+                    //         // return '<div class="tooltip-title">Basic (stable)</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>';
+                    //         $("div.tooltip-inner").html('<div class="tooltip-title">Basic (stable)</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
 
-                //         return '';
-                //     }
-                // },
-                ticks_tooltip: true,
-                // ticks_tooltip: true,
-                // lock_to_ticks: true,
-                // step: 1
-            });
+                    //         return '';
+                    //     }
+                    // },
+                    ticks_tooltip: true,
+                    // ticks_tooltip: true,
+                    // lock_to_ticks: true,
+                    // step: 1
+                });
 
-            $(".optimzation-slider").mousemove(function (event) {
-                let val = $("#berq_opt_mode").val();
+                $(".optimzation-slider").mousemove(function (event) {
+                    let val = $("#berq_opt_mode").val();
 
-                if ($(".slider-tick:nth-child(1)").is(":hover") || $('.tooltip-inner').html() == '1') {
-                    $("div.tooltip-inner").html('<div class="tooltip-title">Basic</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache, URL prefectch etc.</div>')
-                }
+                    if ($(".slider-tick:nth-child(1)").is(":hover") || $('.tooltip-inner').html() == '1') {
+                        $("div.tooltip-inner").html('<div class="tooltip-title">Basic</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache, URL prefectch etc.</div>')
+                    }
 
-                if ($(".slider-tick:nth-child(2)").is(":hover") || $('.tooltip-inner').html() == '2') {
-                    $("div.tooltip-inner").html('<div class="tooltip-title">Medium</div> <div class="tooltip-content">Highly stable optimization mode for many cases.</div>')
-                }
+                    if ($(".slider-tick:nth-child(2)").is(":hover") || $('.tooltip-inner').html() == '2') {
+                        $("div.tooltip-inner").html('<div class="tooltip-title">Medium</div> <div class="tooltip-content">Highly stable optimization mode for many cases.</div>')
+                    }
 
-                if ($(".slider-tick:nth-child(3)").is(":hover") || $('.tooltip-inner').html() == '3') {
-                    $("div.tooltip-inner").html('<div class="tooltip-title">Blaze</div> <div class="tooltip-content">Balance between optimization and stability.</div>')
-                }
+                    if ($(".slider-tick:nth-child(3)").is(":hover") || $('.tooltip-inner').html() == '3') {
+                        $("div.tooltip-inner").html('<div class="tooltip-title">Blaze</div> <div class="tooltip-content">Balance between optimization and stability.</div>')
+                    }
 
-                if ($(".slider-tick:nth-child(4)").is(":hover") || $('.tooltip-inner').html() == '4') {
-                    $("div.tooltip-inner").html('<div class="tooltip-title">Aggressive</div> <div class="tooltip-content">Provide the best possible speed scores.</div>')
-                }
-            })
+                    if ($(".slider-tick:nth-child(4)").is(":hover") || $('.tooltip-inner').html() == '4') {
+                        $("div.tooltip-inner").html('<div class="tooltip-title">Aggressive</div> <div class="tooltip-content">Provide the best possible speed scores.</div>')
+                    }
+                })
 
-            $("#berq_opt_mode").on("slide slideStop", function (slideEvt) {
-                let val = $("#berq_opt_mode").val();
+                $("#berq_opt_mode").on("slide slideStop", function (slideEvt) {
+                    let val = $("#berq_opt_mode").val();
 
-                if (val == 1) {
-                    $("div.tooltip-inner").html('<div class="tooltip-title">Basic (stable)</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
-                }
+                    if (val == 1) {
+                        $("div.tooltip-inner").html('<div class="tooltip-title">Basic (stable)</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
+                    }
 
-                if (val == 2) {
-                    $("div.tooltip-inner").html('<div class="tooltip-title">Medium (stable)</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
-                }
+                    if (val == 2) {
+                        $("div.tooltip-inner").html('<div class="tooltip-title">Medium (stable)</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
+                    }
 
-                if (val == 3) {
-                    $("div.tooltip-inner").html('<div class="tooltip-title">Blaze</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
-                }
+                    if (val == 3) {
+                        $("div.tooltip-inner").html('<div class="tooltip-title">Blaze</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
+                    }
 
-                if (val == 4) {
-                    $("div.tooltip-inner").html('<div class="tooltip-title">Aggressive</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
-                }
-            })
+                    if (val == 4) {
+                        $("div.tooltip-inner").html('<div class="tooltip-title">Aggressive</div> <div class="tooltip-content">Basic optimizations like image lazy loading, page cache etc</div>')
+                    }
+                })
+            }
+
+            init_opt_slider();
 
             $('.berqwp-tab').click(function () {
                 let tab = $(this).attr('data-tab');
 
-                $('.berqwp-tab-content > form > div').hide();
+                $('.berqwp-tab-content > form > div').css({'visibility':'hidden','opacity':0,'height':'0px','overflow':'hidden'});
                 $('.berqwp-tab').removeClass('active');
                 $(this).addClass('active');
-                $(`.berqwp-tab-content #${tab}`).show();
+                // $(`.berqwp-tab-content #${tab}`).show();
+                $(`.berqwp-tab-content #${tab}`).css({'visibility':'visible','opacity':1,'height':'auto'});
+
+                let tab_id = $(`.berqwp-tab-content #${tab}`).attr('id');
+                $('input[name="bwp_current_tab_id"]').val(tab_id);
+
+
+                // Get the current URL and its parts
+                const url = new URL(window.location.href);
+
+                // Check if 'tab_id' is present
+                if (url.searchParams.has('tab_id')) {
+                    // Update the 'tab_id' parameter value
+                    url.searchParams.set('tab_id', tab_id);
+                    
+                    // Update the address bar with the new URL (without reloading the page)
+                    window.history.replaceState(null, null, url.toString());
+                }
+
+
 
             })
+
+            // let tab_id = $('input[name="bwp_current_tab_id"]').val();
+            // $(`.berqwp-tab[data-tab="${tab_id}"]`).trigger('click');
 
             <?php
             $cache_directory = bwp_get_cache_dir();
             $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
             $home_cache_file = $cache_directory . md5($home_slug) . '.html';
             $is_home_ready = file_exists($home_cache_file);
-            if ($is_home_ready && bwp_is_partial_cache('/') === false) { ?>
+            if ($is_home_ready && bwp_is_partial_cache($home_slug) === false) { ?>
 
                 $.ajax({
                     method: 'GET',

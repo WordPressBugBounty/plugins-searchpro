@@ -123,7 +123,11 @@ if (!class_exists('berqWP')) {
 					$query->the_post();
 		
 					$url = get_permalink();
-					$url = str_replace(home_url(), bwp_admin_home_url(), $url);
+
+					if (strpos($url, bwp_admin_home_url()) === false) {
+						$url = str_replace(home_url(), bwp_admin_home_url(), $url);
+					}
+
 					$slug = bwp_url_into_path($url);
 		
 					if (!bwp_can_optimize_page_url($url)) {
@@ -248,6 +252,14 @@ if (!class_exists('berqWP')) {
 		function initialize()
 		{
 
+			if (defined('DOING_CRON') && DOING_CRON) {
+				return;
+			}
+		
+			if (defined('DOING_AJAX') && DOING_AJAX) {
+				return;
+			}
+
 			// Set default settings
 			require_once optifer_PATH . '/inc/initialize.php';
 
@@ -266,6 +278,10 @@ if (!class_exists('berqWP')) {
 
 			if (is_admin() && !empty(get_option('berqwp_license_key'))) {
 				$license_key = get_option('berqwp_license_key');
+
+				global $berq_log;
+				$berq_log->info("License key check from initialize function.");
+
 				$key_response = $this->verify_license_key($license_key);
 
 				if (!empty($key_response) && $key_response->result == 'success' && $key_response->status == 'active') {
@@ -501,6 +517,10 @@ if (!class_exists('berqWP')) {
 			if (empty($license_key)) {
 				return;
 			}
+
+			if (defined('BERQWP_DOING_LICENSE_CHECK')) {
+				sleep(1);
+			}
 			
 			global $berq_log;
 			$transient_key = 'berq_lic_response_cache'; // Set a unique key for the transient
@@ -522,6 +542,8 @@ if (!class_exists('berqWP')) {
 				if ($rateLimiter->isRateLimited($clientIdentifier)) {
 					return false;
 				}
+
+				define('BERQWP_DOING_LICENSE_CHECK', true);
 
 				$berq_log->info('Checking the license key.');
 
@@ -554,11 +576,11 @@ if (!class_exists('berqWP')) {
 					'sslverify' => false,  // Disable SSL verification (for debugging purposes)
 				);
 			
-				// $response = wp_remote_request(add_query_arg($api_params, BERQ_SERVER), $args);
 
 				$query_string = http_build_query($api_params);
 				$client = new HttpClient(BERQ_SERVER);
 				$client->setUserAgent('BerqWP');
+				$client->setReferer('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 				$client->post('?'.$query_string , $api_params);
 
 				if ($client->ok()) {
@@ -576,6 +598,7 @@ if (!class_exists('berqWP')) {
 						$query_string = http_build_query($api_params);
 						$client = new HttpClient(BERQ_SERVER);
 						$client->setUserAgent('BerqWP');
+						$client->setReferer('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 						$client->post('?'.$query_string, $api_params);
 						
 						if ($client->ok()) {

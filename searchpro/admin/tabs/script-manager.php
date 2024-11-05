@@ -7,10 +7,42 @@ $exclude_urls = get_option('berq_exclude_js_css', []);
 $url_lines = implode("\n", $exclude_urls);
 
 ?>
-<div id="script-manager" style="display:none">
+<div id="script-manager" <?php bwp_is_tab('script-manager'); ?>>
     <h2 class="berq-tab-title">
         <?php esc_html_e('Script Manager', 'searchpro'); ?>
     </h2>
+    <div class="berq-info-box">
+        <h3 class="berq-box-title">
+            <?php esc_html_e('CSS optimization', 'searchpro'); ?>
+        </h3>
+        <div class="berq-box-content">
+            <p>
+                <?php esc_html_e("Choose how CSS files should load to improve page performance. Select one of the following options:", 'searchpro'); ?>
+            </p>
+            <select name="berq_css_optimization">
+                <option <?php selected( get_option('berq_css_optimization'), 'auto' ); ?> value="auto"><?php esc_html_e('Auto (According to optimization mode setting)', 'searchpro'); ?></option>
+                <option <?php selected( get_option('berq_css_optimization'), 'asynchronous' ); ?> value="asynchronous"><?php esc_html_e('Asynchronous', 'searchpro'); ?></option>
+                <option <?php selected( get_option('berq_css_optimization'), 'delay' ); ?> value="delay"><?php esc_html_e('Delay', 'searchpro'); ?></option>
+                <option <?php selected( get_option('berq_css_optimization'), 'disable' ); ?> value="disable"><?php esc_html_e('Disable', 'searchpro'); ?></option>
+            </select>
+        </div>
+    </div>
+    <div class="berq-info-box">
+        <h3 class="berq-box-title">
+            <?php esc_html_e('JavaScript optimization', 'searchpro'); ?>
+        </h3>
+        <div class="berq-box-content">
+            <p>
+                <?php esc_html_e("Choose how JavaScript files should load to improve page performance. Select one of the following options:", 'searchpro'); ?>
+            </p>
+            <select name="berq_js_optimization">
+                <option <?php selected( get_option('berq_js_optimization'), 'auto' ); ?> value="auto"><?php esc_html_e('Auto (According to optimization mode setting)', 'searchpro'); ?></option>
+                <option <?php selected( get_option('berq_js_optimization'), 'asynchronous' ); ?> value="asynchronous"><?php esc_html_e('Asynchronous', 'searchpro'); ?></option>
+                <option <?php selected( get_option('berq_js_optimization'), 'delay' ); ?> value="delay"><?php esc_html_e('Delay', 'searchpro'); ?></option>
+                <option <?php selected( get_option('berq_js_optimization'), 'disable' ); ?> value="disable"><?php esc_html_e('Disable', 'searchpro'); ?></option>
+            </select>
+        </div>
+    </div>
     <?php if ($this->is_key_verified) { ?>
         <div class="berq-info-box">
             <h3 class="berq-box-title">
@@ -35,6 +67,20 @@ $url_lines = implode("\n", $exclude_urls);
             <label class="berq-check">
                 <input type="checkbox" name="berqwp_preload_fontfaces" <?php checked(1, get_option('berqwp_preload_fontfaces'), true); ?>>
                 <?php esc_html_e('Enable preload font faces', 'searchpro'); ?>
+            </label>
+        </div>
+    </div>
+    <div class="berq-info-box">
+        <h3 class="berq-box-title">
+            <?php esc_html_e('Preload cookie banner', 'searchpro'); ?>
+        </h3>
+        <div class="berq-box-content">
+            <p>
+                <?php esc_html_e('Preload the cookie banner on the initial page load, may sometimes cause a drop in the PageSpeed score. Currently supports CookieYes and Real Cookie Banner.', 'searchpro'); ?>
+            </p>
+            <label class="berq-check">
+                <input type="checkbox" name="berqwp_preload_cookiebanner" <?php checked(1, get_option('berqwp_preload_cookiebanner'), true); ?>>
+                <?php esc_html_e('Enable preload for cookie banner', 'searchpro'); ?>
             </label>
         </div>
     </div>

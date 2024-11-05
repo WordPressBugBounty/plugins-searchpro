@@ -291,7 +291,9 @@ class berqDivi {
                         }
                     };
     
-                    animationHandler.processAnimationData(et_animation_data);
+                    if (et_animation_data) {
+                        animationHandler.processAnimationData(et_animation_data);
+                    }
                     animationHandler.addEtAnimatedClassToElements();
                 
                 })

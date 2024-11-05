@@ -12,8 +12,10 @@ if (!defined('optifer_PATH')) {
 require_once ABSPATH . '/wp-content/plugins/searchpro/inc/crawler/berqDetectCrawler.php';
 require_once ABSPATH . '/wp-content/plugins/searchpro/inc/class-ignoreparams.php';
 require_once ABSPATH . '/wp-content/plugins/searchpro/inc/dropin-functions.php';
+require_once ABSPATH . '/wp-content/plugins/searchpro/inc/class-berqconfigs.php';
+require_once ABSPATH . '/wp-content/plugins/searchpro/inc/common-functions.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !bwp_is_user_logged_in() && !bwp_is_ajax() && !berqDetectCrawler::is_crawler()) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !bwp_is_user_logged_in() && !bwp_is_ajax() && !berqDetectCrawler::is_crawler() && bwp_pass_cookie_requirement()) {
     $slug = $_SERVER['REQUEST_URI'];
     $slug = dropin_remove_ignore_params($slug);
     $cache_key = md5($slug);

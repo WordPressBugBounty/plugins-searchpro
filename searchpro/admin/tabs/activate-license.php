@@ -2,7 +2,7 @@
 if (!defined('ABSPATH'))
     exit;
 ?>
-<div id="activate-license" style="display:none">
+<div id="activate-license"  <?php bwp_is_tab('activate-license'); ?>>
     <h2 class="berq-tab-title"><?php esc_html_e("$plugin_name License", 'searchpro'); ?></h2>
     <style>
 

@@ -99,6 +99,12 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_enable_cwv', 0);
     }
 
+    if (isset($_POST['berqwp_preload_cookiebanner'])) {
+        update_option('berqwp_preload_cookiebanner', 1);
+    } else {
+        update_option('berqwp_preload_cookiebanner', 0);
+    }
+
     if (isset($_POST['berqwp_preload_fontfaces'])) {
         update_option('berqwp_preload_fontfaces', 1);
     } else {
@@ -203,7 +209,12 @@ if (isset($_POST['berqwp_save_nonce'])) {
         // Add trailing slash to each URL
         $urls_array = array_map(function ($url) {
             if (!empty ($url)) {
-                return trailingslashit(trim($url));
+                $url = trailingslashit(trim($url));
+                
+                // Delete cache for this url
+                berqCache::delete_page_cache_files(bwp_url_into_path($url));
+
+                return $url;
             }
         }, $urls_array);
 
@@ -224,6 +235,17 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
     }
 
+    if (isset($_POST['berq_exclude_cookies'])) {
+        $cookie_ids = sanitize_textarea_field($_POST['berq_exclude_cookies']);
+        $cookie_ids_array = explode("\n", $cookie_ids);
+
+        if (isset($cookie_ids_array) && is_array($cookie_ids_array)) {
+            $berqconfigs = new berqConfigs();
+            $berqconfigs->update_configs(['exclude_cookies'=>$cookie_ids_array]);
+        }
+
+    }
+
     if (isset($_POST['berq_exclude_js_css'])) {
         $urls = sanitize_textarea_field($_POST['berq_exclude_js_css']);
         $urls_array = explode("\n", $urls);
@@ -234,13 +256,28 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
     }
 
+    if (!empty($_POST['berq_css_optimization'])) {
+        $css_optimization = sanitize_textarea_field($_POST['berq_css_optimization']);
+        update_option('berq_css_optimization', $css_optimization);
+    }
+
+    if (!empty($_POST['berq_js_optimization'])) {
+        $css_optimization = sanitize_textarea_field($_POST['berq_js_optimization']);
+        update_option('berq_js_optimization', $css_optimization);
+    }
+
     global $berqNotifications;
     $berqNotifications->success('Changes have been saved! Please flush the cache to make changes visible for the visitors.');
+
+    $tab_id = '';
+    if (!empty($_POST['bwp_current_tab_id'])) {
+        $tab_id = "&tab_id=".sanitize_text_field( $_POST['bwp_current_tab_id'] );
+    }
 
     
     ?>
         <script>
-            location.href = '<?php echo esc_html(get_admin_url() . 'admin.php?page=berqwp'); ?>';
+            location.href = '<?php echo get_admin_url() . 'admin.php?page=berqwp'.$tab_id; ?>';
         </script>
         <?php
         exit;

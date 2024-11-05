@@ -136,10 +136,10 @@ p.cached-pages {
 }
 
 a.berq-btn {
-  background: #5057FF;
+  background: #fff;
   border-radius: 6px;
   padding: 10px 20px;
-  color: #FFF;
+  color: #384a69;
   font-size: 15px;
   font-style: normal;
   display: block;
@@ -147,9 +147,12 @@ a.berq-btn {
   width: -moz-fit-content;
   width: fit-content;
   margin-bottom: 5px;
+  border: 1px solid #dbe9fe;
+  box-shadow: 0px 0px 7px -6px #000;
 }
 a.berq-btn:hover {
   background-color: #3d44d9;
+  border-color: #3d44d9;
   color: #fff;
   text-decoration: none;
 }
@@ -520,6 +523,13 @@ table.berq-image-settings {
   width: 100%;
 }
 
+.berq-info-box select {
+  margin-top: 16px;
+  display: block;
+  color: #465774;
+  font-size: 15px;
+}
+
 .berq-info-box.guide p, .berq-info-box.guide a {
   color: #fff;
 }
@@ -832,6 +842,7 @@ div.dt-container .dt-paging .dt-paging-button:hover {
 .berqwp-notification.warning {
   background-color: #fff074;
   color: #7b6904;
+  border: 1px solid #eee069;
 }
 .berqwp-notification.warning .icon svg {
   fill: #7b6904;

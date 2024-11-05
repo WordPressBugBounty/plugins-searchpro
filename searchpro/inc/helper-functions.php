@@ -6,9 +6,10 @@ use BerqWP\BerqWP;
 
 function berqwp_is_slug_excludable($slug)
 {
-    if (empty($slug)) {
-        return true;
-    }
+    // Allow empty slug
+    // if (empty($slug)) {
+    //     return true;
+    // }
 
     $exclude_items = [
         "favicon.ico", 
@@ -132,6 +133,7 @@ function berqwp_is_slug_excludable($slug)
         "&newsletter=",
         "affwp_ref=",
         "affwp_campaign=",
+        "hmwp_token=",
     ];
 
     $exclude_items = apply_filters('berqwp_exclude_slug_match', $exclude_items);
@@ -145,10 +147,12 @@ function berqwp_is_slug_excludable($slug)
     return false;
 }
 
-function berqwp_get_page_params($slug, $is_forced = false) {
-    if (empty($slug)) {
-        return;
-    }
+function berqwp_get_page_params($slug='', $is_forced = false) {
+
+    // Allow empty slug (page path)
+    // if (empty($slug)) {
+    //     return;
+    // }
 
     $url = home_url() . $slug;
     $slug_md5 = md5($slug);
@@ -197,6 +201,9 @@ function berqwp_get_page_params($slug, $is_forced = false) {
         'preload_fontfaces'             => get_option('berqwp_preload_fontfaces'),
         'use_cache_webhook'             => true,
         'enable_cwv'                    => get_option('berqwp_enable_cwv'),
+        'preload_cookiebanner'          => get_option('berqwp_preload_cookiebanner'),
+        'css_optimization'              => get_option('berq_css_optimization'),
+        'js_optimization'               => get_option('berq_js_optimization'),
         // 'mobile_lcp'                 => json_encode($mobile_lcp),
         // 'desktop_lcp'                => json_encode($desktop_lcp),
         'version'                       => BERQWP_VERSION
@@ -216,6 +223,10 @@ function bwp_pass_account_requirement() {
     global $berqWP, $berq_log;
 
     $license_key = get_option('berqwp_license_key');
+
+    global $berq_log;
+    $berq_log->info("License key check from bwp_pass_account_requirement function.");
+
 	$key_response = $berqWP->verify_license_key($license_key);
 
     if (empty($key_response->product_ref)) {
@@ -417,11 +428,37 @@ function berqwp_remove_ignore_params($slug)
 
 function berqwp_is_sub_dir_wp()
 {
-    // remove http
-    $site_url = explode('//', home_url())[1];
-    $break_slash = explode('/', $site_url);
+    // // remove http
+    // $site_url = explode('//', home_url())[1];
+    // $break_slash = explode('/', $site_url);
 
-    return count($break_slash) > 1;
+    // return count($break_slash) > 1;
+
+    $site_url = site_url();
+    $home_url = home_url();
+
+    // Parse paths from URLs
+    $site_path = @trim(parse_url($site_url, PHP_URL_PATH), '/');
+    $home_path = @trim(parse_url($home_url, PHP_URL_PATH), '/');
+
+    // Split paths into segments
+    $site_segments = explode('/', $site_path);
+    $home_segments = explode('/', $home_path);
+
+    // Check if Site URL has any segments and is not empty
+    if (!empty($site_path) && count($site_segments) > 0) {
+        // If both paths are the same and contain at least one segment
+        if ($site_path === $home_path && count($site_segments) > 0) {
+            return true; // WordPress is in a subdirectory
+        }
+    }
+
+    // Check if the Home URL has more segments than the Site URL
+    if (count($home_segments) > 1) {
+        return true; // Home URL indicates a subdirectory
+    }
+
+    return false; // Otherwise, it's likely not in a subdirectory
 }
 
 function berqwp_current_page_cache_file()
@@ -1075,6 +1112,8 @@ function bwp_url_into_path($url) {
         $path = str_replace($commonPath, '', $path);
     }
 
+    $path = bwp_intersect_str(bwp_admin_home_url(), $path);
+
     return $path;
 }
 
@@ -1284,11 +1323,72 @@ function bwp_admin_home_url($relative_path = '') {
         $url_converter = $trp->get_component( 'url_converter' );
         $url_slugs = $trp_settings['url-slugs'];
         
-        if (!empty($default_lang) && $trp_settings['add-subdirectory-to-default-language'] == 'yes' && !empty($url_slugs[$default_lang])) {
+        if (!empty($default_lang) && $trp_settings['add-subdirectory-to-default-language'] == 'yes' && !empty($url_slugs[$default_lang]) && strpos($home_url, "/$url_slugs[$default_lang]") === false) {
             // var_dump($trp_settings);
             return $home_url . '/' . $url_slugs[$default_lang] . $relative_path;
         }
     }
 
     return $home_url . $relative_path;
+}
+
+function bwp_intersect_str($str1, $str2) {
+    $arr = explode('/', $str1);
+    $last_item = $arr[count($arr) - 1]; // Get last item from $arr
+    $arr2 = explode('/', $str2);
+
+    if (!empty($arr2) && strpos($str2, $last_item) !== false) {
+        
+        for ($i=1; $i<count($arr2); $i++) {
+            if (!empty($arr2[$i]) && $arr2[$i] == $last_item) {
+                unset($arr2[$i]);
+            }
+        }
+
+        $str2 = implode('/', $arr2);
+
+    }
+
+    return $str2 ;
+}
+
+function bwp_is_tab($tab_id) {
+    $default_tab = 'dashboard';
+
+    if (!empty($_GET['tab_id'])) {
+        if (sanitize_text_field( $_GET['tab_id'] ) == $tab_id) {
+            // echo ' style="display:block" ';
+            echo ' style="visibility:visible;opacity:1;height:auto;" ';
+
+        } else {
+            // echo ' style="display:none" ';
+            echo ' style="visibility:hidden;opacity:0;height:0;overflow:hidden;" ';
+
+        }
+    } else {
+
+        if ($tab_id == $default_tab) {
+            // echo ' style="display:block" ';
+            echo ' style="visibility:visible;opacity:1;height:auto;" ';
+        } else {
+            // echo ' style="display:none" ';
+            echo ' style="visibility:hidden;opacity:0;height:0;overflow:hidden;" ';
+        }
+    }
+}
+
+function bwp_is_tab_nav($tab_id) {
+    $default_tab = 'dashboard';
+
+    if (!empty($_GET['tab_id'])) {
+        if (sanitize_text_field( $_GET['tab_id'] ) == $tab_id) {
+            echo ' active ';
+        }
+
+    } else {
+
+        if ($tab_id == $default_tab) {
+            echo ' active ';
+        }
+    }
 }

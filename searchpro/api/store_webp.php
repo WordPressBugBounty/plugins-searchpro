@@ -7,7 +7,7 @@ $webp_url = sanitize_text_field($request->get_param('url'));
 $webp_path = str_replace(get_site_url(), ABSPATH, $webp_url);
 
 // Validate file extension
-$valid_extensions = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
+$valid_extensions = ['webp'];
 $url_path = parse_url($webp_url, PHP_URL_PATH);
 $file_extension = strtolower(pathinfo($url_path, PATHINFO_EXTENSION));
 

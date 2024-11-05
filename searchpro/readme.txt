@@ -3,7 +3,7 @@ Contributors: thevisionofhamza, berqwp, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.6
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -165,6 +165,14 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.1.5 =
+* [New Feature] Added a setting to configure CSS loading.
+* [New Feature] Added a setting to configure JavaScript loading.
+* [New Feature] Added an option to preload the cookie banner.
+* [New Feature] Users can now exclude specific cookie IDs to bypass cache for them.
+* [Bug Fix] Resolved issues with license key verification.
+* [Bug Fix] Fixed a compatibility issue with TranslatePress where optimized pages were not displaying on the plugin settings page.
 
 = 2.1.4 =
 * [Enhancement] Added an option to enable/disable Core Web Vitals tracking.

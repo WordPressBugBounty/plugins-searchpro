@@ -59,6 +59,10 @@ class berqScriptOptimizer {
                 return $tag; // Keep the script tag with id="berqWP"
             }
 
+            if (strpos($tag, '$zoho.salesiq = ') !== false) {
+                return $tag;
+            }
+
             // Create a Simple HTML DOM object
             $html = str_get_html($tag);
 

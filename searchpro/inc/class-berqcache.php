@@ -333,7 +333,8 @@ if (!class_exists('berqCache')) {
             }
 
             // $home_slug = bwp_url_into_path(home_url('/'));
-            $home_slug = bwp_url_into_path(get_home_url(null, '/'));
+            // $home_slug = bwp_url_into_path(get_home_url(null, '/'));
+            $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
 
             if (false === as_has_scheduled_action('warmup_cache_quickly') && (bwp_is_home_cached() === false || bwp_is_partial_cache($home_slug)) && function_exists('as_enqueue_async_action')) {
                 as_enqueue_async_action('warmup_cache_quickly', [$home_slug, true]);
@@ -768,6 +769,10 @@ if (!class_exists('berqCache')) {
                 return;
             }
 
+            if (!bwp_pass_cookie_requirement()) {
+                return;
+            }
+
             $bypass_cache = apply_filters( 'berqwp_bypass_cache', false );
 
             if ($bypass_cache) {
@@ -776,6 +781,13 @@ if (!class_exists('berqCache')) {
 
             $slug_uri = $_SERVER['REQUEST_URI'];
             $slug_uri = bwp_sluguri_into_path($_SERVER['REQUEST_URI']);
+
+            /**
+             * In case of a multilingual home URL, 
+             * remove the common translation slug from the page slug (path)
+             */
+            $slug_uri = bwp_intersect_str(home_url(), $slug_uri);
+
             // $is_multisite = function_exists('is_multisite') && is_multisite();
 
             // // if wordpress is installed in a sub directory
