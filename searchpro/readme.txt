@@ -166,6 +166,9 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 
 == Changelog ==
 
+= 2.1.6 =
+* [Bug] Resolved an issue where the cache was not working after adding items to the cart.
+
 = 2.1.5 =
 * [New Feature] Added a setting to configure CSS loading.
 * [New Feature] Added a setting to configure JavaScript loading.

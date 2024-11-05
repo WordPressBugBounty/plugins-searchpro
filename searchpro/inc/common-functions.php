@@ -7,6 +7,12 @@ function bwp_pass_cookie_requirement() {
 
     if (!empty($excluded_cookies)) {
         foreach ($excluded_cookies as $cookie_id) {
+            
+            // Skip if empty
+            if (empty($cookie_id)) {
+                continue;
+            }
+
             foreach ($_COOKIE as $key => $value) {
                 if (strpos($key, $cookie_id) === 0) {
                     return false;
