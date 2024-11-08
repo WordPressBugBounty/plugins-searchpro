@@ -191,6 +191,8 @@ if (!class_exists('berqCache')) {
         }
 
         public static function purge_page($page_path, $flush_criticalcss = false) {
+
+            $page_path = bwp_intersect_str(home_url(), $page_path);
             
             self::delete_page_cache_files($page_path);
             

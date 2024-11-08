@@ -144,7 +144,7 @@ class berqScriptOptimizer {
             if (!empty($photonClass->js_css_exclude_urls)) {
                 foreach ($photonClass->js_css_exclude_urls as $js_exclude_keyword) {
                     if (!empty($js_exclude_keyword)) {
-                        if (strpos($tag, $js_exclude_keyword) !== false) {
+                        if (strpos($tag, trim($js_exclude_keyword)) !== false) {
                             return $tag;
                         }
                     }

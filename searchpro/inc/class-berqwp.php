@@ -276,6 +276,12 @@ if (!class_exists('berqWP')) {
 				$this->disable_emoji();
 			}
 
+			if (is_admin() && isset($_GET['bwp_get_ip'])) {
+				$ip = file_get_contents('https://api.ipify.org');
+				echo 'Server Public IP Address: ' . $ip;
+				exit;
+			}
+
 			if (is_admin() && !empty(get_option('berqwp_license_key'))) {
 				$license_key = get_option('berqwp_license_key');
 
@@ -290,6 +296,10 @@ if (!class_exists('berqWP')) {
 
 				} else {
 					$this->is_key_verified = false;
+
+					if (!empty($key_response) && $key_response->result == 'error') {
+						delete_option( 'berqwp_license_key' );
+					}
 				}
 			}
 
@@ -395,6 +405,23 @@ if (!class_exists('berqWP')) {
 
 			if (isset($_GET['dismiss_feedback'])) {
 				set_transient( 'bqwp_hide_feedback_notice', true, DAY_IN_SECONDS * 2 );
+			}
+
+			if (!empty(get_option('berqwp_license_key'))) {
+				$license_key = get_option('berqwp_license_key');
+
+				global $berq_log;
+				$berq_log->info("License key check for admin notices.");
+
+				$key_response = $this->verify_license_key($license_key);
+
+				if (!empty($key_response) && $key_response->result == 'success' && $key_response->status == 'expired') {
+					?>
+					<div class="notice notice-error">
+						<p><strong>Error:</strong> <?php echo $plugin_name; ?> license key has expired. Please renew your subscription.</p>
+					</div>
+					<?php
+				}
 			}
 
 			// Check rest api
@@ -551,17 +578,18 @@ if (!class_exists('berqWP')) {
                 $domain = $parsed_url['host'];
 
 				$api_params = array(
-					'registered_domain' => $domain,
-					'slm_action' => $action,
-					'secret_key' => BERQ_SECRET,
-					'license_key' => $license_key,
+					'registered_domain' 		=> $domain,
+					'slm_action' 				=> $action,
+					'secret_key' 				=> BERQ_SECRET,
+					'license_key' 				=> $license_key,
+					't' 						=> time(),
 				);
 
 				$endpoint_url = esc_url(add_query_arg($api_params, BERQ_SERVER));
 
 				$args = array(
 					'method' => 'POST',  // Only POST works for unknown reason
-					'timeout' => 10,
+					'timeout' => 20,
 					'redirection' => 5,
 					'blocking' => true,
 					'headers' => array(
@@ -575,31 +603,37 @@ if (!class_exists('berqWP')) {
 					'cookies' => array(),
 					'sslverify' => false,  // Disable SSL verification (for debugging purposes)
 				);
+
+				// $request = wp_remote_request( $endpoint_url, $args );
 			
 
 				$query_string = http_build_query($api_params);
 				$client = new HttpClient(BERQ_SERVER);
 				$client->setUserAgent('BerqWP');
-				$client->setReferer('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 				$client->post('?'.$query_string , $api_params);
 
+				$berq_log->info('Making request 1');
+			
 				if ($client->ok()) {
 					$response = $client->getContent();
 					$JSON = json_decode($response);
 
-					if ($action == 'slm_activate' && isset($JSON->error_code)) {
+					if ($action == 'slm_activate' && isset($JSON->error_code) && $JSON->message !== 'Invalid license key') {
+						sleep(1);
 						$api_params = array(
-							'registered_domain' => $domain,
-							'slm_action' => 'slm_check',
-							'secret_key' => BERQ_SECRET,
-							'license_key' => $license_key,
+							'registered_domain' 		=> $domain,
+							'slm_action' 				=> 'slm_check',
+							'secret_key' 				=> BERQ_SECRET,
+							'license_key' 				=> $license_key,
+							't' 						=> time(),
 						);
 	
 						$query_string = http_build_query($api_params);
 						$client = new HttpClient(BERQ_SERVER);
 						$client->setUserAgent('BerqWP');
-						$client->setReferer('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 						$client->post('?'.$query_string, $api_params);
+
+						$berq_log->info('Making request 2');
 						
 						if ($client->ok()) {
 							$response = $client->getContent();
@@ -611,14 +645,25 @@ if (!class_exists('berqWP')) {
 
 				$cached_response = json_decode($response);
 
-				if ($action == 'slm_check' && !empty($cached_response) && $cached_response->result == 'success' && $cached_response->status == 'active') {
+				if ($action == 'slm_check' && !empty($cached_response) && !empty($cached_response->result)) {
 					// Cache the response for 24 hours
 					set_transient($transient_key, $cached_response, 24 * HOUR_IN_SECONDS);
 				}
+
+				// if ($action == 'slm_check' && !empty($cached_response) && $cached_response->result == 'success' && $cached_response->status == 'active') {
+				// 	// Cache the response for 24 hours
+				// 	set_transient($transient_key, $cached_response, 24 * HOUR_IN_SECONDS);
+				// }
+
+				// if ($action == 'slm_check' && !empty($cached_response) && $cached_response->result == 'error') {
+				// 	// Key verification failed, cache the response for 14 hours 
+				// 	// preventing unnecessary verification requests
+				// 	set_transient($transient_key, $cached_response, 14 * HOUR_IN_SECONDS);
+				// }
+
 			} else {
 				$berq_log->info('Delivering license key object from the transient cache.');
 			}
-
 
 			// Return the cached response
 			return $cached_response;

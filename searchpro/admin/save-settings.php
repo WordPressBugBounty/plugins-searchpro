@@ -11,14 +11,14 @@ if (isset($_POST['berqwp_save_nonce'])) {
     $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
     if (!empty($_POST['berqwp_license_key'])) {
-        if (berq_is_localhost() && get_site_url() !== 'http://berq-test.local') {
-            return;
-        }
+        // if (berq_is_localhost() && get_site_url() !== 'http://berq-test.local') {
+        //     return;
+        // }
         
         $key = sanitize_text_field($_POST['berqwp_license_key']);
         $key_response = $this->verify_license_key($key, 'slm_activate');
 
-        if (!empty($key_response) && $key_response->result == 'success') {
+        if (!empty($key_response) && $key_response->result == 'success' && ($key_response->message == 'License key activated' || $key_response->result == 'active')) {
             update_option('berqwp_license_key', $key);
 
             // trigger cache warmup
@@ -45,7 +45,27 @@ if (isset($_POST['berqwp_save_nonce'])) {
             </script>
             <?php
             exit();
+        } elseif ($key_response->status == 'expired') {
+            global $berqNotifications;
+            $berqNotifications->error('License key has expired. Please renew your subscription.');
+
+            ?>
+            <script>
+                location.href = '<?php echo esc_html(get_admin_url() . 'admin.php?page=berqwp'); ?>';
+            </script>
+            <?php
+            exit();
         }
+
+        global $berqNotifications;
+        $berqNotifications->error('License key verification failed. Please contact support if the issue persists.');
+
+        ?>
+        <script>
+            location.href = '<?php echo esc_html(get_admin_url() . 'admin.php?page=berqwp'); ?>';
+        </script>
+        <?php
+        exit();
     }
 
     if (isset($_POST['berqwp_enable_sandbox'])) {

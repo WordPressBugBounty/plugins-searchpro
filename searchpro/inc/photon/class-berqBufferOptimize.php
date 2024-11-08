@@ -109,7 +109,7 @@ class berqBufferOptimize {
         'cdn-cookieyes.com/client_data', 
         'static.getclicky.com', 
         'clarity.ms/', 
-        'google.com', 
+        // 'google.com', 
         'doubleclick.net', 
         'stats.wp.com', 
         '/elementor/', 
