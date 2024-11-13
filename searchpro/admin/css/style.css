@@ -874,4 +874,19 @@ div.dt-container .dt-search input {
   border: 1px solid #dce6f7;
   border-radius: 10px;
   background-color: #f4f8ff;
+}
+
+a.berqwp-refresh-license-btn {
+  background-color: #cfffe8;
+  padding: 5px;
+  border-radius: 4px;
+  position: absolute;
+  right: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+a.berqwp-refresh-license-btn:hover {
+  background-color: #b9fddc;
 }/*# sourceMappingURL=style.css.map */

@@ -2,8 +2,8 @@
 Contributors: thevisionofhamza, berqwp, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
-Tested up to: 6.6
-Stable tag: 2.1.7
+Tested up to: 6.7
+Stable tag: 2.1.8
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -165,6 +165,10 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.1.8 =
+* [New Feature] Added a button to refresh license key details.
+* [Enhancement] Replaced transients with options to avoid unnecessary license key verification requests.
 
 = 2.1.7 =
 * [Bug] Fixed issue with purge page not working on multilingual websites.

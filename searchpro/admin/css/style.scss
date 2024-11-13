@@ -904,3 +904,19 @@ div.dt-container .dt-search input {
     border-radius: 10px;
     background-color: #f4f8ff;
 }
+
+a.berqwp-refresh-license-btn {
+    background-color: #cfffe8;
+    padding: 5px;
+    border-radius: 4px;
+    position: absolute;
+    right: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all .3s ease;
+
+    &:hover {
+        background-color: #b9fddc;
+    }
+}

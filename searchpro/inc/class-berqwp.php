@@ -87,7 +87,32 @@ if (!class_exists('berqWP')) {
 			add_filter( 'action_scheduler_cleanup_batch_size', function ( $batch_size ) {
 				return 100;
 			} );
+
+			// Refresh license key
+			add_action('admin_post_bwp_refresh_license', [$this, 'handle_refresh_license_action']);
 		}
+
+		function handle_refresh_license_action()
+        {
+            // Check if the user has the necessary nonce and the action matches
+            if (isset($_GET['action']) && $_GET['action'] === 'bwp_refresh_license' && wp_verify_nonce($_GET['_wpnonce'], 'bwp_refresh_license_action')) {
+                
+				$transient_key = 'berq_lic_response_cache';
+				$expire_transient_key = 'berq_lic_cache_expire';
+
+				delete_option( $transient_key );
+				delete_option( $expire_transient_key );
+                
+                global $berqNotifications;
+				$berqNotifications->success('License key successfully refreshed.');
+
+                $redirect_url = add_query_arg('berq_refresh_license', '', wp_get_referer());
+
+                // Redirect back to the referring page after clearing the cache
+                wp_safe_redirect($redirect_url);
+                exit;
+            }
+        }
 
 		function berqwp_get_optimized_pages() {
 			if (!isset($_POST['start']) || !isset($_POST['length'])) {
@@ -546,21 +571,30 @@ if (!class_exists('berqWP')) {
 			}
 
 			if (defined('BERQWP_DOING_LICENSE_CHECK')) {
-				sleep(1);
+				// sleep(1);
+				return;
 			}
+
+			/**
+			 * Replaced transients with options
+			 */
 			
 			global $berq_log;
 			$transient_key = 'berq_lic_response_cache'; // Set a unique key for the transient
+			$expire_transient_key = 'berq_lic_cache_expire'; // Set a unique key for the transient
 			
 			if ($action !== 'slm_check') {
-				delete_transient( $transient_key );
+				// delete_transient( $transient_key );
+				delete_option( $transient_key );
 			}
 
 			// Check if the response is already cached
-			$cached_response = get_transient($transient_key);
+			// $cached_response = get_transient($transient_key);
+			$cached_response = get_option($transient_key);
+			$cache_expire_time = (int) get_option($expire_transient_key);
 
 
-			if (false === $cached_response) {
+			if (false === $cached_response || $cache_expire_time < time()) {
 				// If not cached, perform the API request
 
 				$rateLimiter = new RateLimiter(5, 60, optifer_cache);
@@ -607,12 +641,12 @@ if (!class_exists('berqWP')) {
 				// $request = wp_remote_request( $endpoint_url, $args );
 			
 
+				$berq_log->info('Making request 1');
+
 				$query_string = http_build_query($api_params);
 				$client = new HttpClient(BERQ_SERVER);
 				$client->setUserAgent('BerqWP');
 				$client->post('?'.$query_string , $api_params);
-
-				$berq_log->info('Making request 1');
 			
 				if ($client->ok()) {
 					$response = $client->getContent();
@@ -628,13 +662,13 @@ if (!class_exists('berqWP')) {
 							't' 						=> time(),
 						);
 	
+						$berq_log->info('Making request 2');
+
 						$query_string = http_build_query($api_params);
 						$client = new HttpClient(BERQ_SERVER);
 						$client->setUserAgent('BerqWP');
 						$client->post('?'.$query_string, $api_params);
 
-						$berq_log->info('Making request 2');
-						
 						if ($client->ok()) {
 							$response = $client->getContent();
 						}
@@ -647,7 +681,9 @@ if (!class_exists('berqWP')) {
 
 				if ($action == 'slm_check' && !empty($cached_response) && !empty($cached_response->result)) {
 					// Cache the response for 24 hours
-					set_transient($transient_key, $cached_response, 24 * HOUR_IN_SECONDS);
+					// set_transient($transient_key, $cached_response, 24 * HOUR_IN_SECONDS);
+					update_option($transient_key, $cached_response);
+					update_option($expire_transient_key, time() + 24 * HOUR_IN_SECONDS);
 				}
 
 				// if ($action == 'slm_check' && !empty($cached_response) && $cached_response->result == 'success' && $cached_response->status == 'active') {
@@ -740,7 +776,7 @@ if (!class_exists('berqWP')) {
 		function register_menu()
 		{
 			$svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path fill-rule="evenodd" clip-rule="evenodd" d="M6.43896 0H17.561C21.1172 0 24 2.88287 24 6.43903V17.561C24 21.1171 21.1172 24 17.561 24H6.43896C2.88281 24 0 21.1171 0 17.561V6.43903C0 2.88287 2.88281 0 6.43896 0ZM15.7888 4.09753L8.59961 12.7534H12.3517L7.02441 20.4878L16.3903 11.0222L12.7814 10.3799L15.7888 4.09753Z" fill="#1F71FF"/>
+			<path fill-rule="evenodd" clip-rule="evenodd" d="M6.43896 0H17.561C21.1172 0 24 2.88287 24 6.43903V17.561C24 21.1171 21.1172 24 17.561 24H6.43896C2.88281 24 0 21.1171 0 17.561V6.43903C0 2.88287 2.88281 0 6.43896 0ZM15.7888 4.09753L8.59961 12.7534H12.3517L7.02441 20.4878L16.3903 11.0222L12.7814 10.3799L15.7888 4.09753Z" fill="#a7aaad"/>
 			</svg>';
 
 			$plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';

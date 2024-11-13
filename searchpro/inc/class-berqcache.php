@@ -325,9 +325,9 @@ if (!class_exists('berqCache')) {
                 // Enable object cache in wp-config.php
                 berqwp_enable_object_cache(true);
 
-                if (function_exists('wp_cache_flush')) {
-                    wp_cache_flush(); // Clear the entire object cache.
-                }
+                // if (function_exists('wp_cache_flush')) {
+                //     wp_cache_flush(); // Clear the entire object cache.
+                // }
             }
 
             if (get_option('berqwp_enable_sandbox') == 1 && file_exists($wp_content_adv_cache)) {
@@ -483,6 +483,7 @@ if (!class_exists('berqCache')) {
             if (isset($_GET['action']) && $_GET['action'] === 'berq_request_cache' && wp_verify_nonce($_GET['_wpnonce'], 'berq_request_cache_action')) {
 
                 $slug = $_GET['uri'];
+                $slug = bwp_intersect_str(home_url(), $slug);
 
                 as_enqueue_async_action('warmup_cache_quickly', [$slug, true]);
                 
@@ -616,10 +617,15 @@ if (!class_exists('berqCache')) {
 
             // Check if the user has the capability to clear the cache (adjust the capability as needed)
             if (current_user_can('manage_options')) {
+                $icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.43896 0H17.561C21.1172 0 24 2.88287 24 6.43903V17.561C24 21.1171 21.1172 24 17.561 24H6.43896C2.88281 24 0 21.1171 0 17.561V6.43903C0 2.88287 2.88281 0 6.43896 0ZM15.7888 4.09753L8.59961 12.7534H12.3517L7.02441 20.4878L16.3903 11.0222L12.7814 10.3799L15.7888 4.09753Z" fill="#a7aaad"/>
+                </svg>';
+                $icon_base64 = base64_encode($icon);
+            
                 $wp_admin_bar->add_menu(
                     array(
                         'id' => 'berqWP',
-                        'title' => $plugin_name,
+                        'title' => '<span class="ab-icon" style="background-image:url(data:image/svg+xml;base64,'.$icon_base64.')!important;height:25px;width:18px;background-size:contain;background-repeat:no-repeat;background-position:center;"></span>'.$plugin_name,
                         'href' => get_admin_url() . '/admin.php?page=berqwp',
                     )
                 );
