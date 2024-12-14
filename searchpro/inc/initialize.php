@@ -29,8 +29,8 @@ if (get_option('berqwp_enable_cwv') == null) {
     update_option('berqwp_enable_cwv', 0);
 }
 
-if (get_option('berqwp_preload_cookiebanner') == null) {
-    update_option('berqwp_preload_cookiebanner', 0);
+if (get_option('berqwp_preload_fontfaces') == null) {
+    update_option('berqwp_preload_fontfaces', 1);
 }
 
 if (get_option('berqwp_preload_cookiebanner') == null) {
