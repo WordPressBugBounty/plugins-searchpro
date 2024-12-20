@@ -15,7 +15,6 @@ delete_option('berqwp_preload_fontfaces');
 delete_option('berqwp_disable_emojis');
 delete_option('berqwp_lazyload_youtube_embed');
 delete_option('berqwp_javascript_execution_mode');
-delete_option('berqwp_enable_preload_mostly_used_font');
 delete_option('berqwp_interaction_delay');
 delete_option('berq_opt_mode');
 delete_option('berq_ignore_urls_params');

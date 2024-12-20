@@ -983,7 +983,7 @@ function bwp_check_connection($force_check = false) {
     }
 
     // Perform the actual REST API check
-    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.home_url('/'), ['timeout' => 20] );
+    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.bwp_admin_home_url('/'), ['timeout' => 20] );
 
     if ( is_wp_error( $response ) ) {
         $result = array(
@@ -1112,7 +1112,7 @@ function bwp_url_into_path($url) {
         $path = str_replace($commonPath, '', $path);
     }
 
-    $path = bwp_intersect_str(bwp_admin_home_url(), $path);
+    // $path = bwp_intersect_str(bwp_admin_home_url(), $path);
 
     return $path;
 }
@@ -1391,4 +1391,62 @@ function bwp_is_tab_nav($tab_id) {
             echo ' active ';
         }
     }
+}
+
+function bwp_notice($status = '', $title = null, $message = null, $btn = [], $dismissible = false) {
+    ?>
+    <div class="bwp-notice notice <?php echo esc_attr($status); ?> <?php echo $dismissible ? 'dismissible' : ''; ?>">
+        <?php if ($dismissible) {?>
+					<div class="close"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></div>
+                    <?php } ?>
+
+					<div class="icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+			<path fill-rule="evenodd" clip-rule="evenodd" d="M6.43896 0H17.561C21.1172 0 24 2.88287 24 6.43903V17.561C24 21.1171 21.1172 24 17.561 24H6.43896C2.88281 24 0 21.1171 0 17.561V6.43903C0 2.88287 2.88281 0 6.43896 0ZM15.7888 4.09753L8.59961 12.7534H12.3517L7.02441 20.4878L16.3903 11.0222L12.7814 10.3799L15.7888 4.09753Z" fill="#1f72ff"/>
+			</svg></div>
+					<div class="content">
+                        <?php if (!empty($title)) { ?>
+						<h5><?php echo wp_kses_post(__($title, 'searchpro')); ?></h5>
+                        <?php } ?>
+
+                        <?php if (!empty($message)) { ?>
+						<?php echo wp_kses_post(__($message, 'searchpro')); ?>
+                        <?php } ?>
+
+                        <?php if (!empty($btn) && is_array($btn)) {?>
+						<div class="bwp-notice-btn">
+                            <?php 
+                            foreach($btn as $bwp_btn) {
+                                ?>
+                                <a href="<?php echo esc_attr($bwp_btn['href']) ?? ''; ?>" class="bwp-btn <?php echo esc_attr($bwp_btn['classes']) ?? ''; ?>">
+                                    <?php echo esc_html__( $bwp_btn['text'], 'searchpro' ) ?? ''; ?>
+                                </a>
+                                <?php
+                            }
+                            ?>
+						</div>
+                        <?php } ?>
+					</div>
+				</div>
+    <?php
+}
+
+function bwp_is_option_updated($option_name) {
+    $value = isset($_POST[$option_name]) ? $_POST[$option_name] : 0;
+
+    if ($value == 'on') {
+        $value = 1;
+    }
+    
+    $option_val = get_option($option_name);
+    
+    if ($option_name == 'berq_exclude_js_css') {
+        $urls = sanitize_textarea_field($value);
+        $urls_array = explode("\n", $urls);
+        
+        return !empty(array_diff($option_val, $urls_array));
+    }
+
+    $values_changed = $option_val == $value;
+
+    return !$values_changed;
 }

@@ -3,7 +3,7 @@ Contributors: thevisionofhamza, berqwp, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.7
-Stable tag: 2.1.8
+Stable tag: 2.2.11
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -165,6 +165,14 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.2.11 =
+* [New Feature] Added a new JavaScript execution mode: "Parallel execution".
+* [Enhancement] Improved cache refresh using a fetch request, resulting in a better cache hit rate.
+* [Bug] Resolved an issue on multilingual sites where the wrong cache file was being delivered for specific languages.
+* [Bug] Fixed an issue where optimizations were not reflected in WebPageTest.org reports.
+* [Bug] Addressed high server resource usage by disabling cache generation for unknown query parameters.
+* [Bug] Fixed an issue where logged-in users were served cached pages.
 
 = 2.1.8 =
 * [New Feature] Added a button to refresh license key details.

@@ -119,19 +119,23 @@ $url_lines = implode("\n", $exclude_urls);
             </h3>
             <div class="berq-box-content">
                 <p>
-                    <?php esc_html_e("$plugin_name offers three JavaScript optimization modes, so every JavaScript-heavy website can unlock its true potential.", 'searchpro'); ?>
+                    <?php esc_html_e("$plugin_name offers different JavaScript optimization modes, so every JavaScript-heavy website can unlock its true potential.", 'searchpro'); ?>
                 </p>
                 <label class="berq-check">
                     <input type="radio" name="berqwp_javascript_execution_mode" value="1" <?php echo get_option('berqwp_javascript_execution_mode') == 1 ? 'checked' : ''; ?>>
-                    <?php esc_html_e('Delay & inline first execution (Recommended)', 'searchpro'); ?>
+                    <?php esc_html_e('Sequential Blocking Execution - High Compatibility (Default)', 'searchpro'); ?>
+                </label>
+                <label class="berq-check">
+                    <input type="radio" name="berqwp_javascript_execution_mode" value="3" <?php echo get_option('berqwp_javascript_execution_mode') == 3 ? 'checked' : ''; ?>>
+                    <?php esc_html_e('Parallel Execution - High Compatibility', 'searchpro'); ?>
                 </label>
                 <label class="berq-check">
                     <input type="radio" name="berqwp_javascript_execution_mode" value="0" <?php echo get_option('berqwp_javascript_execution_mode') == 0 ? 'checked' : ''; ?>>
-                    <?php esc_html_e('Sequential execution', 'searchpro'); ?>
+                    <?php esc_html_e('Sequential Execution', 'searchpro'); ?>
                 </label>
                 <label class="berq-check">
                     <input type="radio" name="berqwp_javascript_execution_mode" value="2" <?php echo get_option('berqwp_javascript_execution_mode') == 2 ? 'checked' : ''; ?>>
-                    <?php esc_html_e('Defer JavaScript (Safe)', 'searchpro'); ?>
+                    <?php esc_html_e('Defer JavaScript (Safe - No Delay)', 'searchpro'); ?>
                 </label>
             </div>
         </div>

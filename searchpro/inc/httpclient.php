@@ -246,6 +246,10 @@ class HttpClient {
         return ($this->status == 200);
     }
 
+    public function setTimeout($timeout) {
+        $this->timeout = $timeout;
+    }
+
     // --- Response accessors:
 
     public function getContent() {

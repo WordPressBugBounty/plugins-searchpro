@@ -18,7 +18,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
         $key = sanitize_text_field($_POST['berqwp_license_key']);
         $key_response = $this->verify_license_key($key, 'slm_activate');
 
-        if (!empty($key_response) && $key_response->result == 'success' && ($key_response->message == 'License key activated' || $key_response->result == 'active')) {
+        if (!empty($key_response) && $key_response->result == 'success' && ($key_response->message == 'License key activated' || $key_response->status == 'active')) {
             update_option('berqwp_license_key', $key);
 
             // trigger cache warmup
@@ -33,7 +33,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
             </script>
             <?php
             exit();
-        } elseif ($key_response->result == 'error') {
+        } elseif (isset($key_response->result ) && $key_response->result == 'error') {
             $error = $key_response->message;
 
             global $berqNotifications;
@@ -45,7 +45,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
             </script>
             <?php
             exit();
-        } elseif ($key_response->status == 'expired') {
+        } elseif (isset($key_response->status) && $key_response->status == 'expired') {
             global $berqNotifications;
             $berqNotifications->error('License key has expired. Please renew your subscription.');
 
@@ -95,10 +95,20 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_webp_quality', $val);
     }
 
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_image_lazyloading') === true) {
+        update_option('bwp_require_flush_cache', 1);
+    }
+
     if (isset($_POST['berqwp_image_lazyloading'])) {
         update_option('berqwp_image_lazyloading', 1);
     } else {
         update_option('berqwp_image_lazyloading', 0);
+    }
+
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_disable_webp')) {
+        update_option('bwp_require_flush_cache', 1);
     }
 
     if (isset($_POST['berqwp_disable_webp'])) {
@@ -107,10 +117,20 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_disable_webp', 0);
     }
 
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_enable_cdn')) {
+        update_option('bwp_require_flush_cache', 1);
+    }
+
     if (isset($_POST['berqwp_enable_cdn'])) {
         update_option('berqwp_enable_cdn', 1);
     } else {
         update_option('berqwp_enable_cdn', 0);
+    }
+
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_enable_cwv')) {
+        update_option('bwp_require_flush_cache', 1);
     }
 
     if (isset($_POST['berqwp_enable_cwv'])) {
@@ -119,10 +139,20 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_enable_cwv', 0);
     }
 
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_preload_cookiebanner')) {
+        update_option('bwp_require_flush_cache', 1);
+    }
+
     if (isset($_POST['berqwp_preload_cookiebanner'])) {
         update_option('berqwp_preload_cookiebanner', 1);
     } else {
         update_option('berqwp_preload_cookiebanner', 0);
+    }
+
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_preload_fontfaces')) {
+        update_option('bwp_require_flush_cache', 1);
     }
 
     if (isset($_POST['berqwp_preload_fontfaces'])) {
@@ -137,10 +167,20 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_disable_emojis', 0);
     }
 
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_lazyload_youtube_embed')) {
+        update_option('bwp_require_flush_cache', 1);
+    }
+
     if (isset($_POST['berqwp_lazyload_youtube_embed'])) {
         update_option('berqwp_lazyload_youtube_embed', 1);
     } else {
         update_option('berqwp_lazyload_youtube_embed', 0);
+    }
+
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_javascript_execution_mode')) {
+        update_option('bwp_require_flush_cache', 1);
     }
 
     if (isset($_POST['berqwp_javascript_execution_mode'])) {
@@ -172,12 +212,6 @@ if (isset($_POST['berqwp_save_nonce'])) {
         }
 
         update_option('berq_opt_mode', $val);
-    }
-
-    if (isset($_POST['berqwp_enable_preload_mostly_used_font'])) {
-        update_option('berqwp_enable_preload_mostly_used_font', 1);
-    } else {
-        update_option('berqwp_enable_preload_mostly_used_font', 0);
     }
 
     /*if (!empty($_POST['berqwp_license_key'])) {
@@ -229,7 +263,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
         // Add trailing slash to each URL
         $urls_array = array_map(function ($url) {
             if (!empty ($url)) {
-                $url = trailingslashit(trim($url));
+                $url = trim($url);
                 
                 // Delete cache for this url
                 berqCache::delete_page_cache_files(bwp_url_into_path($url));
@@ -266,6 +300,11 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
     }
 
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berq_exclude_js_css')) {
+        update_option('bwp_require_flush_cache', 1);
+    }
+
     if (isset($_POST['berq_exclude_js_css'])) {
         $urls = sanitize_textarea_field($_POST['berq_exclude_js_css']);
         $urls_array = explode("\n", $urls);
@@ -276,9 +315,19 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
     }
 
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berq_css_optimization')) {
+        update_option('bwp_require_flush_cache', 1);
+    }
+
     if (!empty($_POST['berq_css_optimization'])) {
         $css_optimization = sanitize_textarea_field($_POST['berq_css_optimization']);
         update_option('berq_css_optimization', $css_optimization);
+    }
+
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berq_js_optimization')) {
+        update_option('bwp_require_flush_cache', 1);
     }
 
     if (!empty($_POST['berq_js_optimization'])) {

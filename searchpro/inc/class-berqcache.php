@@ -161,6 +161,9 @@ if (!class_exists('berqCache')) {
         }
 
         function request_warmup_cache() {
+            // Remove require cache warning
+            update_option('bwp_require_flush_cache', 0);
+            
             if (false === as_has_scheduled_action('bwp_warmup_sitemap') && function_exists('as_enqueue_async_action')) {
                 as_enqueue_async_action('bwp_warmup_sitemap', []);
             }
@@ -192,7 +195,7 @@ if (!class_exists('berqCache')) {
 
         public static function purge_page($page_path, $flush_criticalcss = false) {
 
-            $page_path = bwp_intersect_str(home_url(), $page_path);
+            // $page_path = bwp_intersect_str(home_url(), $page_path);
             
             self::delete_page_cache_files($page_path);
             
@@ -794,7 +797,7 @@ if (!class_exists('berqCache')) {
              * In case of a multilingual home URL, 
              * remove the common translation slug from the page slug (path)
              */
-            $slug_uri = bwp_intersect_str(home_url(), $slug_uri);
+            // $slug_uri = bwp_intersect_str(home_url(), $slug_uri);
 
             // $is_multisite = function_exists('is_multisite') && is_multisite();
 
@@ -833,6 +836,11 @@ if (!class_exists('berqCache')) {
             if (get_option('berqwp_enable_sandbox') == 1 && isset($_GET['berqwp'])) {
                 $slug = explode('?berqwp', $slug_uri)[0];
             } elseif (get_option('berqwp_enable_sandbox') == 1 && !isset($_GET['creating_cache'])) {
+                return;
+            }
+
+            // Disable cache for unknown query parameters
+            if (strpos($slug, '?') !== false) {
                 return;
             }
 
@@ -925,7 +933,8 @@ if (!class_exists('berqCache')) {
             }
             
             // If the cached HTML file exists, serve it and stop further execution
-            if (!isset($_GET['creating_cache']) && file_exists($cache_file) && !$this->is_cache_file_expired($cache_file, true)) {
+            // if (!isset($_GET['creating_cache']) && file_exists($cache_file) && !$this->is_cache_file_expired($cache_file, true)) {
+            if (!isset($_GET['creating_cache']) && file_exists($cache_file)) {
                 $lastModified = filemtime($cache_file);
                 $etag = md5_file($cache_file);
                 header('ETag: ' . $etag);
@@ -942,6 +951,7 @@ if (!class_exists('berqCache')) {
                 } else {
 
                     header('Cache-Control: public, max-age=86400');
+                    header('Vary: Cookie');
 
                     if (file_exists($cache_file)) {
                         readfile($cache_file);

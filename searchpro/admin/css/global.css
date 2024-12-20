@@ -1,0 +1,58 @@
+.bwp-notice {
+  display: flex;
+  margin: 10px 0 !important;
+  gap: 20px;
+  border: 1px solid #e1ecff !important;
+  padding: 25px 20px !important;
+  background-color: #f1f6ff !important;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: none !important;
+}
+.bwp-notice .close {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  opacity: 1;
+  cursor: pointer;
+}
+.bwp-notice.error {
+  background-color: #ffe4e4 !important;
+  border: 1px solid #ffd2d3 !important;
+}
+.bwp-notice.warning {
+  background-color: #f8f3d3 !important;
+  border: 1px solid #f6ea9e !important;
+}
+.bwp-notice.success {
+  background-color: #e2ffeb !important;
+  border: 1px solid #a1ffc0 !important;
+}
+.bwp-notice .content h5 {
+  font-size: 18px;
+  margin: 0;
+  margin-bottom: 15px;
+}
+.bwp-notice .content p {
+  font-size: 14px;
+}
+.bwp-notice .content .bwp-notice-btn {
+  display: flex;
+  margin-top: 14px;
+  gap: 8px;
+}
+.bwp-notice .content .bwp-notice-btn .bwp-btn {
+  text-decoration: none;
+  color: #465774;
+  background: #fff;
+  padding: 11px 15px;
+  display: block;
+  line-height: 1;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 1px solid #dbe9fe;
+}
+.bwp-notice .content .bwp-notice-btn .bwp-btn.primary {
+  background-color: #5057ff !important;
+  color: #fff !important;
+}/*# sourceMappingURL=global.css.map */

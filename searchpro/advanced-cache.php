@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !bwp_is_user_logged_in() && !bwp_is
     $cache_directory = ABSPATH . '/wp-content/cache/berqwp/html/';
     $cache_file = $cache_directory . $cache_key . '.html';
     $gzip_support = function_exists('gzencode') && isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false;
-    $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
+    $cache_max_life = @filemtime($cache_file) + (48 * 60 * 60);
     $is_litespeed = isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false;
 
     $headers = getallheaders();
@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !bwp_is_user_logged_in() && !bwp_is
             } 
 
             header('Cache-Control: public, max-age=86400');
+            header('Vary: Cookie');
     
             if (file_exists($cache_file)) {
                 readfile($cache_file);

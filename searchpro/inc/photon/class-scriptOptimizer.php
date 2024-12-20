@@ -151,7 +151,7 @@ class berqScriptOptimizer {
                 }
             }
 
-            if ($photonClass->js_mode == 1) {
+            if ($photonClass->js_mode == 1 || $photonClass->js_mode == 3) {
                 $html = str_get_html($tag);
     
                 // Find all script tags
@@ -620,6 +620,156 @@ class berqScriptOptimizer {
 
 
                             
+                        } else if (js_execution_mode == 3) {
+
+                            (function(){
+                                // Select all inline script tags with type=\"text/bwp-script\"
+                                const inlineScripts = document.querySelectorAll('script[type=\"text/bwp-script\"]');
+                                
+                                inlineScripts.forEach((script) => {
+                                    // Get the content of the inline script
+                                    const scriptContent = script.innerHTML;
+
+                                    if (!scriptContent) {
+                                        return;
+                                    }
+
+                                    // Create a Blob from the script content
+                                    const blob = new Blob([scriptContent], { type: 'application/javascript' });
+
+                                    // Create a URL for the Blob
+                                    const scriptURL = URL.createObjectURL(blob);
+
+                                    // Create a new external script tag
+                                    const newScript = document.createElement('script');
+                                    newScript.src = scriptURL;
+                                    newScript.type = 'text/bwp-script';  // Or 'text/bwp-script', but 'application/javascript' is more typical for JS
+
+                                    // Replace the original inline script with the new external script tag
+                                    script.parentNode.replaceChild(newScript, script);
+                                });
+                            })();
+
+
+                            (function () {
+                                const scriptQueue = [];
+                                let b = 0;
+
+                                console.log('Starting script processing...');
+
+                                triggerReadyStateChange('interactive');
+
+                                const berqwp_lcp_event = new CustomEvent('berqwpLCPLoaded');
+                                window.dispatchEvent(berqwp_lcp_event);
+
+                                const scripts = Array.from(document.querySelectorAll('script[type=\"text/bwp-script\"], script[type=\"application/javascript\"]'));
+
+                                if (scripts.length === 0) {
+                                    console.warn('No scripts found. Exiting...');
+                                    return;
+                                }
+
+                                const preloadScript = (src, id, type) => {
+                                    console.log(`Preloading script: \${src}`);
+                                    return new Promise((resolve) => {
+                                        fetch(src)
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error(`Failed to preload script \${id}: \${response.status}`);
+                                                }
+                                                return response.text();
+                                            })
+                                            .then(code => {
+                                                console.log(`Script \${id} preloaded successfully.`);
+                                                resolve({ id, src, code });
+                                            })
+                                            .catch(error => {
+                                                console.warn(`Error preloading script \${id}:`, error);
+                                                resolve(null);  // Resolve with null to skip this script and continue execution
+                                            });
+                                    });
+                                };
+
+                                const preloadInlineScript = (code, id, type) => {
+                                    console.log(`Preloading inline script: \${id}`);
+                                    return Promise.resolve({ id, code, type });
+                                };
+
+                                const executeScriptsSequentially = async (scriptsToExecute) => {
+                                    console.log('Starting sequential script execution...');
+                                    for (let i = 0; i < scriptsToExecute.length; i++) {
+                                        const scriptData = scriptsToExecute[i];
+                                        if (!scriptData) {
+                                            continue;  // Skip this script if it was skipped during preloading
+                                        }
+
+                                        try {
+                                            console.log(`Executing script: \${scriptData.id}`);
+                                            const scriptElement = document.createElement('script');
+                                            scriptElement.id = scriptData.id;
+                                            scriptElement.type = scriptData.type;
+
+                                            if (scriptData.src) {
+                                                scriptElement.src = scriptData.src;
+                                            } else {
+                                                scriptElement.textContent = scriptData.code;
+                                            }
+
+                                            // Adding a 1ms delay before executing each script
+                                            setTimeout(() => {
+                                                document.head.appendChild(scriptElement);
+                                                console.log(`Script \${scriptData.id} executed.`);
+
+                                                // Dispatch lifecycle events only after the very last script
+                                                if (i === scriptsToExecute.length - 1) {
+                                                    // Dispatching lifecycle events
+                                                    const event = new Event('DOMContentLoaded', { bubbles: true, cancelable: true });
+                                                    window.dispatchEvent(event);
+                                                    document.dispatchEvent(event);
+
+                                                    triggerReadyStateChange('complete');
+
+                                                    window.dispatchEvent(new Event('load'));
+                                                    document.dispatchEvent(new Event('load'));
+
+                                                    const resizeEvent = new Event('resize');
+                                                    window.dispatchEvent(resizeEvent);
+                                                    document.dispatchEvent(resizeEvent);
+
+                                                    console.log('Scripts fully loaded.');
+                                                    window.dispatchEvent(new Event('berqwp_after_delay_js_loaded'));
+                                                }
+                                            }, 1);  // 1ms delay
+
+                                        } catch (error) {
+                                            console.error(`Error executing script \${scriptData.id}:`, error);
+                                        }
+                                    }
+                                    console.log('All scripts executed.');
+                                };
+
+                                // Step 1: Preload all scripts
+                                for (let i = 0; i < scripts.length; i++) {
+                                    const script = scripts[i];
+                                    const id = script.id || `script-\${b++}`;
+                                    const type = script.getAttribute('data-type');
+
+                                    if (script.src) {
+                                        scriptQueue.push(preloadScript(script.src, id, type));
+                                    } else {
+                                        const code = script.textContent || script.innerText;
+                                        scriptQueue.push(preloadInlineScript(code, id, type));
+                                    }
+                                }
+
+                                // Step 2: Execute scripts as soon as they're preloaded
+                                Promise.all(scriptQueue)
+                                    .then(preloadedScripts => executeScriptsSequentially(preloadedScripts))
+                                    .catch(error => {
+                                        console.error('Error during script processing:', error);
+                                    });
+                            })();
+
                         }
 
                         

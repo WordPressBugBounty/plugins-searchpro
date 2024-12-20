@@ -73,6 +73,8 @@ if (!class_exists('berqWP')) {
 
 			add_action('wp_ajax_berqwp_get_optimized_pages', [$this, 'berqwp_get_optimized_pages']);
 
+			add_action('admin_enqueue_scripts', [$this, 'admin_scripts']);
+
 			// add_filter( 'action_scheduler_queue_runner_concurrent_batches', [$this, 'ashp_increase_concurrent_batches'] );
 
 			add_filter( 'action_scheduler_retention_period', function ( $period ) {
@@ -90,6 +92,15 @@ if (!class_exists('berqWP')) {
 
 			// Refresh license key
 			add_action('admin_post_bwp_refresh_license', [$this, 'handle_refresh_license_action']);
+		}
+
+		function admin_scripts() {
+			wp_enqueue_style(
+				'bwp-global-styles', // Handle for the style
+				optifer_URL . 'admin/css/global.css', // URL to the CSS file
+				[], // Dependencies (array of handles)
+				BERQWP_VERSION // Version number
+			);
 		}
 
 		function handle_refresh_license_action()
@@ -480,6 +491,16 @@ if (!class_exists('berqWP')) {
 				echo wp_kses_post($notice);
 			}
 
+			if (get_option('bwp_require_flush_cache', false)) {
+				bwp_notice('warning', 'Cache Flush Required', '<p>To apply the changes, please flush the cache.</p>', [
+					[
+						'href'	=> esc_attr(wp_nonce_url(admin_url('admin-post.php?action=clear_cache'), 'clear_cache_action')),
+						'text'	=> 'Flush cache',
+						'classes'	=> '',
+					]
+				]);
+			}
+
 			if (berq_is_localhost()) {
 				?>
 				<div class="notice notice-warning">
@@ -616,6 +637,7 @@ if (!class_exists('berqWP')) {
 					'slm_action' 				=> $action,
 					'secret_key' 				=> BERQ_SECRET,
 					'license_key' 				=> $license_key,
+					'version' 					=> BERQWP_VERSION,
 					't' 						=> time(),
 				);
 
@@ -647,6 +669,13 @@ if (!class_exists('berqWP')) {
 				$client = new HttpClient(BERQ_SERVER);
 				$client->setUserAgent('BerqWP');
 				$client->post('?'.$query_string , $api_params);
+				// $client->get('?'.$query_string);
+				// $client->setDebug(true);
+				$client->setTimeout(30);
+
+				// var_dump($client->getContent(), $client->getError(), $api_params);
+
+				// $berq_log->info(print_r($client->getContent(), true).'---'.$client->ok());
 			
 				if ($client->ok()) {
 					$response = $client->getContent();
@@ -669,12 +698,18 @@ if (!class_exists('berqWP')) {
 						$client->setUserAgent('BerqWP');
 						$client->post('?'.$query_string, $api_params);
 
+						$berq_log->info(print_r($client->getContent(), true));
+
 						if ($client->ok()) {
 							$response = $client->getContent();
 						}
 
 					}
 
+				}
+
+				if (empty($response)) {
+					return;
 				}
 
 				$cached_response = json_decode($response);
