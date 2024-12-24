@@ -681,7 +681,7 @@ class berqScriptOptimizer {
                                             })
                                             .then(code => {
                                                 console.log(`Script \${id} preloaded successfully.`);
-                                                resolve({ id, src, code });
+                                                resolve({ id, src, code, type });
                                             })
                                             .catch(error => {
                                                 console.warn(`Error preloading script \${id}:`, error);

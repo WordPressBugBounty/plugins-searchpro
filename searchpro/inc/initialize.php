@@ -69,6 +69,10 @@ if (get_option('berqwp_optimize_post_types') === false) {
     update_option('berqwp_optimize_post_types', ['post', 'page', 'product']);
 }
 
+if (get_option('berq_exclude_js_css') === false) {
+    update_option('berq_exclude_js_css', []);
+}
+
 if (get_option('berqwp_optimize_taxonomies') === false) {
     update_option('berqwp_optimize_taxonomies', ['category', 'product_cat']);
 }

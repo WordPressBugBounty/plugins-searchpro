@@ -25,6 +25,7 @@ delete_option('berqwp_post_type_names');
 delete_option('berqwp_optimize_post_types');
 delete_option('berqwp_optimize_taxonomies');
 delete_option('berqwp_enable_cwv');
+delete_option('berq_exclude_js_css');
 
 // Remove advanced-cache.php file
 $dropin_file = ABSPATH . 'wp-content/advanced-cache.php';

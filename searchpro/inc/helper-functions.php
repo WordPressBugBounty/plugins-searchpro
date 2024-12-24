@@ -1442,6 +1442,8 @@ function bwp_is_option_updated($option_name) {
     if ($option_name == 'berq_exclude_js_css') {
         $urls = sanitize_textarea_field($value);
         $urls_array = explode("\n", $urls);
+        // var_dump($option_val, $urls_array);
+        // exit;
         
         return !empty(array_diff($option_val, $urls_array));
     }
