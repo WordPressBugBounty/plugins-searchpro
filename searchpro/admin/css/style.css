@@ -4,6 +4,18 @@
   background-color: #fff;
   border-radius: 10px;
   overflow: hidden;
+  height: 100vh;
+  transition: all 0.3s ease;
+}
+.berqwp-dashbaord.sticky {
+  position: fixed;
+  top: 12px;
+  margin-left: -22px;
+  margin-right: 0px;
+  padding-bottom: 100vh;
+  margin-bottom: 100vh;
+  border-radius: 0;
+  z-index: 99;
 }
 
 .berqwp-header {
@@ -62,6 +74,11 @@ a.berqwp-support {
   background: #0D2958;
 }
 
+.sticky .berqwp-tabs {
+  overflow-y: scroll;
+  height: 85vh;
+}
+
 .berqwp-tab {
   padding: 18px 20px;
   font-size: 16px;
@@ -75,10 +92,13 @@ a.berqwp-support {
   width: calc(100% - 300px);
   padding: 0 25px;
   padding-top: 25px;
-  height: 100vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  height: 85vh;
+  overflow: hidden;
   background: #F7FAFF;
+}
+
+.sticky .berqwp-tab-content {
+  overflow-y: scroll;
 }
 
 h2.berq-tab-title {
@@ -191,6 +211,14 @@ button.berqwp-save:hover {
   background-color: #3d44d9;
   color: #fff;
   text-decoration: none;
+}
+button.berqwp-save.cf {
+  margin-top: 10px;
+  text-transform: inherit;
+  background-color: #F6821F;
+}
+button.berqwp-save.cf:hover {
+  background-color: #e29230;
 }
 
 .berqwp-tab.active {
@@ -889,4 +917,41 @@ a.berqwp-refresh-license-btn {
 }
 a.berqwp-refresh-license-btn:hover {
   background-color: #b9fddc;
+}
+
+label.berq-check input[type=text] {
+  width: 300px;
+  display: block;
+  font-weight: normal;
+  max-width: 300px;
+  border: 1px solid #d3d3d3;
+  padding: 2px 10px;
+}
+
+.berqwp-cf-connected {
+  background-color: #c4ffc4;
+  width: -moz-fit-content;
+  width: fit-content;
+  padding: 10px 20px;
+  margin-top: 15px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+}
+.berqwp-cf-connected svg {
+  width: 35px;
+  height: auto;
+  fill: #22b522;
+  margin-right: 10px;
+}
+
+input.bwp-disable-cf {
+  margin-top: 10px;
+  border: none;
+  color: #ff1e1e;
+  background: transparent;
+  padding: 0;
+  font-size: 15px;
+  margin-left: auto;
+  display: block;
 }/*# sourceMappingURL=style.css.map */

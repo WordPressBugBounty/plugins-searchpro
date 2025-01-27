@@ -64,181 +64,6 @@
     }
     ,
     {
-      "pattern": "[wW]get",
-      "instances": [
-        "WGETbot/1.0 (+http://wget.alanreed.org)",
-        "Wget/1.14 (linux-gnu)",
-        "Wget/1.20.3 (linux-gnu)"
-      ]
-    }
-    ,
-    {
-      "pattern": "LinkedInBot",
-      "instances": [
-        "LinkedInBot/1.0 (compatible; Mozilla/5.0; Jakarta Commons-HttpClient/3.1 +http://www.linkedin.com)",
-        "LinkedInBot/1.0 (compatible; Mozilla/5.0; Jakarta Commons-HttpClient/4.3 +http://www.linkedin.com)",
-        "LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)"
-      ]
-    }
-    ,
-    {
-      "pattern": "Python-urllib",
-      "instances": [
-        "Python-urllib/1.17",
-        "Python-urllib/2.5",
-        "Python-urllib/2.6",
-        "Python-urllib/2.7",
-        "Python-urllib/3.1",
-        "Python-urllib/3.2",
-        "Python-urllib/3.3",
-        "Python-urllib/3.4",
-        "Python-urllib/3.5",
-        "Python-urllib/3.6",
-        "Python-urllib/3.7"
-       ]
-    }
-    ,
-    {
-      "pattern": "python-requests",
-      "addition_date": "2018/05/27",
-      "instances": [
-        "python-requests/2.9.2",
-        "python-requests/2.11.1",
-        "python-requests/2.18.4",
-        "python-requests/2.19.1",
-        "python-requests/2.20.0",
-        "python-requests/2.21.0",
-        "python-requests/2.22.0"
-      ]
-    }
-    ,
-    {
-      "pattern": "aiohttp",
-      "addition_date": "2019/12/23",
-      "instances": [
-        "Python/3.9 aiohttp/3.7.3",
-        "Python/3.8 aiohttp/3.7.2",
-        "Python/3.7 aiohttp/3.6.2a2"
-      ],
-      "url": "https://docs.aiohttp.org/en/stable/"
-    }
-    ,
-    {
-      "pattern": "httpx",
-      "addition_date": "2019/12/23",
-      "instances": [
-        "python-httpx/0.16.1",
-        "python-httpx/0.13.0.dev1"
-  
-      ],
-      "url": "https://www.python-httpx.org"
-    }
-    ,
-    {
-      "pattern": "libwww-perl",
-      "instances": [
-        "2Bone_LinkChecker/1.0 libwww-perl/6.03",
-        "2Bone_LinkChkr/1.0 libwww-perl/6.03",
-        "amibot - http://www.amidalla.de - tech@amidalla.com libwww-perl/5.831"
-      ]
-    }
-    ,
-    {
-      "pattern": "httpunit",
-      "instances": [
-        "httpunit/1.x"
-      ]
-    }
-    ,
-    {
-      "pattern": "Nutch",
-      "instances": [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/605.1.16 (KHTML, like Gecko; compatible; Friendly_Crawler/2.0) Chrome/120.0.6099.217 Safari/605.1.15/Nutch-1.20-SNAPSHOT",
-        "NutchCVS/0.7.1 (Nutch; http://lucene.apache.org/nutch/bot.html; nutch-agent@lucene.apache.org)",
-        "istellabot-nutch/Nutch-1.10"
-      ]
-    }
-    ,
-    {
-      "pattern": "Go-http-client",
-      "addition_date": "2016/03/26",
-      "url": "https://golang.org/pkg/net/http/",
-      "instances": [
-        "Go-http-client/1.1",
-        "Go-http-client/2.0"
-      ]
-    }
-    ,
-    {
-      "pattern": "phpcrawl",
-      "addition_date": "2012/09/17",
-      "url": "http://phpcrawl.cuab.de/",
-      "instances": [
-        "phpcrawl"
-      ]
-    }
-    ,
-    {
-      "pattern": "msnbot",
-      "url": "http://search.msn.com/msnbot.htm",
-      "instances": [
-        "adidxbot/1.1 (+http://search.msn.com/msnbot.htm)",
-        "adidxbot/2.0 (+http://search.msn.com/msnbot.htm)",
-        "librabot/1.0 (+http://search.msn.com/msnbot.htm)",
-        "librabot/2.0 (+http://search.msn.com/msnbot.htm)",
-        "msnbot-NewsBlogs/2.0b (+http://search.msn.com/msnbot.htm)",
-        "msnbot-UDiscovery/2.0b (+http://search.msn.com/msnbot.htm)",
-        "msnbot-media/1.0 (+http://search.msn.com/msnbot.htm)",
-        "msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)",
-        "msnbot-media/2.0b (+http://search.msn.com/msnbot.htm)",
-        "msnbot/1.0 (+http://search.msn.com/msnbot.htm)",
-        "msnbot/1.1 (+http://search.msn.com/msnbot.htm)",
-        "msnbot/2.0b (+http://search.msn.com/msnbot.htm)",
-        "msnbot/2.0b (+http://search.msn.com/msnbot.htm).",
-        "msnbot/2.0b (+http://search.msn.com/msnbot.htm)._"
-      ]
-    }
-    ,
-    {
-      "pattern": "jyxobot",
-      "instances": []
-    }
-    ,
-    {
-      "pattern": "FAST-WebCrawler",
-      "instances": [
-        "FAST-WebCrawler/3.6/FirstPage (atw-crawler at fast dot no;http://fast.no/support/crawler.asp)",
-        "FAST-WebCrawler/3.7 (atw-crawler at fast dot no; http://fast.no/support/crawler.asp)",
-        "FAST-WebCrawler/3.7/FirstPage (atw-crawler at fast dot no;http://fast.no/support/crawler.asp)",
-        "FAST-WebCrawler/3.8"
-      ]
-    }
-    ,
-    {
-      "pattern": "FAST Enterprise Crawler",
-      "instances": [
-        "FAST Enterprise Crawler 6 / Scirus scirus-crawler@fast.no; http://www.scirus.com/srsapp/contactus/",
-        "FAST Enterprise Crawler 6 used by Schibsted (webcrawl@schibstedsok.no)"
-      ]
-    }
-    ,
-    {
-      "pattern": "BIGLOTRON",
-      "instances": [
-        "BIGLOTRON (Beta 2;GNU/Linux)"
-      ]
-    }
-    ,
-    {
-      "pattern": "Teoma",
-      "instances": [
-        "Mozilla/2.0 (compatible; Ask Jeeves/Teoma; +http://sp.ask.com/docs/about/tech_crawling.html)",
-        "Mozilla/2.0 (compatible; Ask Jeeves/Teoma; +http://about.ask.com/en/docs/about/webmasters.shtml)"
-      ],
-      "url": "http://about.ask.com/en/docs/about/webmasters.shtml"
-    }
-    ,
-    {
       "pattern": "convera",
       "instances": [
         "ConveraCrawler/0.9e (+http://ews.converasearch.com/crawl.htm)"
@@ -284,14 +109,6 @@
     }
     ,
     {
-      "pattern": "ia_archiver",
-      "instances": [
-        "ia_archiver (+http://www.alexa.com/site/help/webmasters; crawler@alexa.com)",
-        "ia_archiver-web.archive.org"
-      ]
-    }
-    ,
-    {
       "pattern": "GingerCrawler",
       "instances": [
         "GingerCrawler/1.0 (Language Assistant for Dyslexics; www.gingersoftware.com/crawler_agent.htm; support at ginger software dot com)"
@@ -301,13 +118,6 @@
     {
       "pattern": "webmon ",
       "instances": []
-    }
-    ,
-    {
-      "pattern": "HTTrack",
-      "instances": [
-        "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)"
-      ]
     }
     ,
     {
@@ -343,17 +153,6 @@
     }
     ,
     {
-      "pattern": "speedy",
-      "instances": [
-        "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) Speedy Spider (http://www.entireweb.com/about/search_tech/speedy_spider/)",
-        "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) Speedy Spider for SpeedyAds (http://www.entireweb.com/about/search_tech/speedy_spider/)",
-        "Mozilla/5.0 (compatible; Speedy Spider; http://www.entireweb.com/about/search_tech/speedy_spider/)",
-        "Speedy Spider (Entireweb; Beta/1.2; http://www.entireweb.com/about/search_tech/speedyspider/)",
-        "Speedy Spider (http://www.entireweb.com/about/search_tech/speedy_spider/)"
-      ]
-    }
-    ,
-    {
       "pattern": "fluffy",
       "instances": []
     }
@@ -385,11 +184,6 @@
         "findlinks/2.5 (+http://wortschatz.uni-leipzig.de/findlinks/)",
         "findlinks/2.6 (+http://wortschatz.uni-leipzig.de/findlinks/)"
       ]
-    }
-    ,
-    {
-      "pattern": "msrbot",
-      "instances": []
     }
     ,
     {
@@ -754,22 +548,6 @@
     }
     ,
     {
-      "pattern": "findthatfile",
-      "addition_date": "2011/06/21",
-      "url": "http://www.findthatfile.com/",
-      "instances": []
-    }
-    ,
-    {
-      "pattern": "europarchive\\.org",
-      "addition_date": "2011/06/21",
-      "url": "",
-      "instances": [
-        "Mozilla/5.0 (compatible; MSIE 7.0 +http://www.europarchive.org)"
-      ]
-    }
-    ,
-    {
       "pattern": "NerdByNature\\.Bot",
       "addition_date": "2011/07/12",
       "url": "http://www.nerdbynature.net/bot",
@@ -782,20 +560,6 @@
       "pattern": "sistrix crawler",
       "addition_date": "2011/08/02",
       "instances": []
-    }
-    ,
-    {
-      "pattern": "Ahrefs(Bot|SiteAudit)",
-      "addition_date": "2011/08/28",
-      "instances": [
-        "Mozilla/5.0 (compatible; AhrefsBot/6.1; +http://ahrefs.com/robot/)",
-        "Mozilla/5.0 (compatible; AhrefsSiteAudit/6.1; +http://ahrefs.com/robot/)",
-        "Mozilla/5.0 (compatible; AhrefsBot/5.2; News; +http://ahrefs.com/robot/)",
-        "Mozilla/5.0 (compatible; AhrefsBot/5.2; +http://ahrefs.com/robot/)",
-        "Mozilla/5.0 (compatible; AhrefsSiteAudit/5.2; +http://ahrefs.com/robot/)",
-        "Mozilla/5.0 (compatible; AhrefsBot/6.1; News; +http://ahrefs.com/robot/)",
-        "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)"
-      ]
     }
     ,
     {
@@ -1134,17 +898,6 @@
     }
     ,
     {
-      "pattern": "web-archive-net\\.com\\.bot",
-      "instances": []
-    }
-    ,
-    {
-      "pattern": "backlinkcrawler",
-      "addition_date": "2013/01/04",
-      "instances": []
-    }
-    ,
-    {
       "pattern": "coccoc",
       "addition_date": "2013/01/04",
       "url": "http://help.coccoc.vn/",
@@ -1283,24 +1036,6 @@
     }
     ,
     {
-      "pattern": "360Spider",
-      "addition_date": "2014/03/14",
-      "url": "http://needs-be.blogspot.co.uk/2013/02/how-to-block-spider360.html",
-      "instances": [
-        "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.89 Safari/537.1; 360Spider",
-        "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.89 Safari/537.1; 360Spider(compatible; HaosouSpider; http://www.haosou.com/help/help_3_2.html)",
-        "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36 QIHU 360SE; 360Spider",
-        "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; )  Firefox/1.5.0.11; 360Spider",
-        "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.0.11)  Firefox/1.5.0.11; 360Spider",
-        "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.0.11) Firefox/1.5.0.11 360Spider;",
-        "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.0.11) Gecko/20070312 Firefox/1.5.0.11; 360Spider",
-        "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0); 360Spider",
-        "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0); 360Spider(compatible; HaosouSpider; http://www.haosou.com/help/help_3_2.html)",
-        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36; 360Spider"
-      ]
-    }
-    ,
-    {
       "pattern": "psbot",
       "addition_date": "2014/03/31",
       "url": "http://www.picsearch.com/bot.html",
@@ -1375,14 +1110,6 @@
         "binlar_2.6.3 larbin2.6.3@unspecified.mail",
         "binlar_2.6.3 phanendra_kalapala@McAfee.com",
         "binlar_2.6.3 test@mgmt.mic"
-      ]
-    }
-    ,
-    {
-      "pattern": "SimpleCrawler",
-      "addition_date": "2014/09/12",
-      "instances": [
-        "SimpleCrawler/0.1"
       ]
     }
     ,
@@ -1603,22 +1330,6 @@
         "Mozilla/5.0 (compatible; Findxbot/1.0; +http://www.findxbot.com)"
       ],
       "addition_date": "2015/05/07"
-    }
-    ,
-    {
-      "pattern": "S[eE][mM]rushBot",
-      "url": "http://www.semrush.com/bot.html",
-      "instances": [
-        "Mozilla/5.0 (compatible; SemrushBot-SA/0.97; +http://www.semrush.com/bot.html)",
-        "Mozilla/5.0 (compatible; SemrushBot-SI/0.97; +http://www.semrush.com/bot.html)",
-        "Mozilla/5.0 (compatible; SemrushBot/3~bl; +http://www.semrush.com/bot.html)",
-        "Mozilla/5.0 (compatible; SemrushBot/0.98~bl; +http://www.semrush.com/bot.html)",
-        "Mozilla/5.0 (compatible; SemrushBot-BA; +http://www.semrush.com/bot.html)",
-        "Mozilla/5.0 (compatible; SemrushBot/6~bl; +http://www.semrush.com/bot.html)",
-        "Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)",
-        "SEMrushBot"
-      ],
-      "addition_date": "2015/05/26"
     }
     ,
     {

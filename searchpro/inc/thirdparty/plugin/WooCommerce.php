@@ -36,12 +36,7 @@ class berqWooCommerce extends berqIntegrations {
 
         // Get the full URL of the product
         $product_url = get_permalink( $post_id );
-        
-        // Parse the URL to get the path
-        $parsed_url = wp_parse_url( $product_url );
-        $product_path = isset( $parsed_url['path'] ) ? $parsed_url['path'] : '';
-
-        berqCache::purge_page($product_path);
+        berqCache::purge_page($product_url);
     }
 
 

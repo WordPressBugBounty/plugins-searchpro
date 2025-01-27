@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET['berqwp_webhook']) && 
     $html = base64_decode($data['html']);
     $page_slug = $data['page_slug'];
     $license_key_hash = sanitize_text_field($data['license_key_hash']);
+    $page_url = $data['page_url'];
 
     if ($status == 'success' && !empty($data['html'])) {
 
@@ -49,12 +50,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET['berqwp_webhook']) && 
         }
 
         $cache = new Cache(null, bwp_get_cache_dir());
-        $cache->store_cache($page_slug, $html);
+        $cache->store_cache($page_url, $html);
 
         do_action('berqwp_stored_page_cache', $page_slug);
     
         global $berq_log;
-        $berq_log->info("Stored cache for $page_slug");
+        $berq_log->info("Stored cache for $page_url");
 
         // Cache is stored which means connection is stable
         // Delete connection test error transient

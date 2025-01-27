@@ -17,10 +17,10 @@ class Cache {
         $this->storage_dir = $storage_dir;
     }
 
-    function request_cache($post_data) {
+    function request_cache($post_data, $timeout = 30) {
 
         $rateLimiter = new RateLimiter(5, 60, $this->storage_dir);
-        $clientIdentifier = $_SERVER['REMOTE_ADDR'];
+        $clientIdentifier = gethostname();
 
         if ($rateLimiter->isRateLimited($clientIdentifier)) {
             return false;
@@ -28,6 +28,7 @@ class Cache {
 
         $client = new HttpClient($this->api_host);
         $client->setUserAgent('BerqWP');
+        $client->setTimeout($timeout);
         $client->post('/photon/', $post_data, ['Content-Type' => 'application/x-www-form-urlencoded']);
         
         if ($client->ok()) {
@@ -43,7 +44,7 @@ class Cache {
         }
 
         $rateLimiter = new RateLimiter(5, 60, $this->storage_dir);
-        $clientIdentifier = $_SERVER['REMOTE_ADDR'];
+        $clientIdentifier = gethostname();
 
         if ($rateLimiter->isRateLimited($clientIdentifier)) {
             return false;
@@ -57,19 +58,19 @@ class Cache {
         $responses = $httpMulti->execute();
     }
 
-    function store_cache($page_path, $html) {
+    function store_cache($page_url, $html) {
         
         // Create the cache directory if it doesn't exist
         if (!file_exists($this->cache_directory)) {
             mkdir($this->cache_directory, 0755, true);
         }
 
-        $cache_file = $this->cache_directory . md5($page_path) . '.html';
+        $cache_file = $this->cache_directory . md5($page_url) . '.html';
 
         file_put_contents($cache_file, $html);
 
         if (Utils::is_gzip_supported()) {
-            $cache_file = $this->cache_directory . md5($page_path) . '.gz';
+            $cache_file = $this->cache_directory . md5($page_url) . '.gz';
             $html = gzencode($html);
             file_put_contents($cache_file, $html);
         }

@@ -17,9 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['berqwp_request_cache']
     }
 
     $path = $_POST['page_slug'];
+    $page_url = $_POST['page_url'];
 
-    if (bwp_can_warmup_cache($path)) {
-        warmup_cache_by_slug($path);
+    if (bwp_can_warmup_cache($page_url)) {
+        warmup_cache_by_url($page_url);
         echo json_encode(['status' => 'success']);
     }
     

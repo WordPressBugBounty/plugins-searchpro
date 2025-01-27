@@ -153,7 +153,7 @@ class berqStyleOptimizer
         add_filter('berqwp_buffer_before_closing_body', [$this, 'script']);
 
         // CSS compatibility for javascript disabled
-        add_filter('berqwp_buffer_before_closing_body', [$this, 'noscript']);
+        // add_filter('berqwp_buffer_before_closing_body', [$this, 'noscript']);
 
         unset($photonClass);
 

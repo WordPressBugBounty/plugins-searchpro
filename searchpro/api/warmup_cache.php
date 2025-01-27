@@ -1,10 +1,10 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-$slug = $request->get_param('slug');
+$page_url = $request->get_param('page_url');
 $is_forced = false;
 
-if (!empty($slug) && bwp_can_warmup_cache($slug)) {
-    warmup_cache_by_slug($slug, $is_forced);
+if (!empty($page_url) && bwp_can_warmup_cache($page_url)) {
+    warmup_cache_by_url($page_url, $is_forced);
     return;
 }

@@ -3,7 +3,7 @@
  * Plugin Name:       BerqWP
  * Plugin URI:        https://berqwp.com
  * Description:       Automatically pass Core Web Vitals for WordPress and boost your speed score to 90+ for both mobile and desktop without any technical skills.
- * Version:           2.2.14
+ * Version:           2.2.15
  * Requires at least: 5.3
  * Requires PHP:      7.4
  * Author:            BerqWP
@@ -15,7 +15,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BERQWP_VERSION')) {
-	define('BERQWP_VERSION', '2.2.14');
+	define('BERQWP_VERSION', '2.2.15');
 }
 
 if (!defined('optifer_PATH')) {
@@ -51,6 +51,9 @@ if (!file_exists(optifer_cache)) {
 	mkdir(optifer_cache, 0755, true);
 }
 
+global $bwp_current_page;
+$bwp_current_page = null;
+
 // Initialize BerqWP SDK
 require_once optifer_PATH . '/BerqWP/vendor/autoload.php';
 
@@ -63,6 +66,7 @@ require_once optifer_PATH . '/vendor/woocommerce/action-scheduler/action-schedul
 require_once optifer_PATH . '/inc/class-berqlogs.php';
 require_once optifer_PATH . '/inc/helper-functions.php';
 require_once optifer_PATH . '/inc/common-functions.php';
+require_once optifer_PATH . '/inc/dropin-functions.php';
 require_once optifer_PATH . '/inc/classs-http.php';
 require_once optifer_PATH . '/inc/photon/class-berqPageOptimizer.php';
 require_once optifer_PATH . '/inc/photon/class-berqBufferOptimize.php';
@@ -71,14 +75,19 @@ require_once optifer_PATH . '/inc/photon/class-scriptOptimizer.php';
 require_once optifer_PATH . '/inc/photon/class-berqImages.php';
 require_once optifer_PATH . '/inc/photon/class-berqCDN.php';
 require_once optifer_PATH . '/inc/photon/class-berqCriticalCSS.php';
+require_once optifer_PATH . '/inc/class-berqintegrations.php';
 require_once optifer_PATH . '/inc/photon/integration/index.php';
 require_once optifer_PATH . '/inc/class-berqcache.php';
 require_once optifer_PATH . '/inc/class-berqwp.php';
 require_once optifer_PATH . '/inc/class-berqimages.php';
-require_once optifer_PATH . '/inc/class-berqintegrations.php';
 require_once optifer_PATH . '/inc/class-berqnotifications.php';
 require_once optifer_PATH . '/inc/httpclient.php';
+require_once optifer_PATH . '/inc/class-berqCloudflareAPIHandler.php';
 
+if (get_option('berqwp_enable_sandbox') == 0) {
+	bwp_serve_advanced_cache();
+}
+register_shutdown_function('bwp_cache_current_page');
 
 // Redirect to BerqWP admin page after activation
 register_activation_hook(__FILE__, 'berqwp_activation');

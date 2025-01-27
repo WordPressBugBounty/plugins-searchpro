@@ -18,9 +18,9 @@ class BerqWP
         $this->storage_dir = $storage_dir;
     }
 
-    function request_cache($post_data) {
+    function request_cache($post_data, $timeout = 30) {
         $cache = new Cache($this->api_host, $this->cache_directory, $this->storage_dir);
-        return $cache->request_cache($post_data);
+        return $cache->request_cache($post_data, $timeout);
     }
 
     function request_multi_cache($post_data_arr) {

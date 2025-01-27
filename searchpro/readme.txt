@@ -3,7 +3,7 @@ Contributors: thevisionofhamza, berqwp, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.7
-Stable tag: 2.2.14
+Stable tag: 2.2.15
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -165,6 +165,17 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.2.15 =
+* [New Feature] Added Cloudflare Edge Cache support.
+* [New Feature] Added preload video poster for YouTube embeds.
+* [Enhancement] Auto purge homepage cache when a new post is published.
+* [Enhancement] Added support for the Filter Everything plugin; disabled cache for all filter URLs.
+* [Enhancement] Improved compatibility with reverse proxy cache.
+* [Enhancement] Removed "Defer JavaScript" from the JavaScript execution mode setting.
+* [Bug] Fixed issue with translated page URLs.
+* [Bug] Disabled JavaScript and CSS optimization for partial cache to ensure maximum compatibility.
+* [Bug] Fixed bug where sitemap was being cached by BerqWP.
 
 = 2.2.14 =
 * [Bug] Fixed a fatal error when updating the JS/CSS exclude value.

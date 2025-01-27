@@ -41,7 +41,7 @@ if ($cached_percentage < 0) {
     <?php } ?>
 
     <?php 
-    if (!bwp_is_home_cached() || (bwp_is_home_cached() && bwp_is_partial_cache(bwp_url_into_path(bwp_admin_home_url('/')))) ) {
+    if (!bwp_is_home_cached() || (bwp_is_home_cached() && bwp_is_partial_cache(bwp_admin_home_url('/'))) ) {
         bwp_dash_notification("We're currently building the cache for this website's homepage, which may take up to 5 minutes. Thank you for your patience, good things are worth the wait.", 'warning');
     }
     ?>
@@ -74,9 +74,9 @@ if ($cached_percentage < 0) {
             <p class="website-url">
                 <?php 
                 $cache_directory = bwp_get_cache_dir();
-                // $home_slug = bwp_url_into_path(home_url('/'));
-                $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
-                $is_home_ready = file_exists($cache_directory . md5($home_slug) . '.html') && bwp_is_partial_cache($home_slug) === false;
+                // $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
+                $home_url = bwp_admin_home_url('/');
+                $is_home_ready = file_exists($cache_directory . md5($home_url) . '.html') && bwp_is_partial_cache($home_url) === false;
                 $msg = '';
 
                 if (get_option('berqwp_enable_sandbox')) {
@@ -101,9 +101,9 @@ if ($cached_percentage < 0) {
             <p class="website-url">
                 <?php 
                 $cache_directory = bwp_get_cache_dir();
-                // $home_slug = bwp_url_into_path(home_url('/'));
-                $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
-                $is_home_ready = file_exists($cache_directory . md5($home_slug) . '.html') && bwp_is_partial_cache($home_slug) === false;
+                // $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
+                $home_url = bwp_admin_home_url('/');
+                $is_home_ready = file_exists($cache_directory . md5($home_url) . '.html') && bwp_is_partial_cache($home_url) === false;
                 $msg = '';
 
                 if (get_option('berqwp_enable_sandbox')) {

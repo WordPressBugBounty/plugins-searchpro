@@ -61,6 +61,9 @@ if (!class_exists('berqWP')) {
 			// Sitemap for cache warmup
 			add_action('init', 'bwp_get_sitemap');
 
+			// BerqWP display logs
+			add_action('init', 'bwp_display_logs');
+
 			require_once optifer_PATH . '/api/register_apis.php';
 
 			add_action('admin_menu', [$this, 'register_menu']);
@@ -113,6 +116,9 @@ if (!class_exists('berqWP')) {
 
 				delete_option( $transient_key );
 				delete_option( $expire_transient_key );
+
+				// clear cache from cloud
+				bwp_request_purge_license_key_cache();
                 
                 global $berqNotifications;
 				$berqNotifications->success('License key successfully refreshed.');
@@ -171,13 +177,14 @@ if (!class_exists('berqWP')) {
 					}
 		
 					$cache_directory = bwp_get_cache_dir();
-					$cache_key = md5($slug);
+					$cache_key = md5($url);
+					// $cache_key = md5($slug);
 					$cache_file = $cache_directory . $cache_key . '.html';
 		
 					if (file_exists($cache_file)) {
 						$status = '<span class="bwp-cache-tag completed">Completed</span>';
 		
-						if (bwp_is_partial_cache($slug) === true) {
+						if (bwp_is_partial_cache($url) === true) {
 							$status = '<span class="bwp-cache-tag part-completed">Partial cache</span>';
 						}
 						
@@ -231,7 +238,7 @@ if (!class_exists('berqWP')) {
 
 			check_ajax_referer('wp_rest', 'nonce');
 			
-			$url = get_option('berqwp_enable_sandbox') ? home_url().'/?berqwp' : home_url();
+			$url = get_option('berqwp_enable_sandbox') ? bwp_admin_home_url('/?berqwp') : bwp_admin_home_url('/');
 		
 			// $response = wp_remote_get($url);
 			$response = bwp_wp_remote_get($url);
@@ -472,12 +479,19 @@ if (!class_exists('berqWP')) {
 			}*/
 
 			// Check connection
-			$check_rest = bwp_check_connection();
+			$check_rest = bwp_check_connection(!empty($_GET['bwp_connection_test'])===true);
 			if ( $check_rest['status'] == 'error' ) {
+				bwp_notice('error', 'Website Unreachable: Connection Blocked', "<p>$plugin_name server is unable to access this website, please whitelist our server IP address. <a href='https://berqwp.com/help-center/get-started-with-berqwp/' target='_blank'>Find our server IP address here.</a></p>", [
+					[
+						'href'	=> esc_attr(add_query_arg(['bwp_connection_test'=>true], wp_get_referer())),
+						'text'	=> 'Check again',
+						'classes'	=> '',
+					]
+				]);
 				?>
-				<div class="notice notice-error">
+				<!-- <div class="notice notice-error">
 					<p><strong>Error:</strong> <?php echo $plugin_name; ?> server is unable to access this website, please whitelist our server IP address. <a href="https://berqwp.com/help-center/get-started-with-berqwp/" target="_blank">Find our server IP address here.</a></p>
-				</div>
+				</div> -->
 				<?php
 			}
 
@@ -619,7 +633,7 @@ if (!class_exists('berqWP')) {
 				// If not cached, perform the API request
 
 				$rateLimiter = new RateLimiter(5, 60, optifer_cache);
-				$clientIdentifier = $_SERVER['REMOTE_ADDR'];
+				$clientIdentifier = gethostname();
 		
 				if ($rateLimiter->isRateLimited($clientIdentifier)) {
 					return false;

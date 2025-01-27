@@ -147,18 +147,15 @@ function berqwp_is_slug_excludable($slug)
     return false;
 }
 
-function berqwp_get_page_params($slug='', $is_forced = false) {
+function berqwp_get_page_params($page_url, $is_forced = false) {
 
-    // Allow empty slug (page path)
-    // if (empty($slug)) {
-    //     return;
-    // }
+    if (empty($page_url)) {
+        return;
+    }
 
-    $url = home_url() . $slug;
-    $slug_md5 = md5($slug);
-
+    $page_slug = bwp_url_into_path($page_url);
     $cache_directory = bwp_get_cache_dir();
-    $cache_file = $cache_directory . $slug_md5 . '.html';
+    $cache_file = $cache_directory . $page_url . '.html';
     // $key = uniqid();
     $key = '';
     $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
@@ -183,13 +180,14 @@ function berqwp_get_page_params($slug='', $is_forced = false) {
     // Data to send as POST parameters
     $post_data = array(
         'license_key'                   => get_option('berqwp_license_key'),
-        'page_url'                      => $url,
-        'page_slug'                     => $slug,
+        'page_url'                      => $page_url,
+        'page_slug'                     => $page_slug,
         'site_url'                      => home_url(),
         'webp_max_width'                => (int) get_option('berqwp_webp_max_width'),
         'webp_quality'                  => (int) get_option('berqwp_webp_quality'),
         'img_lazyloading'               => get_option('berqwp_image_lazyloading'),
         'youtube_lazyloading'           => get_option('berqwp_lazyload_youtube_embed'),
+        'preload_yt_poster'             => get_option('berqwp_preload_yt_poster'),
         'js_mode'                       => get_option('berqwp_javascript_execution_mode'),
         'key'                           => $key,
         'interaction_delay'             => get_option('berqwp_interaction_delay'),
@@ -249,20 +247,19 @@ function bwp_pass_account_requirement() {
     return true;
 }
 
-function warmup_cache_by_slug($slug, $is_forced = false)
+function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
 {
-    if (empty($slug)) {
+    if (empty($page_url)) {
         return;
     }
 
+    $slug = bwp_url_into_path($page_url);
     if (berqwp_is_slug_excludable($slug)) {
         return;
     }
 
-    $slug_md5 = md5($slug);
-
     $cache_directory = bwp_get_cache_dir();
-    $cache_file = $cache_directory . $slug_md5 . '.html';
+    $cache_file = $cache_directory . $page_url . '.html';
     $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
 
     if (!file_exists($cache_file) && bwp_pass_account_requirement() === false) {
@@ -272,17 +269,9 @@ function warmup_cache_by_slug($slug, $is_forced = false)
     // Return if page is excluded from cache
     $pages_to_exclude = get_option('berq_exclude_urls', []);
 
-    if (in_array(home_url() . $slug, $pages_to_exclude)) {
+    if (in_array($page_url, $pages_to_exclude)) {
         return;
     }
-
-    // Not needed anymore, using webhook instead
-    // $check_rest = bwp_check_rest_api(true);
-    // if ( $check_rest['status'] == 'error' ) {
-    //     global $berq_log;
-    //     $berq_log->error('Exiting cache warmup by slug, rest api not working.');
-    //     return;
-    // }
 
     $check_connection = bwp_check_connection(true);
     if ( $check_connection['status'] == 'error' ) {
@@ -294,9 +283,9 @@ function warmup_cache_by_slug($slug, $is_forced = false)
     // Hook to modify cache lifespan
     $cache_max_life = apply_filters('berqwp_cache_lifespan', $cache_max_life);
 
-    if (file_exists($cache_file) && bwp_is_partial_cache($slug) === false && $cache_max_life > time()) {
-        return;
-    }
+    // if (file_exists($cache_file) && bwp_is_partial_cache($page_url) === false && $cache_max_life > time()) {
+    //     return;
+    // }
 
     // API endpoint URL
     $api_endpoint = 'https://boost.berqwp.com/photon/';
@@ -308,7 +297,7 @@ function warmup_cache_by_slug($slug, $is_forced = false)
     // Modify photon engine endpoint for testing purposes
     $api_endpoint = apply_filters( 'berqwp_photon_endpoint', $api_endpoint );
 
-    $post_data = berqwp_get_page_params($slug, $is_forced);
+    $post_data = berqwp_get_page_params($page_url, $is_forced);
     
     // Set up the request arguments
     $args = array(
@@ -335,27 +324,44 @@ function warmup_cache_by_slug($slug, $is_forced = false)
     // $client->setUserAgent('BerqWP');
     // $client->post('/photon/', $post_data, ['Content-Type' => 'application/x-www-form-urlencoded']);
 
+    global $berq_log;
+    $berq_log->info('warming: '.$page_url);
+
     $berqwp = new BerqWP(get_option('berqwp_license_key'), null, optifer_cache);
-    $berqwp->request_cache($post_data);
+    $timeout = 30;
+
+    if ($async) {
+        $timeout = 0.1;
+    }
+
+    $berqwp->request_cache($post_data, $timeout);
 
 }
 
 function bwp_is_home_cached() {
-    $slug_md5 = md5(bwp_url_into_path(bwp_admin_home_url('/')));
+    $slug_md5 = md5(bwp_admin_home_url('/'));
     $cache_directory = bwp_get_cache_dir();
     $cache_file = $cache_directory . $slug_md5 . '.html';
 
     return file_exists($cache_file);
 }
 
-function bwp_is_partial_cache($slug) {
+function bwp_cache_current_page() {
+    global $bwp_current_page;
+
+    if (!empty($bwp_current_page) && !is_admin()) {
+        warmup_cache_by_url($bwp_current_page, false, true);
+    }
+}
+
+function bwp_is_partial_cache($identifier) {
 
     if (!function_exists('str_get_html')) {
         require_once optifer_PATH . '/simplehtmldom/simple_html_dom.php';
     }
     
     $cache_directory = bwp_get_cache_dir();
-    $cache_key = md5($slug);
+    $cache_key = md5($identifier);
     $cache_file = $cache_directory . $cache_key . '.html';
     
     if (file_exists($cache_file)) {
@@ -418,12 +424,12 @@ function berqwp_remove_ignore_params($slug)
     $new_query_string = http_build_query($url_params);
 
     // Reconstruct the URL with the new query string
-    $new_slug = $url_parts['path'];
+    $updated_url = $url_parts['scheme'] . "://" . $url_parts['host'] . $url_parts['path'];
     if (!empty($new_query_string)) {
-        $new_slug .= '?' . $new_query_string;
+        $updated_url .= '?' . $new_query_string;
     }
 
-    return $new_slug;
+    return $updated_url;
 }
 
 function berqwp_is_sub_dir_wp()
@@ -832,11 +838,11 @@ function bwp_dash_notification($msg = '', $status = 'warning') {
     <?php
 }
 
-function bwp_can_warmup_cache($slug) {
+function bwp_can_warmup_cache($identifier) {
 
-    if (get_transient( 'bwp_warmup_lock_'.md5($slug) ) === false) {
+    if (get_transient( 'bwp_warmup_lock_'.md5($identifier) ) === false) {
 
-        set_transient( 'bwp_warmup_lock_'.md5($slug), true, 100 );
+        set_transient( 'bwp_warmup_lock_'.md5($identifier), true, 100 );
         return true;
         
     }
@@ -1089,20 +1095,42 @@ function bwp_isGzipEncoded() {
     return false;
 }
 
+function bwp_sluguri_into_path($slug_uri) {
+    $is_multisite = function_exists('is_multisite') && is_multisite();
+    $home_path = parse_url(home_url(), PHP_URL_PATH);
+
+    // if (berqwp_is_sub_dir_wp() && !$is_multisite) {
+    if (!$is_multisite && $home_path !== null) {
+        // Parse strings to extract paths
+        $path1 = explode('/', $home_path);
+        $path2 = explode('/', parse_url($slug_uri, PHP_URL_PATH));
+
+        // Find the common part of the paths
+        $commonPath = implode('/', array_intersect($path1, $path2));
+
+        // Subtract the common part from the first string
+        $slug_uri = str_replace($commonPath, '', $slug_uri);
+    }
+
+    return $slug_uri;
+}
+
 function bwp_url_into_path($url) {
     $parsed_url = parse_url($url);
     $path = isset($parsed_url['path']) ? $parsed_url['path'] : '';
     $query = isset($parsed_url['query']) ? $parsed_url['query'] : '';
+    $homeurl = home_url();
 
     if (!empty($query)) {
         $path = $path . '?' . $query;
     }
 
     $is_multisite = function_exists('is_multisite') && is_multisite();
+    $home_path = parse_url($homeurl, PHP_URL_PATH);
 
-    if (berqwp_is_sub_dir_wp() && !$is_multisite) {
+    if (!$is_multisite && $home_path !== null) {
         // Parse strings to extract paths
-        $path1 = explode('/', parse_url(home_url(), PHP_URL_PATH));
+        $path1 = explode('/', $home_path);
         $path2 = explode('/', parse_url($path, PHP_URL_PATH));
 
         // Find the common part of the paths
@@ -1115,24 +1143,6 @@ function bwp_url_into_path($url) {
     // $path = bwp_intersect_str(bwp_admin_home_url(), $path);
 
     return $path;
-}
-
-function bwp_sluguri_into_path($slug_uri) {
-    $is_multisite = function_exists('is_multisite') && is_multisite();
-
-    if (berqwp_is_sub_dir_wp() && !$is_multisite) {
-        // Parse strings to extract paths
-        $path1 = explode('/', parse_url(home_url(), PHP_URL_PATH));
-        $path2 = explode('/', parse_url($slug_uri, PHP_URL_PATH));
-
-        // Find the common part of the paths
-        $commonPath = implode('/', array_intersect($path1, $path2));
-
-        // Subtract the common part from the first string
-        $slug_uri = str_replace($commonPath, '', $slug_uri);
-    }
-
-    return $slug_uri;
 }
 
 function bwp_get_cache_dir() {
@@ -1404,6 +1414,7 @@ function bwp_notice($status = '', $title = null, $message = null, $btn = [], $di
 			<path fill-rule="evenodd" clip-rule="evenodd" d="M6.43896 0H17.561C21.1172 0 24 2.88287 24 6.43903V17.561C24 21.1171 21.1172 24 17.561 24H6.43896C2.88281 24 0 21.1171 0 17.561V6.43903C0 2.88287 2.88281 0 6.43896 0ZM15.7888 4.09753L8.59961 12.7534H12.3517L7.02441 20.4878L16.3903 11.0222L12.7814 10.3799L15.7888 4.09753Z" fill="#1f72ff"/>
 			</svg></div>
 					<div class="content">
+                        <div class="status-tag"><?php esc_html_e($status, 'searchpro'); ?></div>
                         <?php if (!empty($title)) { ?>
 						<h5><?php echo wp_kses_post(__($title, 'searchpro')); ?></h5>
                         <?php } ?>
@@ -1451,4 +1462,73 @@ function bwp_is_option_updated($option_name) {
     $values_changed = $option_val == $value;
 
     return !$values_changed;
+}
+
+function bwp_request_purge_license_key_cache() {
+
+    $license_key = get_option('berqwp_license_key');
+    $parsed_url = parse_url(home_url());
+    $domain = $parsed_url['host'];
+    
+    if (empty($domain) || empty($license_key)) {
+        return;
+    }
+
+    wp_remote_get( "https://boost.berqwp.com/photon/?flush_key=$license_key&domain=$domain", ['timeout' => 30] );
+}
+
+function bwp_display_logs() {
+    
+    if (isset($_GET['berqwp_logs'])) {
+
+        // Check if the current user is logged in and has admin privileges
+        if (!is_user_logged_in() || !current_user_can('administrator')) {
+            wp_die(__('You are not allowed to access this page.', 'berqwp'));
+        }
+
+        // Define the path to the BerqWP logs file
+        $log_file_path = optifer_cache . 'berqwp.log'; // Adjust path if needed
+    
+        // Check if the log file exists
+        if (!file_exists($log_file_path)) {
+            echo '<div>No logs available. The log file does not exist.</div>';
+            exit;
+        }
+    
+        // Read and display the log file content
+        $logs = file_get_contents($log_file_path);
+    
+        if ($logs === false) {
+            echo '<div>Unable to read the log file.</div>';
+            exit;
+        }
+    
+        echo '<h2>BerqWP Logs</h2>';
+        echo '<pre style="background:#f4f4f4;padding:15px;border:1px solid #ddd;">' . esc_html($logs) . '</pre>';
+        exit;
+        
+    }
+
+}
+
+function bwp_cf_flush_all() {
+    if (!empty(get_option( 'berqwp_cf_creden' ))) {
+        $email = get_option( 'berqwp_cf_creden' )['email'];
+        $apitoken = get_option( 'berqwp_cf_creden' )['apitoken'];
+        $zoneid = get_option( 'berqwp_cf_creden' )['zoneid'];
+
+        $berqCloudflareAPIHandler = new berqCloudflareAPIHandler($email, $apitoken, $zoneid);
+        $berqCloudflareAPIHandler->purge_all_cache();
+    }
+}
+
+function bwp_cf_flush_page($url) {
+    if (!empty(get_option( 'berqwp_cf_creden' ))) {
+        $email = get_option( 'berqwp_cf_creden' )['email'];
+        $apitoken = get_option( 'berqwp_cf_creden' )['apitoken'];
+        $zoneid = get_option( 'berqwp_cf_creden' )['zoneid'];
+
+        $berqCloudflareAPIHandler = new berqCloudflareAPIHandler($email, $apitoken, $zoneid);
+        $berqCloudflareAPIHandler->flush_page_cache($url);
+    }
 }

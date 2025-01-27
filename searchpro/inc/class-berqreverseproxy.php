@@ -83,11 +83,12 @@ class berqReverseProxyCache
             $url = str_replace('/.*', '/', $url);
         }
 
-        $response = wp_remote_get($url, array(
-            'headers' => array(
-                'Cache-Control' => 'no-cache, must-revalidate, max-age=0',
-                'Pragma' => 'no-cache'
-            )
-        ));
+        // $response = wp_remote_get($url, array(
+        //     'headers' => array(
+        //         'Cookie' => 'wordpress_logged_in_',
+        //         'Cache-Control' => 'no-cache, must-revalidate, max-age=0',
+        //         'Pragma' => 'no-cache'
+        //     )
+        // ));
     }
 }

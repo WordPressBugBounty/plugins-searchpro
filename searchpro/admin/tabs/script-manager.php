@@ -50,7 +50,7 @@ $url_lines = implode("\n", $exclude_urls);
             </h3>
             <div class="berq-box-content">
                 <p>
-                    <?php esc_html_e('Enter external JavaScript & CSS file URLs to exclude from optimization, one URL per line. Add relative URLs or filenames with no query parameters, like /wp-includes/js/jquery/jquery.min.js', 'searchpro'); ?>
+                    <?php esc_html_e('Enter URLs, filenames, or keywords from <script> or <link> tags to exclude from optimization, one per line. Example: /wp-includes/js/jquery.min.js or google-analytics.', 'searchpro'); ?>
                 </p>
                 <textarea name="berq_exclude_js_css" cols="30" rows="10"><?php echo esc_textarea($url_lines); ?></textarea>
             </div>
@@ -102,12 +102,16 @@ $url_lines = implode("\n", $exclude_urls);
     </div>
     <div class="berq-info-box">
         <h3 class="berq-box-title">
-            <?php esc_html_e('LazyLoad YouTube embeds', 'searchpro'); ?>
+            <?php esc_html_e('Lazy load YouTube embeds', 'searchpro'); ?>
         </h3>
         <div class="berq-box-content">
             <label class="berq-check">
                 <input type="checkbox" name="berqwp_lazyload_youtube_embed" <?php checked(1, get_option('berqwp_lazyload_youtube_embed'), true); ?>>
-                <?php esc_html_e('Enable lazyload for YouTube videos', 'searchpro'); ?>
+                <?php esc_html_e('Enable lazy load for YouTube videos', 'searchpro'); ?>
+            </label>
+            <label class="berq-check" style="<?php echo get_option('berqwp_lazyload_youtube_embed') ? '' : 'display:none;'; ?>">
+                <input type="checkbox" name="berqwp_preload_yt_poster" <?php checked(1, get_option('berqwp_preload_yt_poster'), true); ?>>
+                <?php esc_html_e('Preload video poster', 'searchpro'); ?>
             </label>
         </div>
     </div>
@@ -133,7 +137,7 @@ $url_lines = implode("\n", $exclude_urls);
                     <input type="radio" name="berqwp_javascript_execution_mode" value="0" <?php echo get_option('berqwp_javascript_execution_mode') == 0 ? 'checked' : ''; ?>>
                     <?php esc_html_e('Sequential Execution', 'searchpro'); ?>
                 </label>
-                <label class="berq-check">
+                <label class="berq-check" style="display:none">
                     <input type="radio" name="berqwp_javascript_execution_mode" value="2" <?php echo get_option('berqwp_javascript_execution_mode') == 2 ? 'checked' : ''; ?>>
                     <?php esc_html_e('Defer JavaScript (Safe - No Delay)', 'searchpro'); ?>
                 </label>

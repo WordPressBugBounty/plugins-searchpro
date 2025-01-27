@@ -95,6 +95,12 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                         <?php esc_html_e('JavaScript Modes, Emojis, YouTube', 'searchpro'); ?>
                     </p>
                 </div>
+                <div class="berqwp-tab <?php bwp_is_tab_nav('integration'); ?>" data-tab="integration">
+                    <?php esc_html_e('Integration', 'searchpro'); ?>
+                    <p>
+                        <?php esc_html_e('Cloudflare Edge Cache', 'searchpro'); ?>
+                    </p>
+                </div>
                 <div class="berqwp-tab <?php bwp_is_tab_nav('activate-license'); ?>" data-tab="activate-license">
                     <?php esc_html_e('License', 'searchpro'); ?>
                     <p>
@@ -113,6 +119,7 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                     require_once optifer_PATH . '/admin/tabs/cache-management.php';
                     require_once optifer_PATH . '/admin/tabs/image-optimization.php';
                     require_once optifer_PATH . '/admin/tabs/script-manager.php';
+                    require_once optifer_PATH . '/admin/tabs/integration.php';
                     require_once optifer_PATH . '/admin/tabs/activate-license.php';
                     ?>
                 </form>
@@ -132,19 +139,6 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
             function numberWithCommas(x) {
                 return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            }
-
-            function berq_clear_cache() {
-                $.ajax({
-                    url: '<?php echo esc_html(get_site_url()); ?>/wp-json/optifer/v1/clear-cache',
-                    method: 'POST',
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('X-WP-Nonce', berq_nounce);
-                    },
-                    success: function (response) {
-
-                    }
-                })
             }
 
             function init_opt_slider() {
@@ -212,6 +206,19 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                 })
             }
 
+            function berq_clear_cache() {
+                $.ajax({
+                    url: '<?php echo esc_html(get_site_url()); ?>/wp-json/optifer/v1/clear-cache',
+                    method: 'POST',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-WP-Nonce', berq_nounce);
+                    },
+                    success: function (response) {
+
+                    }
+                })
+            }
+
             init_opt_slider();
 
             $('.berqwp-tab').click(function () {
@@ -248,10 +255,11 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
             <?php
             $cache_directory = bwp_get_cache_dir();
-            $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
-            $home_cache_file = $cache_directory . md5($home_slug) . '.html';
+            // $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
+            $home_url = bwp_admin_home_url('/');
+            $home_cache_file = $cache_directory . md5($home_url) . '.html';
             $is_home_ready = file_exists($home_cache_file);
-            if ($is_home_ready && bwp_is_partial_cache($home_slug) === false) { ?>
+            if ($is_home_ready && bwp_is_partial_cache($home_url) === false) { ?>
 
                 $.ajax({
                     method: 'GET',
@@ -553,6 +561,42 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                         { data: 'status', title: "Cache Status" },     // Map 'status' to the second column
                         { data: 'last_modified', title: "Last Optimized Date" } // Map 'last_modified' to the third column
                     ]
+                });
+            });
+
+            $('[name="berqwp_lazyload_youtube_embed"]').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('[name="berqwp_preload_yt_poster"]').parent().show();
+                } else {
+                    $('[name="berqwp_preload_yt_poster"]').parent().hide();
+                }
+            });
+            
+            $(document).ready(function () {
+                const stickyDiv = $('.berqwp-dashbaord');
+                const offset = stickyDiv.offset().top;
+
+                $(window).on('scroll', function () {
+                    if ($(this).scrollTop() + 30 >= offset) {
+                        stickyDiv.addClass('sticky');
+                        // stickyDiv.stop(true, true).animate({
+                            //     left: "160px", // Toggle height animation
+                            // }, 1000);
+                            stickyDiv.parent().css('paddingBottom', '100vh');
+                            setTimeout(function() {
+                                var resizeEvent = new Event('resize');
+                                window.dispatchEvent(resizeEvent);
+                                document.dispatchEvent(resizeEvent);
+                            }, 300)
+                    } else {
+                        stickyDiv.removeClass('sticky');
+                        stickyDiv.parent().css('paddingBottom', '0vh');
+                        setTimeout(function() {
+                            var resizeEvent = new Event('resize');
+                            window.dispatchEvent(resizeEvent);
+                            document.dispatchEvent(resizeEvent);
+                        }, 300)
+                    }
                 });
             });
 

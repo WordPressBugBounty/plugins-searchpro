@@ -68,6 +68,72 @@ if (isset($_POST['berqwp_save_nonce'])) {
         exit();
     }
 
+    if (!empty($_POST['bwp_cf_apitoken']) && !empty($_POST['bwp_cf_zoneid']) && !empty($_POST['bwp_cf_email'])) {
+        $apitoken = sanitize_text_field( $_POST['bwp_cf_apitoken'] );
+        $zoneid = sanitize_text_field( $_POST['bwp_cf_zoneid'] );
+        $email = sanitize_text_field( $_POST['bwp_cf_email'] );
+
+        $berqCloudflareAPIHandler = new berqCloudflareAPIHandler($email, $apitoken, $zoneid);
+
+        if ($berqCloudflareAPIHandler->verify_credentials()) {
+            update_option( 'berqwp_cf_creden', [
+                'apitoken'  => $apitoken,
+                'zoneid'    => $zoneid,
+                'email'     => $email,
+            ] );
+
+            $berqCloudflareAPIHandler->add_rule();
+            $berqCloudflareAPIHandler->purge_all_cache();
+
+            global $berqNotifications;
+            $berqNotifications->success('Cloudflare account connected.');
+
+            ?>
+            <script>
+                location.href = '<?php echo esc_html(get_admin_url() . 'admin.php?page=berqwp'); ?>';
+            </script>
+            <?php
+            exit();
+
+        } else {
+            
+            global $berqNotifications;
+            $berqNotifications->error('Invalid Cloudflare credentials.');
+
+            ?>
+            <script>
+                location.href = '<?php echo esc_html(get_admin_url() . 'admin.php?page=berqwp'); ?>';
+            </script>
+            <?php
+            exit();
+        }
+    }
+
+    if (!empty($_POST['bwp_disable_cf'])) {
+
+        if (!empty(get_option( 'berqwp_cf_creden' ))) {
+            $email = get_option( 'berqwp_cf_creden' )['email'];
+            $apitoken = get_option( 'berqwp_cf_creden' )['apitoken'];
+            $zoneid = get_option( 'berqwp_cf_creden' )['zoneid'];
+    
+            $berqCloudflareAPIHandler = new berqCloudflareAPIHandler($email, $apitoken, $zoneid);
+            $berqCloudflareAPIHandler->purge_all_cache();
+            $berqCloudflareAPIHandler->delete_rule_by_description('BerqWP cache rules');
+    
+            delete_option( 'berqwp_cf_creden' );
+        }
+
+        global $berqNotifications;
+        $berqNotifications->success('Cloudflare Edge Cache disabled.');
+
+        ?>
+        <script>
+            location.href = '<?php echo esc_html(get_admin_url() . 'admin.php?page=berqwp'); ?>';
+        </script>
+        <?php
+        exit();
+    }
+
     if (isset($_POST['berqwp_enable_sandbox'])) {
         update_option('berqwp_enable_sandbox', 1);
     } else {
@@ -176,6 +242,17 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_lazyload_youtube_embed', 1);
     } else {
         update_option('berqwp_lazyload_youtube_embed', 0);
+    }
+
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_preload_yt_poster')) {
+        update_option('bwp_require_flush_cache', 1);
+    }
+
+    if (isset($_POST['berqwp_preload_yt_poster'])) {
+        update_option('berqwp_preload_yt_poster', 1);
+    } else {
+        update_option('berqwp_preload_yt_poster', 0);
     }
 
     // If the option is changed require flush cache

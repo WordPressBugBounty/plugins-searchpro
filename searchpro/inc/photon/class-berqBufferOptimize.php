@@ -700,25 +700,27 @@ class berqBufferOptimize {
         $scriptOptimizer = new berqScriptOptimizer();
         $js_optimization = get_option('berq_js_optimization');
 
-        if ($js_optimization == 'auto') {
+        // if ($js_optimization == 'auto') {
 
-            if ($this->optimization_mode == 'medium') {
-                $scriptOptimizer->set_loading('preload');
-            }
+        //     if ($this->optimization_mode == 'medium') {
+        //         $scriptOptimizer->set_loading('preload');
+        //     }
     
-            if ($this->optimization_mode == 'basic') {
-                $scriptOptimizer->set_loading('default');
-            }
+        //     if ($this->optimization_mode == 'basic') {
+        //         $scriptOptimizer->set_loading('default');
+        //     }
 
-        }
+        // }
 
-        if ($js_optimization == 'asynchronous') {
-            $scriptOptimizer->set_loading('preload');
-        }
+        // if ($js_optimization == 'asynchronous') {
+        //     $scriptOptimizer->set_loading('preload');
+        // }
 
-        if ($js_optimization == 'disable') {
-            $scriptOptimizer->set_loading('default');
-        }
+        // if ($js_optimization == 'disable') {
+        //     $scriptOptimizer->set_loading('default');
+        // }
+
+        $scriptOptimizer->set_loading('default');
 
 
         $buffer = apply_filters( 'berqwp_before_script_optimization', $buffer );

@@ -43,12 +43,12 @@ function dropin_remove_ignore_params($slug)
     $new_query_string = http_build_query($url_params);
 
     // Reconstruct the URL with the new query string
-    $new_slug = $url_parts['path'];
+    $updated_url = $url_parts['scheme'] . "://" . $url_parts['host'] . $url_parts['path'];
     if (!empty($new_query_string)) {
-        $new_slug .= '?' . $new_query_string;
+        $updated_url .= '?' . $new_query_string;
     }
 
-    return $new_slug;
+    return $updated_url;
 }
 
 function bwp_dropin_isGzipEncoded() {

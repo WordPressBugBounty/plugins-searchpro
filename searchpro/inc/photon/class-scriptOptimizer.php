@@ -596,7 +596,7 @@ class berqScriptOptimizer {
 
                                     // Copy other attributes if necessary
                                     Array.from(script.attributes).forEach(function(attr) {
-                                        if (attr.name !== 'type') {
+                                        if (attr.name !== 'type' && attr.name !== 'data-type') {
                                             newScript.setAttribute(attr.name, attr.value);
                                         }
                                     });
