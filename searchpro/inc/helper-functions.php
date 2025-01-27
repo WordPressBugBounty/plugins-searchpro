@@ -989,7 +989,7 @@ function bwp_check_connection($force_check = false) {
     }
 
     // Perform the actual REST API check
-    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.bwp_admin_home_url('/'), ['timeout' => 20] );
+    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.bwp_admin_home_url('/'), ['timeout' => 30] );
 
     if ( is_wp_error( $response ) ) {
         $result = array(
@@ -1529,6 +1529,6 @@ function bwp_cf_flush_page($url) {
         $zoneid = get_option( 'berqwp_cf_creden' )['zoneid'];
 
         $berqCloudflareAPIHandler = new berqCloudflareAPIHandler($email, $apitoken, $zoneid);
-        $berqCloudflareAPIHandler->flush_page_cache($url);
+        $berqCloudflareAPIHandler->flush_url($url);
     }
 }

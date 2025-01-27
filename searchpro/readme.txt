@@ -3,7 +3,7 @@ Contributors: thevisionofhamza, berqwp, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.7
-Stable tag: 2.2.15
+Stable tag: 2.2.16
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -28,6 +28,7 @@ BerqWP automatically applies all modern speed optimization techniques recommende
 - **Works with your favorite themes and plugins** 
 - **Doesn’t break your website**
 - **Build for non-techies**
+- **Get instant support with BerqWP's AI assistant**
 
 ## Real World Results
 - **88.6% of BerqWP-optimized websites have an average loading time below 3 seconds.**
@@ -63,6 +64,8 @@ BerqWP automatically applies all modern speed optimization techniques recommende
 - **JavaScript Optimization**: BerqWP offers specialized JavaScript optimization features, including JS delay and JS defer. It provides three distinct JavaScript optimization modes to address Core Web Vitals issues, such as render blocking. BerqWP ensures that your website not only passes Core Web Vitals but also achieves a speed score of 90+ for both mobile and desktop.
 
 - **Web Vitals Analytics:** With BerqWP, you gain access to our Web Vitals Analytics on the BerqWP website. It enables you to track and monitor core web vitals and the website performance experienced by actual visitors.
+
+- **Supports Cloudflare Edge Cache:** BerqWP automatically configures the correct cache rules for your website, delivering page cache through Cloudflare's global network, significantly reducing server response time. Simply connect your Cloudflare account in the plugin settings to get started.
 
 - **Much more!**
 
@@ -165,6 +168,9 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.2.16 =
+* [Bug] Fixed error caused by Cloudflare flush cache.
 
 = 2.2.15 =
 * [New Feature] Added Cloudflare Edge Cache support.
