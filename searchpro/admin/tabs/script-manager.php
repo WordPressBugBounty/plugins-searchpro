@@ -50,7 +50,7 @@ $url_lines = implode("\n", $exclude_urls);
             </h3>
             <div class="berq-box-content">
                 <p>
-                    <?php esc_html_e('Enter URLs, filenames, or keywords from <script> or <link> tags to exclude from optimization, one per line. Example: /wp-includes/js/jquery.min.js or google-analytics.', 'searchpro'); ?>
+                    <?php esc_html_e('Enter URLs, filenames, or keywords from <script> or <link> tags to exclude from optimization, one per line. Example: /wp-includes/js/jquery/jquery.min.js or google-analytics.', 'searchpro'); ?>
                 </p>
                 <textarea name="berq_exclude_js_css" cols="30" rows="10"><?php echo esc_textarea($url_lines); ?></textarea>
             </div>

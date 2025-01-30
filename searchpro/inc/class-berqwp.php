@@ -728,11 +728,36 @@ if (!class_exists('berqWP')) {
 
 				$cached_response = json_decode($response);
 
+				
 				if ($action == 'slm_check' && !empty($cached_response) && !empty($cached_response->result)) {
-					// Cache the response for 24 hours
-					// set_transient($transient_key, $cached_response, 24 * HOUR_IN_SECONDS);
-					update_option($transient_key, $cached_response);
-					update_option($expire_transient_key, time() + 24 * HOUR_IN_SECONDS);
+					$domain_found = false;
+    
+                    foreach ($cached_response->registered_domains as $reg_domain) {
+                        $domain_name = str_replace('www.', '', $domain);
+                        $domain_name_www = 'www.'.$domain;
+    
+                        if ($reg_domain->registered_domain == $domain_name || $reg_domain->registered_domain == $domain_name_www || $reg_domain->registered_domain == $domain) {
+                            $domain_found = true;
+                            break;
+                        }
+    
+                    }
+					
+					if ($domain_found) {
+						// Cache the response for 24 hours
+						// set_transient($transient_key, $cached_response, 24 * HOUR_IN_SECONDS);
+						update_option($transient_key, $cached_response);
+						update_option($expire_transient_key, time() + 24 * HOUR_IN_SECONDS);
+
+					} else {
+
+						delete_option( $transient_key );
+						delete_option( $expire_transient_key );
+						delete_option( 'berqwp_license_key' );
+
+						return false;
+
+					}
 				}
 
 				// if ($action == 'slm_check' && !empty($cached_response) && $cached_response->result == 'success' && $cached_response->status == 'active') {

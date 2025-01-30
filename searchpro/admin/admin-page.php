@@ -579,15 +579,12 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                 $(window).on('scroll', function () {
                     if ($(this).scrollTop() + 30 >= offset) {
                         stickyDiv.addClass('sticky');
-                        // stickyDiv.stop(true, true).animate({
-                            //     left: "160px", // Toggle height animation
-                            // }, 1000);
-                            stickyDiv.parent().css('paddingBottom', '100vh');
-                            setTimeout(function() {
-                                var resizeEvent = new Event('resize');
-                                window.dispatchEvent(resizeEvent);
-                                document.dispatchEvent(resizeEvent);
-                            }, 300)
+                        stickyDiv.parent().css('paddingBottom', '100vh');
+                        setTimeout(function() {
+                            var resizeEvent = new Event('resize');
+                            window.dispatchEvent(resizeEvent);
+                            document.dispatchEvent(resizeEvent);
+                        }, 300)
                     } else {
                         stickyDiv.removeClass('sticky');
                         stickyDiv.parent().css('paddingBottom', '0vh');

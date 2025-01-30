@@ -3,7 +3,7 @@ Contributors: thevisionofhamza, berqwp, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.7
-Stable tag: 2.2.16
+Stable tag: 2.2.17
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -168,6 +168,9 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.2.17 =
+* [Bug] Fixed license key revoke bug.
 
 = 2.2.16 =
 * [Bug] Fixed error caused by Cloudflare flush cache.

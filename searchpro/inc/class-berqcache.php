@@ -133,7 +133,7 @@ if (!class_exists('berqCache')) {
             add_action('publish_post', [$this, 'purge_home']);
 
             // flush cloudflare edge cache
-            add_action('berqwp_stored_page_cache', [$this, 'bwp_cf_flush_page']);
+            add_action('berqwp_stored_page_cache', [$this, 'flush_cf_page']);
 
         }
 
@@ -933,8 +933,7 @@ if (!class_exists('berqCache')) {
                     if (
                         (!file_exists($cache_file) ||
                         (file_exists($cache_file) && $this->is_cache_file_expired($cache_file)) ) ||
-                        (file_exists($cache_file) && bwp_is_partial_cache($page_url) === true) 
-                        && bwp_can_warmup_cache($page_url) 
+                        (file_exists($cache_file) && bwp_is_partial_cache($page_url) === true)
                     ) {
 
                         global $bwp_current_page;

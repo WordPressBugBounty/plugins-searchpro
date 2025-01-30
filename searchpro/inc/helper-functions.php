@@ -349,9 +349,46 @@ function bwp_is_home_cached() {
 function bwp_cache_current_page() {
     global $bwp_current_page;
 
-    if (!empty($bwp_current_page) && !is_admin()) {
-        warmup_cache_by_url($bwp_current_page, false, true);
+    if (empty($bwp_current_page)) {
+        return;
     }
+
+    // Check if the current user is logged in or if it's a POST request
+    if (is_user_logged_in() || $_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'PURGE') {
+        return;
+    }
+
+    if (is_admin()) {
+        return;
+    }
+
+    if (defined('DOING_CRON') && DOING_CRON) {
+        return;
+    }
+
+    if (defined('DOING_AJAX') && DOING_AJAX) {
+        return;
+    }
+
+    if (defined('REST_REQUEST') && REST_REQUEST) {
+        return;
+    }
+
+    if (php_sapi_name() === 'cli' || defined('WP_CLI')) {
+        return;
+    }
+
+    if (!bwp_is_webpage()) {
+        return;
+    }
+
+    if (!bwp_can_warmup_cache($bwp_current_page)) {
+        return;
+    }
+
+    warmup_cache_by_url($bwp_current_page, false, true);
+    $bwp_current_page = null;
+    
 }
 
 function bwp_is_partial_cache($identifier) {
@@ -989,7 +1026,7 @@ function bwp_check_connection($force_check = false) {
     }
 
     // Perform the actual REST API check
-    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.bwp_admin_home_url('/'), ['timeout' => 30] );
+    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.bwp_admin_home_url('/'), ['timeout' => 60] );
 
     if ( is_wp_error( $response ) ) {
         $result = array(
