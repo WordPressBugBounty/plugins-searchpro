@@ -29,7 +29,7 @@ function bwp_get_request_url() {
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost'; // Fallback to 'localhost' if unavailable
     $uri = $_SERVER['REQUEST_URI'] ?? '/';
     $url = $scheme . $host . $uri;
-    return $url;
+    return strtolower($url);
 }
 
 function bwp_serve_advanced_cache($serve_from = 'plugin') {
@@ -42,7 +42,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
         $cache_directory = ABSPATH . '/wp-content/cache/berqwp/html/';
         $cache_file = $cache_directory . $cache_key . '.html';
         $gzip_support = function_exists('gzencode') && isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false;
-        $cache_max_life = @filemtime($cache_file) + (48 * 60 * 60);
+        $cache_max_life = @filemtime($cache_file) + (24 * 60 * 60);
         $is_litespeed = isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false;
     
         if (file_exists($cache_file) && $cache_max_life > time()) {

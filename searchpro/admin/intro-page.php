@@ -2,6 +2,7 @@
 if (!defined('ABSPATH'))
     exit;
 
+do_action('berqwp_notices');
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

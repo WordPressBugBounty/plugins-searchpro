@@ -5,6 +5,40 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     die;
 }
 
+if (!defined('optifer_PATH')) {
+	define('optifer_PATH', plugin_dir_path(__FILE__));
+}
+
+if (!defined('optifer_URL')) {
+	define('optifer_URL', plugin_dir_url(__FILE__));
+}
+
+if (!defined('optifer_cache')) {
+	define('optifer_cache', WP_CONTENT_DIR . '/cache/berqwp/');
+}
+
+use BerqWP\BerqWP;
+
+// Initialize BerqWP SDK
+require_once optifer_PATH . '/BerqWP/vendor/autoload.php';
+
+// Load functions
+require_once optifer_PATH . '/inc/helper-functions.php';
+
+if (!empty(get_option('berqwp_license_key'))) {
+	$parsed_url = wp_parse_url(home_url());
+	$domain = $parsed_url['host'];
+	$berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
+	$berqwp->purge_critilclcss($domain);
+	$berqwp->purge_cdn($domain);
+}
+
+// Define the cache directory
+$cache_directory = bwp_get_cache_dir();
+
+// Delete all cache files within the directory
+berqwp_unlink_recursive($cache_directory);
+
 delete_option('berqwp_enable_sandbox');
 delete_option('berqwp_webp_max_width');
 delete_option('berqwp_webp_quality');

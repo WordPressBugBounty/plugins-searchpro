@@ -10,7 +10,7 @@ $args = array(
 );
 $query = new WP_Query($args);
 $pages_to_exclude = get_option('berq_exclude_urls', []);
-$total_pages = (int) $query->found_posts - count($pages_to_exclude);
+$total_pages = (int) $query->found_posts;
 $optimized_pages = bwp_cached_pages_count();
 
 if (empty($total_pages) || $total_pages <= 0) {
@@ -241,7 +241,7 @@ if ($cached_percentage < 0) {
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e("Monitor Core Web Vitals", 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e("Anonymously track and monitor Core Web Vitals metrics in real time using our Web Vitals Analytics. It may cause a little drop in pagespeed score.", 'searchpro'); ?></p>
+            <p><?php esc_html_e("Anonymously track and monitor Core Web Vitals metrics in real time using our Web Vitals Analytics. It may cause a little drop in PageSpeed score.", 'searchpro'); ?></p>
             <label class="berq-check">
                 <input type="checkbox" name="berqwp_enable_cwv" <?php checked(1, get_option('berqwp_enable_cwv'), true); ?>>
                 <?php esc_html_e("Enable Core Web Vitals tracking", 'searchpro'); ?>

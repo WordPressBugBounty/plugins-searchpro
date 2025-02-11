@@ -45,7 +45,7 @@ if (!class_exists('berqCache')) {
             }
 
             // Add clear cache link to admin bar
-            add_action('admin_bar_menu', [$this, 'add_clear_cache_link_to_admin_bar'], 999);
+            add_action('admin_bar_menu', [$this, 'add_admin_bar_menu'], 999);
 
             // Flush cache
             add_action('admin_post_clear_cache', [$this, 'handle_clear_cache_action']);
@@ -103,20 +103,10 @@ if (!class_exists('berqCache')) {
             add_action('switch_theme', [$this, 'delete_cache_files']);
 
             // Flush critical css when theme changes
-            add_action('switch_theme', function () {
-                $parsed_url = wp_parse_url(home_url());
-                $domain = $parsed_url['host'];
-                $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
-                $berqwp->purge_critilclcss($domain);
-            });
+            add_action('switch_theme', [$this, 'purge_critical_css_cache']);
 
             // Flush critical css when custimizer additional css is updated
-            add_action('customize_save_css', function () {
-                $parsed_url = wp_parse_url(home_url());
-                $domain = $parsed_url['host'];
-                $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
-                $berqwp->purge_critilclcss($domain);
-            });
+            add_action('customize_save_css', [$this, 'purge_critical_css_cache']);
 
             add_action('berqwp_flush_all_cache', [$this, 'request_warmup_cache']);
             add_action('berqwp_cache_warmup', [$this, 'request_warmup_cache']);
@@ -125,7 +115,7 @@ if (!class_exists('berqCache')) {
             // add_action('berqwp_cache_warmup', [$this, 'schedule_cache_warmup']);
 
             // Request cache when a post is published
-            add_action( 'transition_post_status', [$this, 'published_post'], 10, 3 );
+            add_action( 'transition_post_status', [$this, 'handle_post_status_update'], 10, 3 );
 
             add_action('send_headers', [$this, 'brust_cache_for_loggedin']);
 
@@ -135,6 +125,74 @@ if (!class_exists('berqCache')) {
             // flush cloudflare edge cache
             add_action('berqwp_stored_page_cache', [$this, 'flush_cf_page']);
 
+            // add_action( 'save_post', [$this, 'flush_post_taxonomy_and_archive_cache'] );
+
+        }
+
+        function flush_post_taxonomy_cache( $post_id ) {
+            // Bail out on autosaves and revisions.
+            if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+                return;
+            }
+            if ( wp_is_post_revision( $post_id ) ) {
+                return;
+            }
+        
+            $post = get_post( $post_id );
+            if ( ! $post ) {
+                return;
+            }
+
+            global $berq_log;
+        
+            // Get all taxonomies registered for this post type.
+            $taxonomies = get_object_taxonomies( $post->post_type );
+            if ( ! empty( $taxonomies ) ) {
+                // Clear the object term cache for the post.
+                clean_object_term_cache( $post_id, $taxonomies );
+        
+                // Loop through each taxonomy.
+                foreach ( $taxonomies as $taxonomy ) {
+
+                    if (!in_array($taxonomy, get_option('berqwp_optimize_taxonomies'))) {
+                        continue;
+                    }
+
+                    // Get all terms for this post in the current taxonomy.
+                    $terms = get_the_terms( $post_id, $taxonomy );
+                    if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+                        foreach ( $terms as $term ) {
+                            // Clear the term cache for each term.
+                            clean_object_term_cache( $term->term_id, $taxonomy );
+                            
+                            // Retrieve the archive URL for this term.
+                            $term_link = get_term_link( $term );
+                            if ( ! is_wp_error( $term_link ) ) {
+
+                                $berq_log->info("Purging cache for term $term_link");
+                                self::purge_page($term_link);
+                                
+                                $translation_urls = apply_filters( 'berqwp_page_translation_urls', [], $term_link );
+                                
+                                if (!empty($translation_urls)) {
+                                    foreach ($translation_urls as $url) {
+                                        $berq_log->info("Purging taxonomy translation for $url");
+                                        self::purge_page($url);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        
+        }
+
+        function purge_critical_css_cache() {
+            $parsed_url = wp_parse_url(home_url());
+            $domain = $parsed_url['host'];
+            $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
+            $berqwp->purge_critilclcss($domain);
         }
 
         function flush_cf_page($slug='') {
@@ -157,25 +215,29 @@ if (!class_exists('berqCache')) {
             }
         }
 
-        function published_post( $new_status, $old_status, $post ) {
+        function handle_post_status_update( $new_status, $old_status, $post ) {
+            // Get the post types that should be optimized from BerqWP settings
+            $post_types = get_option('berqwp_optimize_post_types');
+
+            // Get the published post URL
+            $post_url = get_permalink( $post );
+
             // Only proceed if the post is being published (from any status to 'publish')
             if ( 'publish' === $new_status && 'publish' !== $old_status ) {
                 
-                // Get the post types that should be optimized from BerqWP settings
-                $post_types = get_option('berqwp_optimize_post_types');
-                
                 // Check if the post type is in the list of types to be optimized
                 if ( in_array( $post->post_type, $post_types ) ) {
+
+                    global $berq_log;
+                    $berq_log->info("Post status updated $post_url");
                     
-                    // Get the published post URL
-                    $post_url = get_permalink( $post );
-                    $slug = bwp_url_into_path($post_url);
-		
 					if (bwp_can_optimize_page_url($post_url)) {
                         warmup_cache_by_url($post_url);
                     }
+
                 }
             }
+
         }
 
         function request_warmup_cache() {
@@ -212,6 +274,8 @@ if (!class_exists('berqCache')) {
         }
 
         public static function purge_page($page_url, $flush_criticalcss = false) {
+
+            $page_url = strtolower($page_url);
 
             // $page_path = bwp_intersect_str(home_url(), $page_path);
             $slug = bwp_url_into_path($page_url);
@@ -346,8 +410,8 @@ if (!class_exists('berqCache')) {
                 // Write the drop-in content to the file, replacing any existing file
                 file_put_contents($dropin_file, $dropin_content);
 
-                // Enable object cache in wp-config.php
-                berqwp_enable_object_cache(true);
+                // Enable wp cache in wp-config.php
+                berqwp_enable_advanced_cache(true);
 
                 // if (function_exists('wp_cache_flush')) {
                 //     wp_cache_flush(); // Clear the entire object cache.
@@ -467,9 +531,31 @@ if (!class_exists('berqCache')) {
                 return;
             }
 
+            $post_type = get_post_type( $post_id );
             $post_url = get_permalink($post_id);
-            
+
+            if (!empty($post_type) || !in_array($post_type, get_option('berqwp_optimize_post_types')) ) {
+                /** Flush post cache if exists */
+                self::purge_page($post_url);
+                return;
+            }
+
+            global $berq_log;
+            $berq_log->info("Post updated: $post_url");
+
             self::purge_page($post_url, true);
+
+            $translation_urls = apply_filters( 'berqwp_page_translation_urls', [], $post_url );
+
+            if (!empty($translation_urls)) {
+                foreach ($translation_urls as $url) {
+
+                    $berq_log->info("Purging translation for $post_url");
+                    self::purge_page($url, true);
+                }
+            }
+
+            $this->flush_post_taxonomy_cache( $post_id );
 
         }
 
@@ -637,8 +723,12 @@ if (!class_exists('berqCache')) {
 
         }
 
-        function add_clear_cache_link_to_admin_bar()
+        function add_admin_bar_menu()
         {
+            if (empty(get_option('berqwp_license_key'))) {
+                return;
+            }
+
             global $wp_admin_bar;
             $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
@@ -806,6 +896,10 @@ if (!class_exists('berqCache')) {
             }
 
             if (!bwp_pass_cookie_requirement()) {
+                return;
+            }
+
+            if (empty(get_option('berqwp_license_key'))) {
                 return;
             }
 

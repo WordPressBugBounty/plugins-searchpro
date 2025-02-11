@@ -1,9 +1,9 @@
 === BerqWP - Automated All-In-One PageSpeed Optimization for Core Web Vitals, Cache, CDN, Images, CSS, and JavaScript ===
-Contributors: thevisionofhamza, berqwp, berqier
+Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.7
-Stable tag: 2.2.17
+Stable tag: 2.2.18
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -168,6 +168,13 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.2.18 =
+* [Enhancement] UI improvements.
+* [Enhancement] Removed unwanted admin notices on the BerqWP settings page.
+* [Enhancement] Automatically purge cache for taxonomies when a post is updated.
+* [Enhancement] Automatically purge WooCommerce product cache when stock or sale status changes.
+* [Enhancement] Automatically purge TranslatePress translation pages when the main page is purged.
 
 = 2.2.17 =
 * [Bug] Fixed license key revoke bug.

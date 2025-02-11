@@ -5,6 +5,7 @@ if (!defined('ABSPATH'))
 $cached_pages = bwp_cached_pages_count();
 $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
+do_action('berqwp_notices');
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -223,6 +224,9 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
             $('.berqwp-tab').click(function () {
                 let tab = $(this).attr('data-tab');
+                $("html, body").animate({
+                    scrollTop: $(".berqwp-dashbaord").offset().top - 30
+                }, 200);
 
                 $('.berqwp-tab-content > form > div').css({'visibility':'hidden','opacity':0,'height':'0px','overflow':'hidden'});
                 $('.berqwp-tab').removeClass('active');
@@ -519,6 +523,7 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
             jQuery(document).ready(function($) {
                 var dataTable = $('.optimized-pages > table').DataTable({
+                    ordering: false,
                     paging: true,
                     searching: true,
                     processing: true,
@@ -572,30 +577,30 @@ $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
                 }
             });
             
-            $(document).ready(function () {
-                const stickyDiv = $('.berqwp-dashbaord');
-                const offset = stickyDiv.offset().top;
+            // $(document).ready(function () {
+            //     const stickyDiv = $('.berqwp-dashbaord');
+            //     const offset = stickyDiv.offset().top;
 
-                $(window).on('scroll', function () {
-                    if ($(this).scrollTop() + 30 >= offset) {
-                        stickyDiv.addClass('sticky');
-                        stickyDiv.parent().css('paddingBottom', '100vh');
-                        setTimeout(function() {
-                            var resizeEvent = new Event('resize');
-                            window.dispatchEvent(resizeEvent);
-                            document.dispatchEvent(resizeEvent);
-                        }, 300)
-                    } else {
-                        stickyDiv.removeClass('sticky');
-                        stickyDiv.parent().css('paddingBottom', '0vh');
-                        setTimeout(function() {
-                            var resizeEvent = new Event('resize');
-                            window.dispatchEvent(resizeEvent);
-                            document.dispatchEvent(resizeEvent);
-                        }, 300)
-                    }
-                });
-            });
+            //     $(window).on('scroll', function () {
+            //         if ($(this).scrollTop() + 30 >= offset) {
+            //             stickyDiv.addClass('sticky');
+            //             stickyDiv.parent().css('paddingBottom', '100vh');
+            //             setTimeout(function() {
+            //                 var resizeEvent = new Event('resize');
+            //                 window.dispatchEvent(resizeEvent);
+            //                 document.dispatchEvent(resizeEvent);
+            //             }, 300)
+            //         } else {
+            //             stickyDiv.removeClass('sticky');
+            //             stickyDiv.parent().css('paddingBottom', '0vh');
+            //             setTimeout(function() {
+            //                 var resizeEvent = new Event('resize');
+            //                 window.dispatchEvent(resizeEvent);
+            //                 document.dispatchEvent(resizeEvent);
+            //             }, 300)
+            //         }
+            //     });
+            // });
 
 
 

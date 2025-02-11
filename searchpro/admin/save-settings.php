@@ -286,6 +286,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
         
         if ($val !== get_option( 'berq_opt_mode' )) {
             do_action( 'berqwp_before_update_optimization_mode' );
+            delete_option( 'bwp_require_flush_cache' );
         }
 
         update_option('berq_opt_mode', $val);

@@ -33,9 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET['berqwp_webhook']) && 
     $status = sanitize_text_field($data['status']);
     $key = sanitize_text_field($data['key']);
     $html = base64_decode($data['html']);
-    $page_slug = $data['page_slug'];
+    $page_slug = strtolower($data['page_slug']);
     $license_key_hash = sanitize_text_field($data['license_key_hash']);
-    $page_url = $data['page_url'];
+    $page_url = strtolower($data['page_url']);
 
     if ($status == 'success' && !empty($data['html'])) {
 

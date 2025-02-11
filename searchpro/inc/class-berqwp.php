@@ -68,7 +68,7 @@ if (!class_exists('berqWP')) {
 
 			add_action('admin_menu', [$this, 'register_menu']);
 			// add_action('init', [$this, 'berq_post_types'], 20);
-			add_action('admin_notices', [$this, 'notices']);
+			add_action('berqwp_notices', [$this, 'notices']);
 
 			add_filter('plugin_action_links_searchpro/berqwp.php', [$this, 'plugin_settings_links']);
 
@@ -95,6 +95,24 @@ if (!class_exists('berqWP')) {
 
 			// Refresh license key
 			add_action('admin_post_bwp_refresh_license', [$this, 'handle_refresh_license_action']);
+
+			add_action('in_admin_header', [$this, 'remove_admin_notices']);
+		}
+
+		function remove_admin_notices() {
+
+			if (current_user_can('manage_options')) {
+				$screen = get_current_screen();
+				if ($screen->id === 'toplevel_page_berqwp') {
+					remove_all_actions('user_admin_notices');
+					remove_all_actions('admin_notices');
+					remove_all_actions('all_admin_notices');
+				} else {
+					add_action('admin_notices', function () {
+						do_action('berqwp_notices');
+					}, 10);
+				}
+			}
 		}
 
 		function admin_scripts() {
@@ -155,7 +173,57 @@ if (!class_exists('berqWP')) {
 			// Add search filtering, if applicable
 			if (!empty($search)) {
 				$args['s'] = $search; // Add the search parameter to the query
-			}		
+			}
+			
+			if ($start === 0 && empty($search)) {
+				$url = bwp_admin_home_url('/');
+
+				if (strpos($url, bwp_admin_home_url()) === false) {
+					$url = str_replace(home_url(), bwp_admin_home_url(), $url);
+				}
+
+				$slug = bwp_url_into_path($url);
+	
+				$cache_directory = bwp_get_cache_dir();
+				$cache_key = md5($url);
+				// $cache_key = md5($slug);
+				$cache_file = $cache_directory . $cache_key . '.html';
+	
+				if (file_exists($cache_file)) {
+					$status = '<span class="bwp-cache-tag completed">Completed</span>';
+	
+					if (bwp_is_partial_cache($url) === true) {
+						$status = '<span class="bwp-cache-tag part-completed">Partial cache</span>';
+					}
+					
+				} else {
+					$status = '<span class="bwp-cache-tag">Pending</span>';
+				}
+				
+				$parsed_url = parse_url($url);
+				$decoded_path = isset($parsed_url['path']) ? urldecode($parsed_url['path']) : '';
+				$decoded_query = isset($parsed_url['query']) ? urldecode($parsed_url['query']) : '';
+
+				$decoded_url = $parsed_url['scheme'] . '://' . $parsed_url['host'];
+				if (isset($parsed_url['port'])) {
+					$decoded_url .= ':' . $parsed_url['port'];
+				}
+				$decoded_url .= $decoded_path;
+				if ($decoded_query) {
+					$decoded_url .= '?' . $decoded_query;
+				}
+				if (isset($parsed_url['fragment'])) {
+					$decoded_url .= '#' . $parsed_url['fragment'];
+				}
+	
+				$page_arr = [
+					'url' => $decoded_url,
+					'status' => $status,
+					'last_modified' => file_exists($cache_file) ? date('Y-m-d H:i:s', filemtime($cache_file)) : ''
+				];
+
+				array_push($optimized_pages, $page_arr);
+			}
 		
 			$query = new WP_Query($args);
 			$total_posts = $query->found_posts; // Get the total number of records
@@ -165,6 +233,10 @@ if (!class_exists('berqWP')) {
 					$query->the_post();
 		
 					$url = get_permalink();
+
+					if (bwp_admin_home_url() == $url) {
+						continue;
+					}
 
 					if (strpos($url, bwp_admin_home_url()) === false) {
 						$url = str_replace(home_url(), bwp_admin_home_url(), $url);
@@ -240,8 +312,8 @@ if (!class_exists('berqWP')) {
 			
 			$url = get_option('berqwp_enable_sandbox') ? bwp_admin_home_url('/?berqwp') : bwp_admin_home_url('/');
 		
-			// $response = wp_remote_get($url);
-			$response = bwp_wp_remote_get($url);
+			$response = wp_remote_get($url);
+			// $response = bwp_wp_remote_get($url);
 		
 			if (is_array($response) && !is_wp_error($response)) {
 				$html = wp_remote_retrieve_body($response);
@@ -545,7 +617,7 @@ if (!class_exists('berqWP')) {
 					display: grid;
 					grid-template-columns: auto min-content;
 				}</style>";
-				echo '<div class="notice notice-error berqwp-plugin-conflict">';
+				echo '<div class="bwp-notice notice notice-error berqwp-plugin-conflict">';
 				echo wp_kses_post(__('<p><strong>BerqWP Plugin Conflict:</strong> The following plugins have a same nature as BerqWP plugin. Having multiple plugins of the same type can cause unexpected results.</p>', 'searchpro'));
 				?>
 				<form action="<?php echo esc_url(get_site_url() . add_query_arg($_GET)); ?>" method="post">

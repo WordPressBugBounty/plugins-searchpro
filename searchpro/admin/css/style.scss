@@ -3,8 +3,8 @@
     margin: 20px 0px;
     background-color: #fff;
     border-radius: 10px;
-    overflow: hidden;
-    height: 100vh;
+    // overflow: hidden;
+    // height: 100vh;
     transition: all .3s ease;
 
     &.sticky {
@@ -24,6 +24,10 @@
 .berqwp-dashbaord * {
     // -webkit-font-smoothing: antialiased;
 }
+
+// .notice:not(.bwp-notice), .fs-notice {
+//     display: none !important;
+// }
 
 .berqwp-header {
     padding: 16px 20px;
@@ -75,11 +79,19 @@ a.berqwp-support {
 .berqwp-dashbord-body {
     display: flex;
     flex-wrap: wrap;
+    position: relative;
+    // align-items: flex-start;
+    background-color: #0d2958;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .berqwp-tabs {
     width: 300px;
-    background: #0D2958;
+    align-self: start;
+    // background: #0D2958;
+    position: sticky;
+    top: 30px;
 }
 
 .sticky .berqwp-tabs {
@@ -100,10 +112,11 @@ a.berqwp-support {
     width: calc(100% - 300px);
     padding: 0 25px;
     padding-top: 25px;
-    height: 85vh;
+    // height: 85vh;
     // overflow-y: scroll;
     overflow: hidden;
     background: #F7FAFF;
+    border-bottom-right-radius: 10px;
 }
 
 .sticky .berqwp-tab-content {
@@ -521,10 +534,12 @@ table.berq-image-settings {
     left: 0;
     top: 0;
     z-index: 0;
+    border-top-left-radius: 10px;
 }
 
 .berqwp-header {
     position: relative;
+    border-top-right-radius: 10px;
 }
 
 .berqwp-header img {

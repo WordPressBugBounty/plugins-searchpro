@@ -4,7 +4,7 @@ class berqNotifications {
     private $transient_key = 'berqwp_user_notice'; // Define a unique key for the transient
 
     function __construct() {
-        add_action('admin_notices', [$this, 'notification']);
+        add_action('berqwp_notices', [$this, 'notification']);
         add_action('shutdown', [$this, 'maybe_clear_transient']); // Clear transient if empty after rendering notices
     }
 

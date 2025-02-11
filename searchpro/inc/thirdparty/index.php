@@ -19,6 +19,7 @@ require_once optifer_PATH . '/inc/thirdparty/plugin/WooCommerce.php';
 require_once optifer_PATH . '/inc/thirdparty/plugin/Elementor.php';
 require_once optifer_PATH . '/inc/thirdparty/plugin/FilterEverything.php';
 require_once optifer_PATH . '/inc/thirdparty/plugin/EWWW.php';
+require_once optifer_PATH . '/inc/thirdparty/plugin/TranslatePress.php';
 
 // Server
 require_once optifer_PATH . '/inc/thirdparty/server/Nginx.php';

@@ -3,8 +3,6 @@
   margin: 20px 0px;
   background-color: #fff;
   border-radius: 10px;
-  overflow: hidden;
-  height: 100vh;
   transition: all 0.3s ease;
 }
 .berqwp-dashbaord.sticky {
@@ -67,11 +65,17 @@ a.berqwp-support {
 .berqwp-dashbord-body {
   display: flex;
   flex-wrap: wrap;
+  position: relative;
+  background-color: #0d2958;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 .berqwp-tabs {
   width: 300px;
-  background: #0D2958;
+  align-self: start;
+  position: sticky;
+  top: 30px;
 }
 
 .sticky .berqwp-tabs {
@@ -92,9 +96,9 @@ a.berqwp-support {
   width: calc(100% - 300px);
   padding: 0 25px;
   padding-top: 25px;
-  height: 85vh;
   overflow: hidden;
   background: #F7FAFF;
+  border-bottom-right-radius: 10px;
 }
 
 .sticky .berqwp-tab-content {
@@ -501,10 +505,12 @@ table.berq-image-settings {
   left: 0;
   top: 0;
   z-index: 0;
+  border-top-left-radius: 10px;
 }
 
 .berqwp-header {
   position: relative;
+  border-top-right-radius: 10px;
 }
 
 .berqwp-header img {
