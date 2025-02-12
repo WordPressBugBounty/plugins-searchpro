@@ -73,7 +73,7 @@ if (!class_exists('berqCache')) {
             add_action('warmup_cache_by_slug', [$this, 'handle_warmup_cache_by_slug']);
             add_action('warmup_cache_quickly', 'warmup_cache_by_url');
             add_action('bwp_warmup_sitemap', [$this, 'warmup_sitemap']);
-            add_action('admin_notices', [$this, 'cache_warmup_admin_notice']);
+            add_action('berqwp_notices', [$this, 'cache_warmup_admin_notice']);
 
 
             // add_action('wp_loaded', [$this, 'berqwp_warmup_cache_all_pages']);
@@ -848,12 +848,11 @@ if (!class_exists('berqCache')) {
 
         static function is_cache_file_expired($cache_file, $check_if_usable = false) {
 
-            $cache_max_life = filemtime($cache_file) + (18 * 60 * 60);
+            $cache_max_life = filemtime($cache_file) + (24 * 60 * 60);
             
-            // Cache is still usable within 20 hours
-            if ($check_if_usable) {
-                $cache_max_life = filemtime($cache_file) + (20 * 60 * 60);
-            }
+            // if ($check_if_usable) {
+            //     $cache_max_life = filemtime($cache_file) + (20 * 60 * 60);
+            // }
             
             // is still valide
             if ($cache_max_life > time()) {
@@ -866,8 +865,8 @@ if (!class_exists('berqCache')) {
 
         function html_cache()
         {
-            // Check if the current user is logged in or if it's a POST request
-            if (is_user_logged_in() || $_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'PURGE') {
+            // Check if the current user is logged in and only allow GET requests
+            if (is_user_logged_in() || $_SERVER['REQUEST_METHOD'] !== 'GET') {
                 return;
             }
 

@@ -97,6 +97,13 @@ if (!class_exists('berqWP')) {
 			add_action('admin_post_bwp_refresh_license', [$this, 'handle_refresh_license_action']);
 
 			add_action('in_admin_header', [$this, 'remove_admin_notices']);
+
+			add_filter( 'nonce_life', [$this, 'increase_nonce_life'] );
+			
+		}
+
+		function increase_nonce_life( $default_life ) {
+			return 30 * DAY_IN_SECONDS;
 		}
 
 		function remove_admin_notices() {
@@ -234,12 +241,12 @@ if (!class_exists('berqWP')) {
 		
 					$url = get_permalink();
 
-					if (bwp_admin_home_url() == $url) {
-						continue;
-					}
-
 					if (strpos($url, bwp_admin_home_url()) === false) {
 						$url = str_replace(home_url(), bwp_admin_home_url(), $url);
+					}
+
+					if (bwp_admin_home_url('/') == $url) {
+						continue;
 					}
 
 					$slug = bwp_url_into_path($url);

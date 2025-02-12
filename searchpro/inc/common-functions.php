@@ -42,11 +42,9 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
         $cache_directory = ABSPATH . '/wp-content/cache/berqwp/html/';
         $cache_file = $cache_directory . $cache_key . '.html';
         $gzip_support = function_exists('gzencode') && isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false;
-        $cache_max_life = @filemtime($cache_file) + (24 * 60 * 60);
-        $is_litespeed = isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false;
+        $cache_max_life = @filemtime($cache_file) + (24 * 60 * 60 * 30);
     
         if (file_exists($cache_file) && $cache_max_life > time()) {
-        
             $file_content = @file_get_contents($cache_file);
             
             if (!isset($_GET['creating_cache']) && file_exists($cache_file) && strpos($file_content, "Optimized with BerqWP's instant cache") === false) {
