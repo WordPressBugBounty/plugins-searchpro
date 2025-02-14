@@ -10,6 +10,7 @@ class berqWooCommerce extends berqIntegrations {
         // add_action( 'woocommerce_update_product', [$this, 'flush_product_cache'] );
         add_action( 'woocommerce_product_set_stock_status', [$this, 'flush_product_cache'] );
         add_action( 'woocommerce_delete_product_transients', [$this, 'flush_product_cache'] );
+        add_action('woocommerce_scheduled_sales', [$this, 'product_sale_end_actions']);
         
         // Flush critical css when needed
         // add_action( 'save_post_product', [$this, 'flush_product_critical_css'] );
@@ -37,7 +38,29 @@ class berqWooCommerce extends berqIntegrations {
 
         // Get the full URL of the product
         $product_url = get_permalink( $post_id );
-        berqCache::purge_page($product_url);
+        berqCache::purge_page($product_url, true);
+    }
+
+    function product_sale_end_actions() {
+        $products_on_sale = wc_get_products(array(
+            'status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_sale_price_dates_to',
+                    'value' => current_time('timestamp'),
+                    'compare' => '<',
+                    'type' => 'NUMERIC'
+                )
+            )
+        ));
+    
+        foreach ($products_on_sale as $product) {
+            // Check if the sale price is still active
+            if (!$product->is_on_sale()) {
+                $product_id = $product->get_id();
+                $this->flush_product_cache($product_id);
+            }
+        }
     }
 
 
