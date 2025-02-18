@@ -59,7 +59,7 @@ if (!class_exists('berqWP')) {
 			add_action('admin_init', [$this, 'save_settings']);
 
 			// Sitemap for cache warmup
-			add_action('init', 'bwp_get_sitemap');
+			add_action('wp', 'bwp_get_sitemap');
 
 			// BerqWP display logs
 			add_action('init', 'bwp_display_logs');

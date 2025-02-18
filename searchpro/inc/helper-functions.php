@@ -1336,20 +1336,6 @@ function bwp_get_sitemap() {
                 $query->the_post();
                 $url = get_permalink();
 
-                // if (class_exists('TRP_Translate_Press')) {
-                //     $translated_urls = bwp_get_translatepress_urls($url);
-
-                //     if (!empty($translated_urls)) {
-                //         foreach ($translated_urls as $translated_url) {
-                //             if (bwp_can_optimize_page_url($translated_url)) {
-                //                 $sitemap_urls[] = $translated_url;
-                //             }
-                //         }
-
-                //         continue;
-                //     }
-                // }
-                
                 if (!bwp_can_optimize_page_url($url)) {
                     continue;
                 }
