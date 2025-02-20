@@ -42,25 +42,43 @@ class berqWooCommerce extends berqIntegrations {
     }
 
     function product_sale_end_actions() {
-        $products_on_sale = wc_get_products(array(
+        global $berq_log;
+        $berq_log->info("Starting product_sale_end_actions");
+
+        $current_time = time();
+        $last_check = get_option( 'berqwp_product_sale_check', false );
+
+        // If is first time run
+        if (empty($last_check)) {
+            $last_check = time() - DAY_IN_SECONDS;
+        }
+
+        $products = wc_get_products([
             'status' => 'publish',
-            'meta_query' => array(
-                array(
+            'meta_query' => [
+                [
                     'key' => '_sale_price_dates_to',
-                    'value' => current_time('timestamp'),
-                    'compare' => '<',
+                    'value' => $current_time,
+                    'compare' => '<=',
                     'type' => 'NUMERIC'
-                )
-            )
-        ));
-    
-        foreach ($products_on_sale as $product) {
-            // Check if the sale price is still active
-            if (!$product->is_on_sale()) {
-                $product_id = $product->get_id();
+                ]
+            ]
+        ]);
+
+        $berq_log->info("Found " . count($products) . " products with expired sales");
+
+        foreach ($products as $product) {
+            $product_id = $product->get_id();
+            $sale_end_date = get_post_meta( $product_id, '_sale_price_dates_to', true );
+            if (!empty($sale_end_date) && $sale_end_date >= $last_check && $sale_end_date <= $current_time) {
+                $berq_log->info("Flushing cache for product ID: $product_id");
                 $this->flush_product_cache($product_id);
             }
         }
+
+        update_option( 'berqwp_product_sale_check', $current_time );
+
+        $berq_log->info("Completed product_sale_end_actions");
     }
 
 
