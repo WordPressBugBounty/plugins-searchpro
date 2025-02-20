@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.7
-Stable tag: 2.2.22
+Stable tag: 2.2.23
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -168,6 +168,9 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.2.23 =
+* [Bug] Fixed an issue where the wp-config.php file could become empty on Azure servers.
 
 = 2.2.22 =
 * [Enhancement] Completely disabled JavaScript optimization for instant cache to ensure maximum compatibility.

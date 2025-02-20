@@ -575,48 +575,130 @@ function berqwp_get_LCP_details($url, $device = 'mobile')
     return $output['lighthouseResult']['audits']['largest-contentful-paint-element']['details']['items'][0]['items'][0]['node'];
 }
 
-function berqwp_enable_advanced_cache($enable) {
+function berqwp_enable_advanced_cache($status) {
     global $berq_log;
-    $berq_log->info("Updating wp-config.php");
 
-    // Specify the wp-config.php file path.
-    $wp_config_file = ABSPATH . 'wp-config.php';
+    // Get wp-config.php path
+    $configFilePath = ABSPATH . 'wp-config.php';
 
-    // Read the contents of wp-config.php.
-    $wp_config_content = file_get_contents( $wp_config_file );
-    if ( $wp_config_content === false ) {
-        $berq_log->error("Error: Could not read wp-config.php");
-        return;
+    // Check if the file exists
+    if (!file_exists($configFilePath)) {
+        $berq_log->error("Error: wp-config.php does not exist.");
+        return false;
     }
 
-    // Use a regex to check if the WP_CACHE definition already exists.
-    if ( preg_match('/define\s*\(\s*[\'"]WP_CACHE[\'"]\s*,/i', $wp_config_content) ) {
-        // Replace the existing WP_CACHE definition.
-        // This regex matches both single- and double-quoted versions with any spacing.
-        $pattern = '/define\s*\(\s*[\'"]WP_CACHE[\'"]\s*,\s*[^;]+;/i';
-        $replacement = "define('WP_CACHE', " . ( $enable ? 'true' : 'false' ) . ");";
-        $wp_config_content = preg_replace( $pattern, $replacement, $wp_config_content );
-    } else {
-        // Find the position of the first PHP tag.
-        if ( preg_match('/<\?php/', $wp_config_content, $matches, PREG_OFFSET_CAPTURE) ) {
-            $first_php_tag_position = $matches[0][1] + strlen('<?php');
+    // Check if the file is writable
+    if (!is_writable($configFilePath)) {
+        $berq_log->error("Error: wp-config.php is not writable. Check file permissions.");
+        return false;
+    }
 
-            // Insert the WP_CACHE definition right after the opening PHP tag.
-            $insertion = "\n// BerqWP advanced cache\n" .
-                         "define('WP_CACHE', " . ( $enable ? 'true' : 'false' ) . ");\n";
-            $wp_config_content = substr_replace( $wp_config_content, $insertion, $first_php_tag_position, 0 );
+    // Prepare the new WP_CACHE definition
+    $newVal = sprintf("define( 'WP_CACHE', %s ); /* Added by BerqWP */\n", ($status ? "true" : "false"));
+    $replacementVal = sprintf(" %s ", ($status ? "true" : "false"));
+
+    // Read the file into an array of lines
+    $lines = file($configFilePath);
+    if ($lines === false || empty($lines)) {
+        $berq_log->error("Error: Could not read wp-config.php or file is empty.");
+        return false;
+    }
+
+    $wpCacheFound = false;
+    $phpOpeningTagLine = false;
+
+    // Process each line to update an existing WP_CACHE definition
+    foreach ($lines as $lineIndex => &$line) {
+        if (strpos($line, "<?php") !== false && strpos($line, "?>") === false) {
+            $phpOpeningTagLine = $lineIndex;
+        }
+        if (!$wpCacheFound && preg_match("/define\s*\(\s*['\"](.*?)['\"]\s*,(.*?)\)/", $line, $matches)) {
+            if ($matches[1] === "WP_CACHE") {
+                // Replace the existing WP_CACHE value with the new value
+                $line = str_replace($matches[2], $replacementVal, $line);
+                $wpCacheFound = true;
+            }
+        }
+        // If we have found both the opening tag and WP_CACHE, we can stop processing further lines.
+        if ($phpOpeningTagLine !== false && $wpCacheFound !== false) {
+            break;
+        }
+    }
+    unset($line);
+
+    // If WP_CACHE was not found and we are enabling it, insert it after the PHP opening tag.
+    if (!$wpCacheFound && $status) {
+        if ($phpOpeningTagLine !== false) {
+            array_splice($lines, $phpOpeningTagLine + 1, 0, [$newVal]);
         } else {
-            $berq_log->error("Error: PHP opening tag not found in wp-config.php");
+            // If no PHP opening tag is found, prepend a new one with the WP_CACHE definition.
+            array_unshift($lines, "<?php " . trim($newVal) . " ?>\n");
         }
     }
 
-    // Write the modified content back to wp-config.php.
-    if ( file_put_contents( $wp_config_file, $wp_config_content ) === false ) {
-        $berq_log->error("Error: Could not write to wp-config.php");
-    } else {
-        $berq_log->info("wp-config.php updated successfully.");
+    // Rebuild the file content
+    $newContent = implode("", $lines);
+    $tempFile = $configFilePath . '.tmp';
+
+    // Write to a temporary file first (atomic write)
+    if (file_put_contents($tempFile, $newContent, LOCK_EX) === false) {
+        $berq_log->error("Error: Could not write to temporary file: $tempFile");
+        return false;
     }
+
+    // Rename the temporary file to wp-config.php
+    if (!rename($tempFile, $configFilePath)) {
+        $berq_log->error("Error: Could not rename temporary file to wp-config.php");
+        unlink($tempFile);
+        return false;
+    }
+
+    $berq_log->info("wp-config.php updated successfully.");
+    return true;
 }
+
+// function berqwp_enable_advanced_cache($enable) {
+//     global $berq_log;
+//     $berq_log->info("Updating wp-config.php");
+
+//     // Specify the wp-config.php file path.
+//     $wp_config_file = ABSPATH . 'wp-config.php';
+
+//     // Read the contents of wp-config.php.
+//     $wp_config_content = file_get_contents( $wp_config_file );
+//     if ( $wp_config_content === false ) {
+//         $berq_log->error("Error: Could not read wp-config.php");
+//         return;
+//     }
+
+//     // Use a regex to check if the WP_CACHE definition already exists.
+//     if ( preg_match('/define\s*\(\s*[\'"]WP_CACHE[\'"]\s*,/i', $wp_config_content) ) {
+//         // Replace the existing WP_CACHE definition.
+//         // This regex matches both single- and double-quoted versions with any spacing.
+//         $pattern = '/define\s*\(\s*[\'"]WP_CACHE[\'"]\s*,\s*[^;]+;/i';
+//         $replacement = "define('WP_CACHE', " . ( $enable ? 'true' : 'false' ) . ");";
+//         $wp_config_content = preg_replace( $pattern, $replacement, $wp_config_content );
+//     } else {
+//         // Find the position of the first PHP tag.
+//         if ( preg_match('/<\?php/', $wp_config_content, $matches, PREG_OFFSET_CAPTURE) ) {
+//             $first_php_tag_position = $matches[0][1] + strlen('<?php');
+
+//             // Insert the WP_CACHE definition right after the opening PHP tag.
+//             $insertion = "\n// BerqWP advanced cache\n" .
+//                          "define('WP_CACHE', " . ( $enable ? 'true' : 'false' ) . ");\n";
+//             $wp_config_content = substr_replace( $wp_config_content, $insertion, $first_php_tag_position, 0 );
+//         } else {
+//             $berq_log->error("Error: PHP opening tag not found in wp-config.php");
+//         }
+//     }
+
+//     // Write the modified content back to wp-config.php.
+//     if ( file_put_contents( $wp_config_file, $wp_config_content ) === false ) {
+//         $berq_log->error("Error: Could not write to wp-config.php");
+//     } else {
+//         $berq_log->info("wp-config.php updated successfully.");
+//     }
+// }
 
 // function berqwp_enable_advanced_cache($enable) {
 //     global $berq_log;
