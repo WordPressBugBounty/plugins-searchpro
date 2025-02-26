@@ -97,8 +97,6 @@ if (!class_exists('berqWP')) {
 			add_action('admin_post_bwp_refresh_license', [$this, 'handle_refresh_license_action']);
 
 			add_action('in_admin_header', [$this, 'remove_admin_notices']);
-
-			add_filter( 'nonce_life', [$this, 'increase_nonce_life'] );
 			
 		}
 
@@ -373,6 +371,8 @@ if (!class_exists('berqWP')) {
 
 		function initialize()
 		{
+			// Increase nonce life
+			add_filter( 'nonce_life', [$this, 'increase_nonce_life'] );
 
 			if (defined('DOING_CRON') && DOING_CRON) {
 				return;

@@ -134,6 +134,7 @@ function berqwp_is_slug_excludable($slug)
         "affwp_ref=",
         "affwp_campaign=",
         "hmwp_token=",
+        "/search/",
     ];
 
     $exclude_items = apply_filters('berqwp_exclude_slug_match', $exclude_items);
@@ -1153,7 +1154,7 @@ function bwp_check_connection($force_check = false) {
     }
 
     // Perform the actual REST API check
-    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.bwp_admin_home_url('/'), ['timeout' => 60] );
+    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.bwp_admin_home_url('/?nocache'), ['timeout' => 60] );
 
     if ( is_wp_error( $response ) ) {
         $result = array(

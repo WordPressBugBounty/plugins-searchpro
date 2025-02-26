@@ -10,7 +10,7 @@ $args = array(
 );
 $query = new WP_Query($args);
 $pages_to_exclude = get_option('berq_exclude_urls', []);
-$total_pages = (int) $query->found_posts;
+$total_pages = (int) $query->found_posts - count($pages_to_exclude);
 $optimized_pages = bwp_cached_pages_count();
 
 if (empty($total_pages) || $total_pages <= 0) {

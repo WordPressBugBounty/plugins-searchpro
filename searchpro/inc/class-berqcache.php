@@ -235,6 +235,8 @@ if (!class_exists('berqCache')) {
                         warmup_cache_by_url($post_url);
                     }
 
+                    $this->flush_post_taxonomy_cache( $post->ID );
+
                 }
             }
 
@@ -732,118 +734,115 @@ if (!class_exists('berqCache')) {
             global $wp_admin_bar;
             $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
-            // Check if the user has the capability to clear the cache (adjust the capability as needed)
-            if (current_user_can('manage_options')) {
-                $icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.43896 0H17.561C21.1172 0 24 2.88287 24 6.43903V17.561C24 21.1171 21.1172 24 17.561 24H6.43896C2.88281 24 0 21.1171 0 17.561V6.43903C0 2.88287 2.88281 0 6.43896 0ZM15.7888 4.09753L8.59961 12.7534H12.3517L7.02441 20.4878L16.3903 11.0222L12.7814 10.3799L15.7888 4.09753Z" fill="#a7aaad"/>
-                </svg>';
-                $icon_base64 = base64_encode($icon);
-            
-                $wp_admin_bar->add_menu(
-                    array(
-                        'id' => 'berqWP',
-                        'title' => '<span class="ab-icon" style="background-image:url(data:image/svg+xml;base64,'.$icon_base64.')!important;height:25px;width:18px;background-size:contain;background-repeat:no-repeat;background-position:center;"></span>'.$plugin_name,
-                        'href' => get_admin_url() . 'admin.php?page=berqwp',
-                    )
-                );
+            $icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.43896 0H17.561C21.1172 0 24 2.88287 24 6.43903V17.561C24 21.1171 21.1172 24 17.561 24H6.43896C2.88281 24 0 21.1171 0 17.561V6.43903C0 2.88287 2.88281 0 6.43896 0ZM15.7888 4.09753L8.59961 12.7534H12.3517L7.02441 20.4878L16.3903 11.0222L12.7814 10.3799L15.7888 4.09753Z" fill="#a7aaad"/>
+            </svg>';
+            $icon_base64 = base64_encode($icon);
+        
+            $wp_admin_bar->add_menu(
+                array(
+                    'id' => 'berqWP',
+                    'title' => '<span class="ab-icon" style="background-image:url(data:image/svg+xml;base64,'.$icon_base64.')!important;height:25px;width:18px;background-size:contain;background-repeat:no-repeat;background-position:center;"></span>'.$plugin_name,
+                    'href' => get_admin_url() . 'admin.php?page=berqwp',
+                )
+            );
 
+            // Add the sub-menu item
+            $wp_admin_bar->add_menu(
+                array(
+                    'parent' => 'berqWP',
+                    // ID of the parent menu item
+                    'id' => 'flush-cache',
+                    'title' => is_multisite() ? 'Flush all sites' : 'Flush cache',
+                    'href' => wp_nonce_url(admin_url('admin-post.php?action=clear_cache'), 'clear_cache_action'),
+                    'meta' => array(
+                        'class' => 'clear-cache-link',
+                        'title' => 'Clear BerqWP cache',
+                    ),
+                )
+            );
+
+            if ( is_multisite() ) {
+                $wp_admin_bar->add_menu( array(
+                    'id'     => 'berqwp-network-sites',
+                    'parent' => 'berqWP',
+                    'title'  => 'Flush site',
+                    'href'  => '#',
+                ));
+        
+                $sites = get_sites();
+                foreach ( $sites as $site ) {
+                    $wp_admin_bar->add_menu( array(
+                        'id'     => 'berqwp-site-flush-' . $site->blog_id,
+                        'parent' => 'berqwp-network-sites',
+                        'title'  => 'Flush site '.get_blog_option( $site->blog_id, 'blogname' ),
+                        'href'   => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_site&site_id='.$site->blog_id), 'berq_flush_site_action'),
+                    ));
+                }
+            }
+
+            $wp_admin_bar->add_menu(
+                array(
+                    'parent' => 'berqWP',
+                    // ID of the parent menu item
+                    'id' => 'flush-cdn',
+                    'title' => 'Flush CDN & page cache',
+                    'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_cdn'), 'berq_flush_cdn_action'),
+                    'meta' => array(
+                        'class' => 'flush-cdn-cache',
+                        'title' => 'Flush CDN & page cache',
+                    ),
+                )
+            );
+
+            $wp_admin_bar->add_menu(
+                array(
+                    'parent' => 'berqWP',
+                    // ID of the parent menu item
+                    'id' => 'flush-criticalcss',
+                    'title' => 'Flush critical CSS cache',
+                    'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_criticalcss'), 'berq_flush_criticalcss_action'),
+                    'meta' => array(
+                        'class' => 'flush-criticalcss',
+                        'title' => 'Flush critical CSS cache',
+                    ),
+                )
+            );
+
+            if (!is_admin()) {
+                $page_url = bwp_get_request_url();
                 // Add the sub-menu item
                 $wp_admin_bar->add_menu(
                     array(
                         'parent' => 'berqWP',
                         // ID of the parent menu item
-                        'id' => 'flush-cache',
-                        'title' => is_multisite() ? 'Flush all sites' : 'Flush cache',
-                        'href' => wp_nonce_url(admin_url('admin-post.php?action=clear_cache'), 'clear_cache_action'),
+                        'id' => 'purge-page',
+                        'title' => 'Purge this page',
+                        'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_purge_page&uri=' . urlencode($page_url)), 'berq_purge_page_action'),
                         'meta' => array(
-                            'class' => 'clear-cache-link',
-                            'title' => 'Clear BerqWP cache',
+                            'class' => 'purge-page-link',
+                            'title' => 'Clear this page cache',
                         ),
                     )
                 );
 
-                if ( is_multisite() ) {
-                    $wp_admin_bar->add_menu( array(
-                        'id'     => 'berqwp-network-sites',
-                        'parent' => 'berqWP',
-                        'title'  => 'Flush site',
-                        'href'  => '#',
-                    ));
-            
-                    $sites = get_sites();
-                    foreach ( $sites as $site ) {
-                        $wp_admin_bar->add_menu( array(
-                            'id'     => 'berqwp-site-flush-' . $site->blog_id,
-                            'parent' => 'berqwp-network-sites',
-                            'title'  => 'Flush site '.get_blog_option( $site->blog_id, 'blogname' ),
-                            'href'   => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_site&site_id='.$site->blog_id), 'berq_flush_site_action'),
-                        ));
-                    }
-                }
-
+                // Add the request cache
                 $wp_admin_bar->add_menu(
                     array(
                         'parent' => 'berqWP',
                         // ID of the parent menu item
-                        'id' => 'flush-cdn',
-                        'title' => 'Flush CDN & page cache',
-                        'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_cdn'), 'berq_flush_cdn_action'),
+                        'id' => 'request-page-cache',
+                        'title' => 'Request cache',
+                        'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_request_cache&uri=' . urlencode($page_url)), 'berq_request_cache_action'),
                         'meta' => array(
-                            'class' => 'flush-cdn-cache',
-                            'title' => 'Flush CDN & page cache',
+                            'class' => 'request-page-cache-link',
+                            'title' => 'Request cache for this page',
                         ),
                     )
                 );
-
-                $wp_admin_bar->add_menu(
-                    array(
-                        'parent' => 'berqWP',
-                        // ID of the parent menu item
-                        'id' => 'flush-criticalcss',
-                        'title' => 'Flush critical CSS cache',
-                        'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_criticalcss'), 'berq_flush_criticalcss_action'),
-                        'meta' => array(
-                            'class' => 'flush-criticalcss',
-                            'title' => 'Flush critical CSS cache',
-                        ),
-                    )
-                );
-
-                if (!is_admin()) {
-                    $page_url = bwp_get_request_url();
-                    // Add the sub-menu item
-                    $wp_admin_bar->add_menu(
-                        array(
-                            'parent' => 'berqWP',
-                            // ID of the parent menu item
-                            'id' => 'purge-page',
-                            'title' => 'Purge this page',
-                            'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_purge_page&uri=' . urlencode($page_url)), 'berq_purge_page_action'),
-                            'meta' => array(
-                                'class' => 'purge-page-link',
-                                'title' => 'Clear this page cache',
-                            ),
-                        )
-                    );
-
-                    // Add the request cache
-                    $wp_admin_bar->add_menu(
-                        array(
-                            'parent' => 'berqWP',
-                            // ID of the parent menu item
-                            'id' => 'request-page-cache',
-                            'title' => 'Request cache',
-                            'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_request_cache&uri=' . urlencode($page_url)), 'berq_request_cache_action'),
-                            'meta' => array(
-                                'class' => 'request-page-cache-link',
-                                'title' => 'Request cache for this page',
-                            ),
-                        )
-                    );
-
-                }
 
             }
+            
         }
 
         static function is_cache_file_expired($cache_file, $check_if_usable = false) {

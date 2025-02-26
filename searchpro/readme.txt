@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.7
-Stable tag: 2.2.24
+Stable tag: 2.2.25
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -14,7 +14,7 @@ Automatically boost your PageSpeed score to 90+ for both mobile & desktop and pa
 
 [BerqWP](https://berqwp.com/?utm_source=wordpress-repo) is a 100% automatic All-In-One speed optimization plugin that ensures your website passes the core web vitals assessment and boosts your website speed score to 90+ for mobile and desktop devices.
 
-BerqWP automatically applies all modern speed optimization techniques recommended by Google, so your customers and visitors can have the best hassle-free experience.
+BerqWP automatically applies all modern speed optimization techniques recommended by Google (web.dev), so your customers and visitors can have the best hassle-free experience.
 
 ## Why do people love BerqWP?
 
@@ -30,7 +30,7 @@ BerqWP automatically applies all modern speed optimization techniques recommende
 - **Build for non-techies**
 - **Get instant support with BerqWP's AI assistant**
 
-## Real World Results
+## 🎯 Real World Results
 - **88.6% of BerqWP-optimized websites have an average loading time below 3 seconds.**
 - **BerqWP-optimized websites have an average bounce rate of 4.78% on mobile and 6.18% on desktop.**
 
@@ -51,7 +51,9 @@ BerqWP automatically applies all modern speed optimization techniques recommende
 
 - **Lazy Load Images:** Lazy Loading for Images: Load images only when they're in the viewport, allowing other assets to download faster.
 
-- **Lazy Load YouTube Videos:** Load YouTube videos only when a user scrolls to them.
+- **Lazy Load Embeds:** Load Google Maps, YouTube videos, and other embeds only when a user scrolls to them.
+
+- **Preload Cookie Banner:** Preload the cookie banner as early as possible during page load, even when JavaScript is delayed. Currently supports CookieYes, Real Cookie Banner, CYTRIO, and My Agile Privacy.
 
 - **Critical CSS:** BerqWP generates critical CSS for each page individually, ensuring a faster web experience by loading inline critical CSS.
 
@@ -70,6 +72,80 @@ BerqWP automatically applies all modern speed optimization techniques recommende
 - **Much more!**
 
 **[Get a free license key](https://berqwp.com/?utm_source=wordpress-repo) with a BerqWP free account and access all BerqWP Premium features for up to 10 pages.**
+
+## 👩‍💻 Real User Success Stories
+* **★★★★★ Consistent 100/100 score, Great support**
+_"I have tried multiple caching software programs, but none of them were so easy to set up, and the results are incomparable! I have reached out several times to the support. They always respond, sometimes you have to wait (decent time), sometimes within a day they respond and solve your issue instantly. Keep up the good work!"_
+
+* **★★★★★ Working really great**
+_"Just bought the pro plugin and started using it replacing the 10web io which was great but expensive for me, I was just a little worried whether this one would work ok without conflicting with my current plugins so i tested the free version first and it worked fine. Good customer support as well. I would recommend the pro plugin but try the free one first and then decide."_
+
+* **★★★★★ A must have**
+_"It’s been a while without writing a review from my side, but BerqWP deserves my 5 stars.It’s incredible easy to use, seriously, a newbie could make it work easily. It improves loading times dramatically, to the point that I don’t really understand what’s the magic behind it (I’m not joking). I always thought that a bit more speed could be achieved at my websites, but not this much. I wasn’t aware that the servers that I use for my sites were capable of this speeds, and I always thought that part of the issue was using medium servers instead of top notch ones.Thank you so much guys! Keep doing your magic, I’ll spread the word about you as I really want you to succeed and last forever. Oh, and I really can’t believe how your plugin can exceed that much what other premium plugins achieve (I tried quite a few)."_
+
+* **★★★★★ Plugin is incredibly easy to use**
+_"The BerqWP plugin is incredibly easy to use, even for those who are not optimization experts. The setup is intuitive, and it works flawlessly, even on websites built with Elementor Pro, without causing any issues. Additionally, their support team is active and consistently responds to inquiries promptly, instilling confidence in the service."_
+
+**[See all reviews](https://wordpress.org/support/plugin/searchpro/reviews/)**
+
+## How Does BerqWP Work?
+Unlike traditional speed optimization plugins, BerqWP optimizes your website using our proprietary optimization software called the Photon Engine. Instead of handling resource-intensive tasks on your web server, which can slow it down, BerqWP processes optimizations externally. This is crucial because heavy tasks like **critical CSS generation, WebP conversion, and JavaScript optimization** can overwhelm ordinary servers when performed at scale.
+
+Here’s how it works:
+
+* When a webpage is added to the **Photon Engine** queue, BerqWP fetches the page’s HTML.
+* Various optimizations are applied, including HTML minification, image conversion, lazy loading, and JavaScript execution control.
+* Once optimized, the Photon Engine stores the **fully optimized HTML** in your website as a form of cache.
+* To handle traffic before optimization is complete, BerqWP creates an **instant cache**, a placeholder cache with minimal optimizations, ensuring fast page loads even before full optimization.
+
+## Advanced Cache for Faster Server Response Time
+BerqWP utilizes the WordPress **advanced-cache.php** file to deliver cached pages as fast as possible. By bypassing unnecessary database queries and reducing the number of files loaded on each request, BerqWP significantly improves **server response time (TTFB – Time to First Byte)**, ensuring that your pages load within milliseconds.
+
+## Core Web Vitals Optimizations
+BerqWP is designed to help websites achieve high scores on **Google’s Core Web Vitals**, improving user experience and SEO rankings.
+
+**1. Largest Contentful Paint (LCP) Optimization** 
+
+* **Image Preloading:** BerqWP detects the LCP element (usually an image or banner) and preloads it to ensure it loads as quickly as possible.
+* **WebP Conversion:** All images are converted into **WebP format**, reducing file size by **70% – 85%** while maintaining quality.
+* **Efficient Lazy Loading:** Images and background images only load when users scroll, reducing initial load time.
+
+**2. Interaction to Next Paint (INP) & JavaScript Optimization**
+
+* **JavaScript Delay:** BerqWP delays JavaScript execution until user interaction (mouse move, click, scroll, or tap), improving initial page load speed.
+* **Multiple Execution Modes:** Choose between different JavaScript execution modes tailored to your website’s needs.
+
+**3. Cumulative Layout Shift (CLS) Fixes**
+
+* **Image Dimension Attributes:** BerqWP ensures all images have width and height attributes, preventing unexpected layout shifts.
+* **Font Optimization:** Fonts are loaded efficiently with font-display: swap to eliminate render-blocking issues.
+
+## Critical CSS for Instant Rendering
+Loading external stylesheets can delay rendering, so BerqWP generates **Critical CSS** for each page separately.
+
+* The Critical CSS contains only the styles needed for the visible portion of the page.
+* The remaining CSS loads **asynchronously**, ensuring fast page rendering without affecting layout or design.
+
+
+## BerqWP CDN – Global Performance Boost
+BerqWP integrates with **Cloudflare CDN** to ensure static assets (images, CSS, JavaScript, web fonts) load from the nearest server to the visitor’s location. This results in:
+
+* **Reduced latency** and improved website performance globally.
+* Faster **Time to First Byte (TTFB)** for all users.
+
+## Font Optimization for CLS Stability
+* BerqWP **extracts and preloads** fonts used in above-the-fold content, ensuring faster font rendering.
+* Uses font-display: swap to **prevent text from disappearing while fonts load**, improving user experience.
+
+## Optimization Modes for Flexibility
+BerqWP offers four optimization modes:
+
+* **Basic** – Minimal optimizations, ensuring stability.
+* **Medium** – A balance between performance and compatibility.
+* **Blaze** – A balance between performance and User Experience.
+* **Aggressive** – Best for high-speed results
+
+For best results, we recommend using **Aggressive mode**, but switching to a different mode can help if compatibility issues arise.
 
 
 ## 💻 A FEW MOST COMMON SPEED ISSUES THAT BERQWP FIXES BEHIND THE HOOD
@@ -168,6 +244,9 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.2.25 =
+* [Bug] Fixed an issue where the product category cache did not flush after adding a new product.
 
 = 2.2.24 =
 * [Bug] Fixed an issue in WooCommerce where the cache for all products was being flushed incorrectly after a product sale ends.

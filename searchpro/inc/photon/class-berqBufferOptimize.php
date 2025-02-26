@@ -168,7 +168,7 @@ class berqBufferOptimize {
         // }
 
         $buffer = $this->lazyload_iframes($buffer);
-        $buffer = $this->js_optimize($buffer);
+        // $buffer = $this->js_optimize($buffer);
         $buffer = $this->optimize_images($buffer);
 
         // global $berqCDN;
