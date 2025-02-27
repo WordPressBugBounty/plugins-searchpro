@@ -371,8 +371,10 @@ if (!class_exists('berqWP')) {
 
 		function initialize()
 		{
-			// Increase nonce life
-			add_filter( 'nonce_life', [$this, 'increase_nonce_life'] );
+			if (!is_admin() && !is_user_logged_in()) {
+				// Increase nonce life
+				add_filter( 'nonce_life', [$this, 'increase_nonce_life'] );
+			}
 
 			if (defined('DOING_CRON') && DOING_CRON) {
 				return;
