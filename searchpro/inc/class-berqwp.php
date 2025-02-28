@@ -97,10 +97,23 @@ if (!class_exists('berqWP')) {
 			add_action('admin_post_bwp_refresh_license', [$this, 'handle_refresh_license_action']);
 
 			add_action('in_admin_header', [$this, 'remove_admin_notices']);
+
+			// Increase nonce life
+			add_filter( 'nonce_life', [$this, 'increase_nonce_life'] );
 			
 		}
 
 		function increase_nonce_life( $default_life ) {
+
+			// Do not modify nonce lifespan for AJAX requests.
+			if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+				return $default_life;
+			}
+		
+			if (empty(is_user_logged_in()) && isset($_GET['creating_cache'])) {
+				return $default_life;
+			}
+
 			return 30 * DAY_IN_SECONDS;
 		}
 
@@ -371,10 +384,6 @@ if (!class_exists('berqWP')) {
 
 		function initialize()
 		{
-			if (!is_admin() && !is_user_logged_in()) {
-				// Increase nonce life
-				add_filter( 'nonce_life', [$this, 'increase_nonce_life'] );
-			}
 
 			if (defined('DOING_CRON') && DOING_CRON) {
 				return;

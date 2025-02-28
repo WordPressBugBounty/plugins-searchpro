@@ -959,6 +959,11 @@ function verify_request_origin($request) {
 function berq_rest_permission_callback(WP_REST_Request $request) {
     // Get the nonce from the request
     $nonce = $request->get_header('X-WP-Nonce');
+    $hash = $request->get_header('X-berqwp-key-hash');
+
+    if ($hash == md5(get_option('berqwp_license_key'))) {
+        return true;
+    }
 
     // Verify the nonce
     if (!wp_verify_nonce($nonce, 'wp_rest')) {
