@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.7
-Stable tag: 2.2.27
+Stable tag: 2.2.28
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -245,8 +245,9 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 
 == Changelog ==
 
-= 2.2.27 = 
+= 2.2.28 = 
 * [Enhancement] Increase nonce lifespan on for BerqWP cache requests.
+* [Enhancement] Better image handling for webp images.
 
 = 2.2.26 =
 * [Bug] Fixed permission issue at post preview page.

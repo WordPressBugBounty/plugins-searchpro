@@ -110,7 +110,7 @@ if (!class_exists('berqWP')) {
 				return $default_life;
 			}
 		
-			if (empty(is_user_logged_in()) && isset($_GET['creating_cache'])) {
+			if (empty(is_user_logged_in()) || !isset($_GET['creating_cache'])) {
 				return $default_life;
 			}
 
