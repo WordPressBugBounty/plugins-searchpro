@@ -3,7 +3,7 @@
  * Plugin Name:       BerqWP
  * Plugin URI:        https://berqwp.com
  * Description:       Automatically pass Core Web Vitals for WordPress and boost your speed score to 90+ for both mobile and desktop without any technical skills.
- * Version:           2.2.28
+ * Version:           2.2.29
  * Requires at least: 5.3
  * Requires PHP:      7.4
  * Author:            BerqWP
@@ -15,7 +15,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BERQWP_VERSION')) {
-	define('BERQWP_VERSION', '2.2.28');
+	define('BERQWP_VERSION', '2.2.29');
 }
 
 if (!defined('optifer_PATH')) {
@@ -131,3 +131,17 @@ function berqwp_deactivate_plugin() {
 	// Disable wp cache in wp-config.php
     berqwp_enable_advanced_cache(false);
 }
+
+function berqwp_after_plugin_update( $upgrader_object, $options ) {
+    if ( 'update' === $options['action'] && 'plugin' === $options['type'] ) {
+        $plugin_basename = plugin_basename( __FILE__ );
+        
+        if ( isset( $options['plugins'] ) && in_array( $plugin_basename, $options['plugins'], true ) ) {
+            if (bwp_pass_account_requirement()) {
+				// trigger cache warmup
+				do_action('berqwp_cache_warmup');
+			}
+        }
+    }
+}
+add_action( 'upgrader_process_complete', 'berqwp_after_plugin_update', 10, 2 );

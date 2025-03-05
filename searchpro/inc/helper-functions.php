@@ -1417,18 +1417,20 @@ function bwp_get_sitemap() {
         $post_params['key'] = '';
 
         if ($query->have_posts()) {
-            $sitemap_urls = array();
+            $sitemap_urls = [];
 
-            // Loop through the posts and generate URLs
-            while ($query->have_posts()) {
-                $query->the_post();
-                $url = get_permalink();
-
-                if (!bwp_can_optimize_page_url($url)) {
-                    continue;
+            if (!isset($_GET['configs_only'])) {
+                // Loop through the posts and generate URLs
+                while ($query->have_posts()) {
+                    $query->the_post();
+                    $url = get_permalink();
+    
+                    if (!bwp_can_optimize_page_url($url)) {
+                        continue;
+                    }
+            
+                    $sitemap_urls[] = $url;
                 }
-		
-                $sitemap_urls[] = $url;
             }
 
             // Return response with pagination info

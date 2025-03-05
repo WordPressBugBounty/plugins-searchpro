@@ -201,11 +201,10 @@ if (!class_exists('berqCache')) {
         }
 
         function purge_home($post_id) {
-            if (get_post_type($post_id) !== 'post') {
-                return;
+            if (get_post_type($post_id) == 'post' || get_post_type($post_id) == 'product') {
+                self::purge_page(home_url('/'));
             }
 
-            self::purge_page(home_url('/'));
         }
 
         function brust_cache_for_loggedin() {
