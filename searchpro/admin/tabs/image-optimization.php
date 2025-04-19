@@ -7,7 +7,7 @@ if (!defined('ABSPATH'))
     <div class="berqwp-webp">
         <div class="berqwp-webp-content">
             <div class="berq-box-content">
-                <h3 class="berq-box-title"><?php esc_html_e('WebP conversion', 'searchpro'); ?></h3>
+                <h3 class="berq-box-title"><?php esc_html_e('WebP Conversion', 'searchpro'); ?></h3>
                 <p><?php esc_html_e("$plugin_name automatically converts images into the WebP format when creating the page cache. This helps improve website performance by reducing image file sizes without compromising quality. It does not modify the original images.", 'searchpro'); ?></p>
                 <table class="berq-image-settings">
                     <tr>
@@ -46,7 +46,7 @@ if (!defined('ABSPATH'))
         </div>
     </div>
     <div class="berq-info-box">
-        <h3 class="berq-box-title"><?php esc_html_e('Disable WebP images', 'searchpro'); ?></h3>
+        <h3 class="berq-box-title"><?php esc_html_e('Disable WebP Images', 'searchpro'); ?></h3>
         <div class="berq-box-content">
             <p><?php esc_html_e('Disabling WebP images may be helpful when you\'re using other tools to generate WebP images.', 'searchpro'); ?>
             </p>
@@ -57,14 +57,14 @@ if (!defined('ABSPATH'))
         </div>
     </div>
     <div class="berq-info-box">
-        <h3 class="berq-box-title"><?php esc_html_e('LazyLoad images', 'searchpro'); ?></h3>
+        <h3 class="berq-box-title"><?php esc_html_e('Lazy Load Images', 'searchpro'); ?></h3>
         <div class="berq-box-content">
             <p><?php esc_html_e('Optimize your web page loading time by loading only the images that are visible on
                 the screen. The remaining images will be loaded as soon as the user scrolls to them.', 'searchpro'); ?>
             </p>
             <label class="berq-check">
                 <input type="checkbox" name="berqwp_image_lazyloading" <?php checked(1, get_option('berqwp_image_lazyloading'), true); ?>>
-                <?php esc_html_e('Enable lazyload for images', 'searchpro'); ?>
+                <?php esc_html_e('Enable lazy loading for images', 'searchpro'); ?>
             </label>
         </div>
     </div>

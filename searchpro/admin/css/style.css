@@ -535,7 +535,8 @@ table.berq-image-settings {
   font-size: 15px;
 }
 
-.berq-info-box.unlock-js-optimization a.upgrade-btn, .berqwp-header a.upgrade-btn {
+.berq-info-box.unlock-js-optimization a.upgrade-btn,
+.berqwp-header a.upgrade-btn {
   background-image: linear-gradient(45deg, #5521ff, #05b9ff);
   font-size: 14px;
   color: #ffffff;
@@ -564,7 +565,8 @@ table.berq-image-settings {
   font-size: 15px;
 }
 
-.berq-info-box.guide p, .berq-info-box.guide a {
+.berq-info-box.guide p,
+.berq-info-box.guide a {
   color: #fff;
 }
 
@@ -680,11 +682,13 @@ table.berq-image-settings {
   visibility: visible;
 }
 
-.slider .bs-tooltip-top .tooltip-inner, .slider .bs-tooltip-bottom .tooltip-inner {
+.slider .bs-tooltip-top .tooltip-inner,
+.slider .bs-tooltip-bottom .tooltip-inner {
   left: -20% !important;
 }
 
-.slider .tooltip.bs-tooltip-top .arrow, .slider .tooltip.bs-tooltip-bottom .arrow {
+.slider .tooltip.bs-tooltip-top .arrow,
+.slider .tooltip.bs-tooltip-bottom .arrow {
   left: 30px !important;
 }
 
@@ -823,16 +827,19 @@ p.below-settings-panel {
   color: #465774;
 }
 
-div.dt-container.dt-empty-footer tbody > tr:last-child > *, table.dataTable > tbody > tr:not(:last-child) {
+div.dt-container.dt-empty-footer tbody > tr:last-child > *,
+table.dataTable > tbody > tr:not(:last-child) {
   border-bottom: 1px solid #dae8ff;
 }
 
-table.dataTable > thead > tr > th, table.dataTable > thead > tr > td {
+table.dataTable > thead > tr > th,
+table.dataTable > thead > tr > td {
   padding: 10px;
   border-bottom: 1px solid #dae8ff;
 }
 
-div.dt-container .dt-paging .dt-paging-button.current, div.dt-container .dt-paging .dt-paging-button.current:hover {
+div.dt-container .dt-paging .dt-paging-button.current,
+div.dt-container .dt-paging .dt-paging-button.current:hover {
   background: #5057ff !important;
   border: none;
   font-size: 15px;
@@ -853,11 +860,6 @@ div.dt-container .dt-paging .dt-paging-button:hover {
   border: none;
   font-size: 15px;
   padding: 6px 13px;
-}
-
-.bwp_feedback a:last-child {
-  display: block !important;
-  text-align: end !important;
 }
 
 .berqwp-notification {
@@ -960,4 +962,56 @@ input.bwp-disable-cf {
   font-size: 15px;
   margin-left: auto;
   display: block;
+}
+
+.berqwp-lifespan-options {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
+}
+.berqwp-lifespan-options label {
+  flex-grow: 2;
+  max-width: 200px;
+  padding: 10px 15px;
+  margin: 0;
+  border: 1px solid #e0e9fa;
+  border-radius: 5px;
+  color: #0C2D66;
+  cursor: pointer;
+}
+.berqwp-lifespan-options label:focus-within, .berqwp-lifespan-options label.selected {
+  background-color: #5057ff;
+  border-color: #5057ff;
+  color: #fff;
+}
+.berqwp-lifespan-options label.selected input {
+  border-color: #fff;
+}
+
+.berqwp-pagecompress-options {
+  margin-top: 16px;
+}
+.berqwp-pagecompress-options a {
+  box-shadow: none;
+}
+.berqwp-pagecompress-options a .berqwp-loader {
+  display: none;
+}
+
+.bwp-disable-pagecompression {
+  cursor: pointer;
+  background: #fff;
+  border-radius: 6px;
+  padding: 10px 20px;
+  color: #384a69;
+  font-size: 15px;
+  font-style: normal;
+  display: block;
+  line-height: normal;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-bottom: 5px;
+  border: 1px solid #dbe9fe;
 }/*# sourceMappingURL=style.css.map */

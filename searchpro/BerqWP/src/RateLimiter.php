@@ -17,6 +17,10 @@ class RateLimiter
 
     public function isRateLimited($clientIdentifier)
     {
+        if (!is_dir($this->storagePath)) {
+            mkdir($this->storagePath, 0755, true);
+        }
+
         $filePath = $this->storagePath . md5($clientIdentifier) . '.json';
 
         if (!file_exists($filePath)) {

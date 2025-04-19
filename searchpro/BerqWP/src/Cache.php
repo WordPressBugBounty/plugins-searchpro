@@ -69,17 +69,21 @@ class Cache {
 
         file_put_contents($cache_file, $html);
 
-        if (Utils::is_gzip_supported()) {
+        // if (Utils::is_gzip_supported()) {
             $cache_file = $this->cache_directory . md5($page_url) . '.gz';
             $html = gzencode($html);
             file_put_contents($cache_file, $html);
-        }
+        // }
     }
 
-    function request_cache_warmup($post_data) {
+    function request_cache_warmup($post_data, $async = false) {
         $client = new HttpClient($this->api_host);
         $client->setUserAgent('BerqWP');
-        // $client->setTimeout(1);
+
+        if ($async) {
+            $client->setTimeout(1);
+        }
+        
         $client->post('/photon/', $post_data, ['Content-Type' => 'application/x-www-form-urlencoded']);
     }
     

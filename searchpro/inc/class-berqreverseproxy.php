@@ -30,33 +30,83 @@ class berqReverseProxyCache
             ($custom_cache_header && isset($_SERVER[$custom_cache_header]));
     }
 
-    public static function purge_varnish_cache($url) {
-        
-        // Parse the URL to extract the host for the Host header
-        $parse_url = parse_url($url);
-        $host = $parse_url['host'];
+    public static function purge_varnish_cache($urls, $server_list = [], $purge_method = 'PURGE', $headers = [])
+    {
 
-        $headers = [
-            "Host: $host"
-        ];
-
-        // Purge varnish cache for whole website
-        if (strpos($url, '.*') !== false) {
-            $headers['X-Ban-Url'] = '.*';
-            $url = home_url();
+        if (!is_array($urls)) {
+            $urls = [$urls];
         }
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'BAN');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        foreach ((array) $urls as $url) {
+            $parsed = parse_url($url);
+            if (!$parsed)
+                continue;
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+            // Build base URL components
+            $scheme = $parsed['scheme'] ?? 'http';
+            $host = $parsed['host'] ?? '';
+            $path = $parsed['path'] ?? '/';
+            $query = $parsed['query'] ?? '';
 
-        return $httpCode === 200;
+            $targets = empty($server_list) ? [['host' => $host, 'url' => $url]] : [];
+
+            // Create server targets if server list exists
+            if (!empty($server_list)) {
+                foreach ($server_list as $server) {
+                    $targets[] = [
+                        'host' => $host,
+                        'url' => "$scheme://$server$path" . ($query ? "?$query" : "")
+                    ];
+                }
+            }
+
+            // Send purge requests
+            foreach ($targets as $target) {
+                $res = wp_remote_request($target['url'], [
+                    'method' => $purge_method,
+                    'headers' => array_merge(
+                        ['Host' => $target['host']],
+                        $headers
+                    ),
+                    // 'blocking' => false // Non-blocking for performance
+                ]);
+                // var_dump($res);
+            }
+        }
+    }
+
+    public static function flush_all()
+    {
+        if (!self::is_reverse_proxy_cache_enabled()) {
+            return false;
+        }
+
+        $results = [];
+
+        // Attempt full site purge using home URL with wildcard
+        $home_url = home_url('/*');
+
+        $results['ban'] = self::purge_varnish_cache(home_url('/.*'));
+
+        // Second method: Generic PURGE with regex
+        $results['purge'] = wp_remote_request($home_url, [
+            'method' => 'PURGE',
+            'headers' => [
+                'Host' => parse_url(home_url(), PHP_URL_HOST),
+                'X-Purge-Regex' => '.*'
+            ]
+        ]);
+
+        // Third method: CacheFlush-style header
+        $results['invalidate'] = wp_remote_request($home_url, [
+            'method' => 'INVALIDATE',
+            'headers' => [
+                'Host' => parse_url(home_url(), PHP_URL_HOST)
+            ]
+        ]);
+
+        // Return true if any method succeeded
+        return in_array(true, $results, true);
     }
 
     public static function purge_cache($url)
@@ -68,15 +118,16 @@ class berqReverseProxyCache
         $parsed_url = parse_url($url);
         $host = $parsed_url['host'];
 
-        wp_remote_request($url, array(
-            'method' => 'PURGE',
-            'headers' => array(
-                'Host' => $host
+        wp_remote_request(
+            $url,
+            array(
+                'method' => 'PURGE',
+                'headers' => array(
+                    'Host' => $host
+                )
             )
-        )
         );
 
-        
         self::purge_varnish_cache($url);
 
         if (strpos($url, '/.*') !== false) {

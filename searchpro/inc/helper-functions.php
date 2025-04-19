@@ -261,6 +261,10 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
         return;
     }
 
+    if (strpos($page_url, '?') !== false) {
+        return;
+    }
+
     $cache_directory = bwp_get_cache_dir();
     $cache_file = $cache_directory . $page_url . '.html';
     $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
@@ -1159,7 +1163,7 @@ function bwp_check_connection($force_check = false) {
     }
 
     // Perform the actual REST API check
-    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.bwp_admin_home_url('/?nocache'), ['timeout' => 60] );
+    $response = wp_safe_remote_get(  'https://boost.berqwp.com/photon/?connection_test=1&url='.bwp_admin_home_url('/?utm_source='.time()), ['timeout' => 60] );
 
     if ( is_wp_error( $response ) ) {
         $result = array(
@@ -1563,7 +1567,7 @@ function bwp_is_tab_nav($tab_id) {
 
 function bwp_notice($status = '', $title = null, $message = null, $btn = [], $dismissible = false) {
     ?>
-    <div class="bwp-notice notice <?php echo esc_attr($status); ?> <?php echo $dismissible ? 'dismissible' : ''; ?>">
+    <div class="bwp-notice <?php echo 'status-'.esc_attr($status); ?> <?php echo $dismissible ? 'dismissible' : ''; ?> <?php echo empty($title) ? 'no-title' : ''; ?>">
         <?php if ($dismissible) {?>
 					<div class="close"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></div>
                     <?php } ?>
@@ -1585,8 +1589,23 @@ function bwp_notice($status = '', $title = null, $message = null, $btn = [], $di
 						<div class="bwp-notice-btn">
                             <?php 
                             foreach($btn as $bwp_btn) {
+                                if (empty($bwp_btn['target'])) {
+                                    $bwp_btn['target'] = '';
+                                }
+
+                                if (empty($bwp_btn['href'])) {
+                                    $bwp_btn['href'] = '';
+                                }
+
+                                if (empty($bwp_btn['classes'])) {
+                                    $bwp_btn['classes'] = '';
+                                }
+
+                                if (empty($bwp_btn['text'])) {
+                                    $bwp_btn['text'] = '';
+                                }
                                 ?>
-                                <a href="<?php echo esc_attr($bwp_btn['href']) ?? ''; ?>" class="bwp-btn <?php echo esc_attr($bwp_btn['classes']) ?? ''; ?>">
+                                <a target="<?php echo esc_attr($bwp_btn['target']) ?? ''; ?>" href="<?php echo esc_attr($bwp_btn['href']) ?? ''; ?>" class="bwp-btn <?php echo esc_attr($bwp_btn['classes']) ?? ''; ?>">
                                     <?php echo esc_html__( $bwp_btn['text'], 'searchpro' ) ?? ''; ?>
                                 </a>
                                 <?php
@@ -1645,7 +1664,7 @@ function bwp_display_logs() {
         }
 
         // Define the path to the BerqWP logs file
-        $log_file_path = optifer_cache . 'berqwp.log'; // Adjust path if needed
+        $log_file_path = optifer_cache . '/logs/berqwp.log'; // Adjust path if needed
     
         // Check if the log file exists
         if (!file_exists($log_file_path)) {
@@ -1689,4 +1708,46 @@ function bwp_cf_flush_page($url) {
         $berqCloudflareAPIHandler = new berqCloudflareAPIHandler($email, $apitoken, $zoneid);
         $berqCloudflareAPIHandler->flush_url($url);
     }
+}
+
+function bwp_cf_delete_rules() {
+    if (!empty(get_option( 'berqwp_cf_creden' ))) {
+        $email = get_option( 'berqwp_cf_creden' )['email'];
+        $apitoken = get_option( 'berqwp_cf_creden' )['apitoken'];
+        $zoneid = get_option( 'berqwp_cf_creden' )['zoneid'];
+
+        $berqCloudflareAPIHandler = new berqCloudflareAPIHandler($email, $apitoken, $zoneid);
+        $berqCloudflareAPIHandler->delete_rule_by_description('BerqWP cache rules');
+    }
+}
+
+function bwp_lock_cache_directory() {
+    $cache_dir = optifer_cache;
+    $htaccess_path = $cache_dir . '.htaccess';
+
+    $rules = <<<HTACCESS
+Order allow,deny
+Deny from all
+HTACCESS;
+
+    if (!file_exists($cache_dir)) {
+        wp_mkdir_p($cache_dir);
+    }
+
+    if (!file_exists($htaccess_path)) {
+        file_put_contents($htaccess_path, $rules);
+    }
+}
+
+function berqwp_is_wp_cron_broken() {
+    $cron = _get_cron_array();
+    if (!$cron || !is_array($cron)) return false;
+
+    $now = time();
+    foreach ($cron as $timestamp => $events) {
+        if ($timestamp < $now - 300) { // 5 minutes overdue
+            return true;
+        }
+    }
+    return false;
 }

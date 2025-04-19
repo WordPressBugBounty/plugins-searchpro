@@ -11,10 +11,21 @@ class berqWooCommerce extends berqIntegrations {
         add_action( 'woocommerce_product_set_stock_status', [$this, 'flush_product_cache'] );
         add_action( 'woocommerce_delete_product_transients', [$this, 'flush_product_cache'] );
         add_action('woocommerce_scheduled_sales', [$this, 'product_sale_end_actions']);
+        add_filter('berqwp_purge_home_post_types', [$this, 'purge_home']);
         
         // Flush critical css when needed
         // add_action( 'save_post_product', [$this, 'flush_product_critical_css'] );
         // add_action( 'woocommerce_update_product', [$this, 'flush_product_critical_css'] );
+    }
+
+    function purge_home($post_types) {
+
+        if (!in_array('product', $post_types)) {
+            $post_types[] = 'product';
+        }
+
+        return $post_types;
+
     }
 
     function flush_product_critical_css($post_id) {

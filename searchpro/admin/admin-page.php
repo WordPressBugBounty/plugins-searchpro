@@ -4,6 +4,8 @@ if (!defined('ABSPATH'))
 
 $cached_pages = bwp_cached_pages_count();
 $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
+$berqconfigs = new berqConfigs();
+$configs = $berqconfigs->get_configs();
 
 do_action('berqwp_notices');
 ?>
@@ -87,7 +89,7 @@ do_action('berqwp_notices');
                 <div class="berqwp-tab <?php bwp_is_tab_nav('image-optimization'); ?>" data-tab="image-optimization">
                     <?php esc_html_e('Image Optimization', 'searchpro'); ?>
                     <p>
-                        <?php esc_html_e('WebP Images, Image Resize, LazyLoad', 'searchpro'); ?>
+                        <?php esc_html_e('WebP Images, Image Resize, Lazy Load', 'searchpro'); ?>
                     </p>
                 </div>
                 <div class="berqwp-tab <?php bwp_is_tab_nav('script-manager'); ?>" data-tab="script-manager">
@@ -270,6 +272,7 @@ do_action('berqwp_notices');
                     url: 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed',
                     data: {
                         url: '<?php echo get_option('berqwp_enable_sandbox') ? esc_html(bwp_admin_home_url() . '/?berqwp') : esc_html(bwp_admin_home_url('/')); ?>',
+                        key: 'AIzaSyBBEiQZ4IEVS2owZIbHSo4evOT-l-5BEHg',
                         strategy: 'mobile'
                     },
                     success: function (data) {
@@ -336,13 +339,14 @@ do_action('berqwp_notices');
                     url: 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed',
                     data: {
                         url: '<?php echo get_option('berqwp_enable_sandbox') ? esc_html(bwp_admin_home_url() . '/?berqwp') : esc_html(bwp_admin_home_url('/')); ?>',
+                        key: 'AIzaSyBBEiQZ4IEVS2owZIbHSo4evOT-l-5BEHg',
                         strategy: 'desktop'
                     },
                     success: function (data) {
                         let mobileSpeedScore = data.lighthouseResult.categories.performance.score * 100;
 
                         if (mobileSpeedScore >= 80 && $('.bwp_feedback')) {
-                            $('.bwp_feedback').show();
+                            $('.bwp_feedback').css('display', 'flex');
                         }
 
                         if (mobileSpeedScore >= 90) {
@@ -609,4 +613,64 @@ do_action('berqwp_notices');
 
 
         })(jQuery)
+</script>
+<script>
+    (function($){
+        $(document).ready(function() {
+            let cache_lifespan_options = $('input[name="berqwp_cache_lifespan"]');
+
+            cache_lifespan_options.change(function() {
+                cache_lifespan_options.parent('label').removeClass('selected');
+                $('input[name="berqwp_cache_lifespan"]:checked').parent('label').addClass('selected');
+            })
+
+            $('input[name="berqwp_cache_lifespan"]:checked').parent('label').addClass('selected');
+        })
+    })(jQuery)
+</script>
+<script>
+    (function($){
+        $(document).ready(function() {
+            let enable_compression_btn = $('a.berqwp-enable-page-compression');
+            let berq_nounce = '<?php echo esc_html(wp_create_nonce('wp_rest')); ?>';
+
+            enable_compression_btn.click(function(e){
+                e.preventDefault();
+
+                let loader = enable_compression_btn.find('.berqwp-loader');
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'berqwp_enable_page_compression',
+                        nonce: berq_nounce,
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-WP-Nonce', berq_nounce);
+                        loader.show();
+                    },
+                    success: function (data) {
+                        loader.hide();
+
+                        if (data.success === true) {
+                            let currentUrl = window.location.href;
+                            let url = new URL(currentUrl);
+                            let params = new URLSearchParams(url.search);
+                            params.set('berqwp_page_compression_enabled', '');
+                            url.search = params.toString();
+                            window.location.href = url.toString();
+                        } else {
+                            alert("Page compression test failed: Your web server doesn't support Gzip compression.");
+                        }
+
+                        
+                    },
+                    error: function () {
+                        loader.hide();
+                        alert("Page compression test failed: Please check your internet connection.");
+                    }
+                });
+            })
+        })
+    })(jQuery)
 </script>

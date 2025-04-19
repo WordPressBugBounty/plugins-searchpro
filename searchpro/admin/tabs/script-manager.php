@@ -13,7 +13,7 @@ $url_lines = implode("\n", $exclude_urls);
     </h2>
     <div class="berq-info-box">
         <h3 class="berq-box-title">
-            <?php esc_html_e('CSS optimization', 'searchpro'); ?>
+            <?php esc_html_e('CSS Optimization', 'searchpro'); ?>
         </h3>
         <div class="berq-box-content">
             <p>
@@ -29,7 +29,7 @@ $url_lines = implode("\n", $exclude_urls);
     </div>
     <div class="berq-info-box">
         <h3 class="berq-box-title">
-            <?php esc_html_e('JavaScript optimization', 'searchpro'); ?>
+            <?php esc_html_e('JavaScript Optimization', 'searchpro'); ?>
         </h3>
         <div class="berq-box-content">
             <p>
@@ -43,22 +43,49 @@ $url_lines = implode("\n", $exclude_urls);
             </select>
         </div>
     </div>
-    <?php if ($this->is_key_verified) { ?>
-        <div class="berq-info-box">
-            <h3 class="berq-box-title">
-                <?php esc_html_e('Exclude JS & CSS', 'searchpro'); ?>
-            </h3>
-            <div class="berq-box-content">
-                <p>
-                    <?php esc_html_e('Enter URLs, filenames, or keywords from <script> or <link> tags to exclude from optimization, one per line. Example: /wp-includes/js/jquery/jquery.min.js or google-analytics.', 'searchpro'); ?>
-                </p>
-                <textarea name="berq_exclude_js_css" cols="30" rows="10"><?php echo esc_textarea($url_lines); ?></textarea>
-            </div>
-        </div>
-    <?php } ?>
+
     <div class="berq-info-box">
         <h3 class="berq-box-title">
-            <?php esc_html_e('Preload font faces', 'searchpro'); ?>
+            <?php esc_html_e('JavaScript Execution Mode', 'searchpro'); ?>
+        </h3>
+        <div class="berq-box-content">
+            <p>
+                <?php esc_html_e("$plugin_name offers different JavaScript optimization modes, so every JavaScript-heavy website can unlock its true potential.", 'searchpro'); ?>
+            </p>
+            <label class="berq-check">
+                <input type="radio" name="berqwp_javascript_execution_mode" value="1" <?php echo get_option('berqwp_javascript_execution_mode') == 1 ? 'checked' : ''; ?>>
+                <?php esc_html_e('Sequential Blocking Execution - High Compatibility (Default)', 'searchpro'); ?>
+            </label>
+            <label class="berq-check">
+                <input type="radio" name="berqwp_javascript_execution_mode" value="4" <?php echo get_option('berqwp_javascript_execution_mode') == 4 ? 'checked' : ''; ?>>
+                <?php esc_html_e('Flora - High Compatibility', 'searchpro'); ?>
+            </label>
+            <label class="berq-check">
+                <input type="radio" name="berqwp_javascript_execution_mode" value="3" <?php echo get_option('berqwp_javascript_execution_mode') == 3 ? 'checked' : ''; ?>>
+                <?php esc_html_e('Parallel Execution - High Compatibility', 'searchpro'); ?>
+            </label>
+            <label class="berq-check">
+                <input type="radio" name="berqwp_javascript_execution_mode" value="0" <?php echo get_option('berqwp_javascript_execution_mode') == 0 ? 'checked' : ''; ?>>
+                <?php esc_html_e('Sequential Execution', 'searchpro'); ?>
+            </label>
+        </div>
+    </div>
+
+    <div class="berq-info-box">
+        <h3 class="berq-box-title">
+            <?php esc_html_e('Exclude JS & CSS', 'searchpro'); ?>
+        </h3>
+        <div class="berq-box-content">
+            <p>
+                <?php esc_html_e('Enter URLs, filenames, or keywords from <script> or <link> tags to exclude from optimization, one per line. Example: /wp-includes/js/jquery/jquery.min.js or google-analytics.', 'searchpro'); ?>
+            </p>
+            <textarea name="berq_exclude_js_css" cols="30" rows="10"><?php echo esc_textarea($url_lines); ?></textarea>
+        </div>
+    </div>
+
+    <div class="berq-info-box">
+        <h3 class="berq-box-title">
+            <?php esc_html_e('Preload Font Faces', 'searchpro'); ?>
         </h3>
         <div class="berq-box-content">
             <p>
@@ -72,7 +99,7 @@ $url_lines = implode("\n", $exclude_urls);
     </div>
     <div class="berq-info-box">
         <h3 class="berq-box-title">
-            <?php esc_html_e('Preload cookie banner', 'searchpro'); ?>
+            <?php esc_html_e('Preload Cookie Banner', 'searchpro'); ?>
         </h3>
         <div class="berq-box-content">
             <p>
@@ -86,7 +113,7 @@ $url_lines = implode("\n", $exclude_urls);
     </div>
     <div class="berq-info-box">
         <h3 class="berq-box-title">
-            <?php esc_html_e('Disable emojis', 'searchpro'); ?>
+            <?php esc_html_e('Disable Emojis', 'searchpro'); ?>
         </h3>
         <div class="berq-box-content">
             <p>
@@ -102,7 +129,7 @@ $url_lines = implode("\n", $exclude_urls);
     </div>
     <div class="berq-info-box">
         <h3 class="berq-box-title">
-            <?php esc_html_e('Lazy load YouTube embeds', 'searchpro'); ?>
+            <?php esc_html_e('Lazy Load YouTube Embeds', 'searchpro'); ?>
         </h3>
         <div class="berq-box-content">
             <label class="berq-check">
@@ -116,59 +143,29 @@ $url_lines = implode("\n", $exclude_urls);
         </div>
     </div>
 
-    <?php if ($this->is_key_verified) { ?>
-        <div class="berq-info-box">
-            <h3 class="berq-box-title">
-                <?php esc_html_e('JavaScript execution mode', 'searchpro'); ?>
-            </h3>
-            <div class="berq-box-content">
-                <p>
-                    <?php esc_html_e("$plugin_name offers different JavaScript optimization modes, so every JavaScript-heavy website can unlock its true potential.", 'searchpro'); ?>
-                </p>
-                <label class="berq-check">
-                    <input type="radio" name="berqwp_javascript_execution_mode" value="1" <?php echo get_option('berqwp_javascript_execution_mode') == 1 ? 'checked' : ''; ?>>
-                    <?php esc_html_e('Sequential Blocking Execution - High Compatibility (Default)', 'searchpro'); ?>
-                </label>
-                <label class="berq-check">
-                    <input type="radio" name="berqwp_javascript_execution_mode" value="3" <?php echo get_option('berqwp_javascript_execution_mode') == 3 ? 'checked' : ''; ?>>
-                    <?php esc_html_e('Parallel Execution - High Compatibility', 'searchpro'); ?>
-                </label>
-                <label class="berq-check">
-                    <input type="radio" name="berqwp_javascript_execution_mode" value="0" <?php echo get_option('berqwp_javascript_execution_mode') == 0 ? 'checked' : ''; ?>>
-                    <?php esc_html_e('Sequential Execution', 'searchpro'); ?>
-                </label>
-                <label class="berq-check" style="display:none">
-                    <input type="radio" name="berqwp_javascript_execution_mode" value="2" <?php echo get_option('berqwp_javascript_execution_mode') == 2 ? 'checked' : ''; ?>>
-                    <?php esc_html_e('Defer JavaScript (Safe - No Delay)', 'searchpro'); ?>
-                </label>
-            </div>
+    <div class="berq-info-box">
+        <h3 class="berq-box-title">
+            <?php esc_html_e('Trigger Interaction', 'searchpro'); ?>
+        </h3>
+        <div class="berq-box-content">
+            <p>
+                <?php esc_html_e('Trigger an interaction after the page has been loaded. The default is empty.', 'searchpro'); ?>
+            </p>
+            <table class="berq-image-settings">
+                <tr>
+                    <td>
+                        <p>
+                            <?php esc_html_e('Trigger after:', 'searchpro'); ?>
+                        </p>
+                    </td>
+                    <td><input type="number" min="0" name="berqwp_interaction_delay"
+                            value="<?php echo esc_attr(get_option('berqwp_interaction_delay')); ?>" style="width:60px">
+                        ms</td>
+                </tr>
+            </table>
         </div>
-    <?php } ?>
+    </div>
 
-    <?php if ($this->is_key_verified) { ?>
-        <div class="berq-info-box">
-            <h3 class="berq-box-title">
-                <?php esc_html_e('Trigger Interaction', 'searchpro'); ?>
-            </h3>
-            <div class="berq-box-content">
-                <p>
-                    <?php esc_html_e('Trigger an interaction after the page has been loaded. The default is empty.', 'searchpro'); ?>
-                </p>
-                <table class="berq-image-settings">
-                    <tr>
-                        <td>
-                            <p>
-                                <?php esc_html_e('Trigger after:', 'searchpro'); ?>
-                            </p>
-                        </td>
-                        <td><input type="number" min="0" name="berqwp_interaction_delay"
-                                value="<?php echo esc_attr(get_option('berqwp_interaction_delay')); ?>" style="width:60px">
-                            ms</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    <?php } ?>
     <button type="submit" class="berqwp-save"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"
             xmlns="http://www.w3.org/2000/svg">
             <path d="M4.16663 10.8333L7.49996 14.1667L15.8333 5.83334" stroke="white" stroke-width="2"

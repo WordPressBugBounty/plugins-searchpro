@@ -24,6 +24,9 @@ if (isset($_POST['berqwp_save_nonce'])) {
             // trigger cache warmup
             do_action('berqwp_cache_warmup');
 
+            // clear cache from cloud
+            bwp_request_purge_license_key_cache();
+
             global $berqNotifications;
             $berqNotifications->success("$plugin_name license key has been activated.");
 
@@ -125,6 +128,23 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
         global $berqNotifications;
         $berqNotifications->success('Cloudflare Edge Cache disabled.');
+
+        ?>
+        <script>
+            location.href = '<?php echo esc_html(get_admin_url() . 'admin.php?page=berqwp'); ?>';
+        </script>
+        <?php
+        exit();
+    }
+
+    if (!empty($_POST['bwp_disable_page_compression'])) {
+
+        // Update settings
+        $berqconfigs = new berqConfigs();
+        $berqconfigs->update_configs(['page_compression'=>false]);
+
+        global $berqNotifications;
+        $berqNotifications->success('Page compression has been successfully disabled on your website.');
 
         ?>
         <script>
@@ -369,12 +389,27 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
     if (isset($_POST['berq_exclude_cookies'])) {
         $cookie_ids = sanitize_textarea_field($_POST['berq_exclude_cookies']);
-        $cookie_ids_array = explode("\n", $cookie_ids);
+        // $cookie_ids_array = explode("\n", $cookie_ids);
+        $cookie_ids_array = preg_split("/\r\n|\n|\r/", trim($cookie_ids));
 
         if (isset($cookie_ids_array) && is_array($cookie_ids_array)) {
             $berqconfigs = new berqConfigs();
             $berqconfigs->update_configs(['exclude_cookies'=>$cookie_ids_array]);
         }
+
+    }
+    
+    if (!empty($_POST['berqwp_cache_lifespan'])) {
+        $cache_lifespan = (int) sanitize_textarea_field($_POST['berqwp_cache_lifespan']);
+        
+        // Sanitize
+        if (!in_array($cache_lifespan, [MONTH_IN_SECONDS, WEEK_IN_SECONDS, DAY_IN_SECONDS])) {
+            $cache_lifespan = MONTH_IN_SECONDS;
+        }
+
+        // Update settings
+        $berqconfigs = new berqConfigs();
+        $berqconfigs->update_configs(['cache_lifespan'=>$cache_lifespan]);
 
     }
 
@@ -414,7 +449,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
     }
 
     global $berqNotifications;
-    $berqNotifications->success('Changes have been saved! Please flush the cache to make changes visible for the visitors.');
+    $berqNotifications->success('Changes have been saved.');
 
     $tab_id = '';
     if (!empty($_POST['bwp_current_tab_id'])) {

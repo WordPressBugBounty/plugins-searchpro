@@ -20,19 +20,61 @@ $taxonomy_names = get_taxonomies(array(
     'show_in_rest' => true
 ), 'names');
 
-$berqconfigs = new berqConfigs();
-$configs = $berqconfigs->get_configs();
 $excluded_cookies = implode("\n", $configs['exclude_cookies']);
-
+$cache_lifespan = $configs['cache_lifespan'];
 
 
 ?>
 <div id="cache-management" <?php bwp_is_tab('cache-management'); ?>>
     <h2 class="berq-tab-title"><?php esc_html_e('Cache Management', 'searchpro'); ?></h2>
     <div class="berq-info-box">
-        <h3 class="berq-box-title"><?php esc_html_e('Page exclusions', 'searchpro'); ?></h3>
+        <h3 class="berq-box-title"><?php esc_html_e('Max. Cache Lifespan', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e('Exclude pages from being cached. Enter page URLs, one URL per line.', 'searchpro'); ?> 
+            <p><?php esc_html_e('Set the maximum cache lifespan to control how long cached pages are stored before being refreshed.', 'searchpro'); ?></p>
+
+            <div class="berqwp-lifespan-options">
+                <label>
+                    <input type="radio" name="berqwp_cache_lifespan" value="<?php echo MONTH_IN_SECONDS; ?>" <?php echo $cache_lifespan == MONTH_IN_SECONDS ? 'checked' : ''; ?>>
+                    <?php esc_html_e('30 Days (Default)', 'searchpro'); ?>
+                </label>
+                <label>
+                    <input type="radio" name="berqwp_cache_lifespan" value="<?php echo WEEK_IN_SECONDS; ?>" <?php echo $cache_lifespan == WEEK_IN_SECONDS ? 'checked' : ''; ?>>
+                    <?php esc_html_e('7 Days', 'searchpro'); ?>
+                </label>
+                <label>
+                    <input type="radio" name="berqwp_cache_lifespan" value="<?php echo DAY_IN_SECONDS; ?>" <?php echo $cache_lifespan == DAY_IN_SECONDS ? 'checked' : ''; ?>>
+                    <?php esc_html_e('24 Hours', 'searchpro'); ?>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="berq-info-box">
+        <h3 class="berq-box-title"><?php esc_html_e('Page Compression', 'searchpro'); ?></h3>
+        <div class="berq-box-content">
+            <p><?php esc_html_e('Deliver GZIP-compressed page cache files, reducing page size by up to 70%.', 'searchpro'); ?></p>
+
+            <div class="berqwp-pagecompress-options">
+
+                <?php if ($configs['page_compression'] === true) { ?>
+
+                    <label class="bwp-disable-pagecompression">
+                        <input type="submit" name="bwp_disable_page_compression" value="Disable page compression" style="display:none">
+                        <?php esc_html_e('Disable page compression', 'searchpro'); ?>
+                    </label>
+
+                <?php } else { ?>
+
+                    <a href="#" class="berq-btn berqwp-enable-page-compression"><div class="berqwp-loader"></div><?php esc_html_e('Enable page compression', 'searchpro'); ?></a>
+
+                <?php } ?>
+
+            </div>
+        </div>
+    </div>
+    <div class="berq-info-box">
+        <h3 class="berq-box-title"><?php esc_html_e('Page Exclusions', 'searchpro'); ?></h3>
+        <div class="berq-box-content">
+            <p><?php esc_html_e('Exclude pages from being cached. Enter page URLs, one URL per line.', 'searchpro'); ?>
 
             <?php if (bwp_show_docs()) { ?>
             <a href="https://berqwp.com/help-center/exclude-pages-from-being-cached/" target="_blank"><?php esc_html_e('Learn more', 'searchpro'); ?></a>
@@ -43,7 +85,7 @@ $excluded_cookies = implode("\n", $configs['exclude_cookies']);
         </div>
     </div>
     <div class="berq-info-box">
-        <h3 class="berq-box-title"><?php esc_html_e('Content types', 'searchpro'); ?></h3>
+        <h3 class="berq-box-title"><?php esc_html_e('Content Types', 'searchpro'); ?></h3>
         <div class="berq-box-content">
             <p><?php esc_html_e('Choose which post types and archive pages should be cached.', 'searchpro'); ?></p>
             <div class="optimize-post-types">
@@ -79,7 +121,7 @@ $excluded_cookies = implode("\n", $configs['exclude_cookies']);
         </div>
     </div>
     <div class="berq-info-box">
-        <h3 class="berq-box-title"><?php esc_html_e('Exclude cookies', 'searchpro'); ?></h3>
+        <h3 class="berq-box-title"><?php esc_html_e('Exclude Cookies', 'searchpro'); ?></h3>
         <div class="berq-box-content">
             <p><?php esc_html_e("Avoid serving cache for the following cookie IDs. Enter one cookie ID per line."); ?>  
 
@@ -88,7 +130,7 @@ $excluded_cookies = implode("\n", $configs['exclude_cookies']);
         </div>
     </div>
     <div class="berq-info-box">
-        <h3 class="berq-box-title"><?php esc_html_e('Ignore URL parameters', 'searchpro'); ?></h3>
+        <h3 class="berq-box-title"><?php esc_html_e('Ignore URL Parameters', 'searchpro'); ?></h3>
         <div class="berq-box-content">
             <p><?php esc_html_e("Ignore page URL parameters, these parameters will be disregarded and won't be cached separately. Enter one parameter per line."); ?> 
             

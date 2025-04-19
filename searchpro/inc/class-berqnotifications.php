@@ -21,12 +21,14 @@ class berqNotifications {
                 $msg = $notice[1];
                 $class = $notice[0];
 
-                $notice_html = '<div class="notice notice-'.$class.' is-dismissible">';
-                $notice_html .= '<p>';
-                $notice_html .= esc_html__($msg, 'searchpro');
-                $notice_html .= '</p>';
-                $notice_html .= '</div>';
-                echo wp_kses_post($notice_html);
+                bwp_notice($class, '', $msg);
+
+                // $notice_html = '<div class="notice notice-'.$class.' is-dismissible">';
+                // $notice_html .= '<p>';
+                // $notice_html .= esc_html__($msg, 'searchpro');
+                // $notice_html .= '</p>';
+                // $notice_html .= '</div>';
+                // echo wp_kses_post($notice_html);
             }
 
             // Clear the notices after displaying them by removing the transient

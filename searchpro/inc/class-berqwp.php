@@ -100,7 +100,76 @@ if (!class_exists('berqWP')) {
 
 			// Increase nonce life
 			add_filter( 'nonce_life', [$this, 'increase_nonce_life'] );
+
+			// Page compression test
+			add_action('wp_ajax_berqwp_enable_page_compression', [$this, 'enable_page_compression']);
+			add_action('template_redirect', [$this, 'page_compression_test']);
+
+			// Run daily maintenance tasks
+			add_action( 'init', [$this, 'schedule_daily_maintenance'] );
+			add_action( 'berqwp_daily_maintenance_hook', [$this, 'daily_maintenance'] );
 			
+		}
+
+		function daily_maintenance() {
+
+			// Perform connection test
+			bwp_check_connection(true);
+
+		}
+
+		function schedule_daily_maintenance() {
+			if ( ! as_next_scheduled_action( 'berqwp_daily_maintenance_hook' ) ) {
+				as_schedule_recurring_action( time(), DAY_IN_SECONDS, 'berqwp_daily_maintenance_hook' );
+			}
+		}
+
+		function page_compression_test() {
+			if (isset($_GET['berqwp_compression_test'])) {
+				$test_file_path = optifer_cache . 'gzip-compression-test.gz';
+				$accept_encoding = $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '';
+				$supports_gzip = strpos($accept_encoding, 'gzip') !== false;
+
+				if ($supports_gzip) {
+					header('Content-Type: text/html; charset=utf-8');
+					header_remove('Content-Encoding');
+					// header('Content-Encoding: gzip');
+					readgzfile($test_file_path);
+				}
+				// header('Content-Type: text/html');
+				// header('Content-Encoding: gzip');
+				// readfile($test_file_path);
+				exit;
+			}
+		}
+
+		function enable_page_compression() {
+
+			check_ajax_referer('wp_rest', 'nonce');
+			
+			$url = home_url('/?berqwp_compression_test='.time());
+			$berqconfigs = new berqConfigs();
+			$testfile = optifer_cache .'gzip-compression-test.gz';
+			$html = gzencode('Hello World!');
+			@file_put_contents($testfile, $html);
+
+			sleep(5);
+			
+			$response = wp_remote_get($url);
+		
+			if (!empty($response) && !is_wp_error($response)) {
+				$html = wp_remote_retrieve_body($response);
+				
+				if ($html == 'Hello World!') {
+					$berqconfigs->update_configs(['page_compression'=>true]);
+					wp_send_json_success('Compression test passed.');
+				}
+			}
+
+			$berqconfigs->update_configs(['page_compression'=>false]);
+			wp_send_json_error('Compression test failed.');
+		
+			die(); // Always exit in AJAX functions
 		}
 
 		function increase_nonce_life( $default_life ) {
@@ -531,8 +600,16 @@ if (!class_exists('berqWP')) {
 
 			$plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
+			if (isset($_GET['berqwp_page_compression_enabled'])) {
+				bwp_notice('success', 'Page Compression Enabled', "<p>Page compression has been successfully enabled on your website.</p>");
+			}
+
 			if (isset($_GET['dismiss_feedback'])) {
-				set_transient( 'bqwp_hide_feedback_notice', true, DAY_IN_SECONDS * 2 );
+				set_transient( 'bqwp_hide_feedback_notice', true, DAY_IN_SECONDS * 14 );
+			}
+
+			if (isset($_GET['bwp_quit_feedback'])) {
+				update_option( 'bwp_quit_feedback', true );
 			}
 
 			if (!empty(get_option('berqwp_license_key'))) {
@@ -580,14 +657,35 @@ if (!class_exists('berqWP')) {
 				<?php
 			}
 
-			if (isset($_GET['page']) && $_GET['page'] == 'berqwp' && !get_transient( 'bqwp_hide_feedback_notice' ) && $this->is_key_verified && bwp_show_account()) {
-				$notice = '<div class="notice notice-info bwp_feedback">';
-				$notice .= '<p>';
-				$notice .= __('🎉 <b>Loving BerqWP\'s performance? 🚀</b> Show some love and help us grow 👉 - <a href="https://wordpress.org/support/plugin/searchpro/reviews/#new-post" target="_blank">Rate BerqWP Plugin</a>. Your insights shape our journey.', 'searchpro');
-				$notice .= '<a href="'.get_admin_url().'admin.php?page=berqwp&dismiss_feedback" style="display: table;margin-left: 50px;color: #969595;display: table;">Dismiss</a>';
-				$notice .= '</p>';
-				$notice .= '</div>';
-				echo wp_kses_post($notice);
+			if (isset($_GET['page']) && $_GET['page'] == 'berqwp' && !get_transient( 'bqwp_hide_feedback_notice' ) && !get_option('bwp_quit_feedback') && $this->is_key_verified && bwp_show_account()) {
+				bwp_notice('info bwp_feedback', 'Loving BerqWP\'s performance?', '<p>Show some love and help us grow 👉 - <a href="https://wordpress.org/support/plugin/searchpro/reviews/#new-post" target="_blank">Rate BerqWP Plugin</a>. Your insights shape our journey.</p>', [
+					[
+						'href'	=> 'https://wordpress.org/support/plugin/searchpro/reviews/#new-post',
+						'text'	=> '❤️ You deserve it',
+						'classes'	=> '',
+						'target'	=> '_blank',
+					],
+					[
+						'href'	=> get_admin_url().'admin.php?page=berqwp&bwp_quit_feedback',
+						'text'	=> '👍 Already did',
+						'classes'	=> '',
+						'target'	=> '',
+					],
+					[
+						'href'	=> get_admin_url().'admin.php?page=berqwp&dismiss_feedback',
+						'text'	=> 'Not Now',
+						'classes'	=> '',
+						'target'	=> '',
+					]
+				]);
+
+				// $notice = '<div class="bwp-notice bwp_feedback">';
+				// $notice .= '<p>';
+				// $notice .= __('🎉 <b>Loving BerqWP\'s performance? 🚀</b> Show some love and help us grow 👉 - <a href="https://wordpress.org/support/plugin/searchpro/reviews/#new-post" target="_blank">Rate BerqWP Plugin</a>. Your insights shape our journey.', 'searchpro');
+				// $notice .= '<a href="'.get_admin_url().'admin.php?page=berqwp&dismiss_feedback" style="display: table;margin-left: 50px;color: #969595;display: table;">Dismiss</a>';
+				// $notice .= '</p>';
+				// $notice .= '</div>';
+				// echo wp_kses_post($notice);
 			}
 
 			if (get_option('bwp_require_flush_cache', false)) {
@@ -717,7 +815,7 @@ if (!class_exists('berqWP')) {
 			if (false === $cached_response || $cache_expire_time < time()) {
 				// If not cached, perform the API request
 
-				$rateLimiter = new RateLimiter(5, 60, optifer_cache);
+				$rateLimiter = new RateLimiter(5, 60, optifer_cache.'ratelimit/');
 				$clientIdentifier = gethostname();
 		
 				if ($rateLimiter->isRateLimited($clientIdentifier)) {
@@ -737,7 +835,7 @@ if (!class_exists('berqWP')) {
 					'secret_key' 				=> BERQ_SECRET,
 					'license_key' 				=> $license_key,
 					'version' 					=> BERQWP_VERSION,
-					't' 						=> time(),
+					't' 						=> '',
 				);
 
 				$endpoint_url = esc_url(add_query_arg($api_params, BERQ_SERVER));
@@ -787,7 +885,7 @@ if (!class_exists('berqWP')) {
 							'slm_action' 				=> 'slm_check',
 							'secret_key' 				=> BERQ_SECRET,
 							'license_key' 				=> $license_key,
-							't' 						=> time(),
+							't' 						=> '',
 						);
 	
 						$berq_log->info('Making request 2');
