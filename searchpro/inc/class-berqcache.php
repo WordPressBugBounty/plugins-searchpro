@@ -127,7 +127,7 @@ if (!class_exists('berqCache')) {
             add_action('berqwp_flush_page_cache', [$this, 'flush_cf_page']);
             add_action('berqwp_flush_all_cache', 'bwp_cf_flush_all');
             add_action('berqwp_deactivate_plugin', 'bwp_cf_delete_rules');
-            add_action('init', [$this, 'check_cf_rules']);
+            add_action('berqwp_activate_plugin', [$this, 'check_cf_rules']);
 
         }
 

@@ -50,60 +50,51 @@ class BerqCloudflareAPIHandler
         return $this->make_request($endpoint, 'GET');
     }
 
-    public function delete_rule_by_description($description)
-    {
-
-        // Step 2: Find the ruleset by searching for the matching description
-        $rulesets = $this->get_cache_ruleset();
-        $ruleset_to_update = null;
-
-        // Look for the ruleset you need to update
-        foreach ($rulesets as $ruleset) {
-            if (isset($ruleset['rules']) && !empty($ruleset['rules'])) {
-                foreach ($ruleset['rules'] as $rule) {
-                    if ($rule['description'] == $description) {
-                        $ruleset_to_update = $ruleset;
-                        break;
-                    }
-                }
-                if ($ruleset_to_update) {
-                    break;
-                }
+    public function delete_rule_by_description($description) {
+        // Step 1: Get the ruleset from Cloudflare
+        $response = $this->get_cache_ruleset();
+    
+        // Handle API errors
+        if (!isset($response['success']) || !$response['success']) {
+            return [
+                'success' => false,
+                'message' => 'Failed to fetch ruleset: ' . ($response['errors'][0]['message'] ?? 'Unknown error'),
+            ];
+        }
+    
+        // Extract the ruleset and its rules
+        $ruleset = $response['result'] ?? [];
+        $rules = $ruleset['rules'] ?? [];
+    
+        // Step 2: Find and remove the rule by description
+        $updatedRules = [];
+        $found = false;
+    
+        foreach ($rules as $rule) {
+            if (isset($rule['description']) && $rule['description'] === $description) {
+                $found = true;
+            } else {
+                $updatedRules[] = $rule; // Keep rules that don't match
             }
         }
-
-        // Step 3: If no matching ruleset found, return failure
-        if (!$ruleset_to_update) {
+    
+        if (!$found) {
             return [
                 'success' => false,
-                'message' => "No rule found with the description: {$description}",
+                'message' => "No rule found with description: {$description}",
             ];
         }
-
-        // Step 4: Filter out the rule to delete based on description
-        $updated_rules = array_filter($ruleset_to_update['rules'], function ($rule) use ($description) {
-            return $rule['description'] !== $description;
-        });
-
-        // Step 5: Check if anything was removed
-        if (count($updated_rules) === count($ruleset_to_update['rules'])) {
-            return [
-                'success' => false,
-                'message' => 'No matching rule found with the given description',
-            ];
-        }
-
-        // Step 6: Prepare the updated ruleset data
-        $ruleset_to_update['rules'] = array_values($updated_rules);
-
-        // Step 7: Send the update request
-        $update_endpoint = "zones/{$this->zone_id}/rulesets/{$ruleset_to_update['id']}";
-        $update_response = $this->make_request($update_endpoint, 'PUT', [
-            'rules' => $ruleset_to_update['rules'],
-        ]);
-
-        // Step 8: Return the success message
-        if ($update_response['success']) {
+    
+        // Step 3: Prepare the updated ruleset payload
+        $ruleset['rules'] = $updatedRules;
+        unset($ruleset['last_updated']);
+    
+        // Step 4: Send the update request
+        $update_endpoint = "zones/{$this->zone_id}/rulesets/{$ruleset['id']}";
+        $update_response = $this->make_request($update_endpoint, 'PUT', $ruleset);
+    
+        // Step 5: Return result
+        if (isset($update_response['success']) && $update_response['success']) {
             return [
                 'success' => true,
                 'message' => 'Rule deleted successfully.',
@@ -111,11 +102,12 @@ class BerqCloudflareAPIHandler
         } else {
             return [
                 'success' => false,
-                'message' => 'Failed to update ruleset: ' . implode(' ', array_column($update_response['errors'], 'message')),
+                'message' => 'Failed to update ruleset: ' . 
+                    implode(' ', array_column($update_response['errors'] ?? [], 'message')),
             ];
         }
     }
-
+    
     public function purge_all_cache() {
         $endpoint = "zones/{$this->zone_id}/purge_cache";
         $response = $this->make_request($endpoint, 'POST', [

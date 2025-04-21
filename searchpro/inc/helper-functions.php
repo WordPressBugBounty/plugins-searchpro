@@ -256,6 +256,13 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
 
     $page_url = strtolower($page_url);
 
+    $parsed_site_url = wp_parse_url(home_url());
+    $parsed_page_url = wp_parse_url($page_url);
+
+    if ($parsed_page_url['host'] !== $parsed_site_url['host']) {
+        return;
+    }
+
     $slug = bwp_url_into_path($page_url);
     if (berqwp_is_slug_excludable($slug)) {
         return;
@@ -338,7 +345,7 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
     $timeout = 30;
 
     if ($async) {
-        $timeout = 0.1;
+        $timeout = 1;
     }
 
     $berqwp->request_cache($post_data, $timeout);
@@ -393,7 +400,7 @@ function bwp_cache_current_page() {
         return;
     }
 
-    warmup_cache_by_url($bwp_current_page, false, true);
+    warmup_cache_by_url($bwp_current_page, false, false);
     $bwp_current_page = null;
     
 }

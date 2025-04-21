@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.8
-Stable tag: 2.2.33
+Stable tag: 2.2.34
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -244,6 +244,10 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 2.2.34 =
+* [Bug] Fixed cache warmup issue for pages with redirects.
+* [Bug] Fixed issue where Cloudflare Edge Cache rules were not deleted when the plugin was deactivated.
 
 = 2.2.33 =
 * [New Feature] Added "Max Cache Lifespan" setting.
