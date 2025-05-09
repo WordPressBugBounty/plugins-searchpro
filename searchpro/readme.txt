@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.8
-Stable tag: 2.2.36
+Stable tag: 2.2.37
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -245,7 +245,7 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 
 == Changelog ==
 
-= 2.2.36 =
+= 2.2.37 =
 * [Bug] Fixed deprecated PHP warning message.
 
 = 2.2.35 =

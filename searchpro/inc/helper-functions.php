@@ -1784,6 +1784,10 @@ function berqwp_is_page_url_excluded($page_url) {
     if (!empty($pages_to_exclude)) {
         foreach ($pages_to_exclude as $single_page_url) {
 
+            if (empty($single_page_url)) {
+                continue;
+            }
+
             if (substr($single_page_url, -1) !== '*') {
                 continue;
             }
