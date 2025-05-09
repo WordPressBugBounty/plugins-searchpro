@@ -108,13 +108,60 @@ if (!class_exists('berqWP')) {
 			// Run daily maintenance tasks
 			add_action( 'init', [$this, 'schedule_daily_maintenance'] );
 			add_action( 'berqwp_daily_maintenance_hook', [$this, 'daily_maintenance'] );
+
+
+			// Revoke License
+			add_action( 'init', [$this, 'revoke_license'] );
 			
+		}
+
+		function revoke_license() {
+			if (isset($_GET['berqwp_revoke_license']) && !empty($_POST['key_hash'])) {
+				$hash = sanitize_text_field( $_POST['key_hash'] );
+
+				if ($hash == md5(get_option('berqwp_license_key'))) {
+					delete_option( 'berqwp_license_key' );
+					echo json_encode(['success'	=> true]);
+					exit;
+				}
+			}
 		}
 
 		function daily_maintenance() {
 
 			// Perform connection test
 			bwp_check_connection(true);
+
+			$log_file = optifer_cache . 'berqwp.log';
+			if (file_exists($log_file)) {
+				@unlink($log_file);
+			}
+
+			$log_dir = optifer_cache . 'logs/';
+			
+			// Check if directory exists
+			if (is_dir($log_dir)) {
+				// Get all files in the directory
+				$files = glob($log_dir . '*');
+			
+				// Check if there are more than 10 files
+				if (count($files) > 10) {
+					// Sort files by modified time, newest first
+					usort($files, function($a, $b) {
+						return filemtime($b) - filemtime($a);
+					});
+			
+					// Get files beyond the first 10
+					$files_to_delete = array_slice($files, 10);
+			
+					// Delete the extra files
+					foreach ($files_to_delete as $file) {
+						if (is_file($file)) {
+							@unlink($file);
+						}
+					}
+				}
+			}
 
 		}
 
@@ -483,7 +530,7 @@ if (!class_exists('berqWP')) {
 				$license_key = get_option('berqwp_license_key');
 
 				global $berq_log;
-				$berq_log->info("License key check from initialize function.");
+				// $berq_log->info("License key check from initialize function.");
 
 				$key_response = $this->verify_license_key($license_key);
 
@@ -655,6 +702,18 @@ if (!class_exists('berqWP')) {
 					<p><strong>Error:</strong> <?php echo $plugin_name; ?> server is unable to access this website, please whitelist our server IP address. <a href="https://berqwp.com/help-center/get-started-with-berqwp/" target="_blank">Find our server IP address here.</a></p>
 				</div> -->
 				<?php
+			}
+
+			// Check Permissions
+			$cache_directory = ABSPATH . 'wp-content/cache/berqwp/';
+			$wp_config_file  = ABSPATH . 'wp-config.php';
+
+			if (!is_writable($cache_directory)) {
+				bwp_notice('error', 'Cache directory not writable', "<p>The $plugin_name cache directory at /wp-content/cache/berqwp/ is not writable. Please update the directory permissions to allow the plugin to store cached files.</p>", []);
+			}
+
+			if (!is_writable($wp_config_file)) {
+				bwp_notice('error', 'wp-config.php not writable', "<p>The wp-config.php file is not writable. $plugin_name may need to write configuration settings to this file. Please adjust the file permissions.", []);
 			}
 
 			if (isset($_GET['page']) && $_GET['page'] == 'berqwp' && !get_transient( 'bqwp_hide_feedback_notice' ) && !get_option('bwp_quit_feedback') && $this->is_key_verified && bwp_show_account()) {
@@ -955,7 +1014,7 @@ if (!class_exists('berqWP')) {
 				// }
 
 			} else {
-				$berq_log->info('Delivering license key object from the transient cache.');
+				// $berq_log->info('Delivering license key object from the transient cache.');
 			}
 
 			// Return the cached response

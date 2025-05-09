@@ -38,16 +38,18 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
         $configs = $berqconfigs->get_configs();
         $url = bwp_get_request_url();
         $url = dropin_remove_ignore_params($url);
-        // $slug = bwp_sluguri_into_path($_SERVER['REQUEST_URI']);
-        // $slug = dropin_remove_ignore_params($slug);
         $cache_key = md5($url);
         $cache_directory = ABSPATH . '/wp-content/cache/berqwp/html/';
         $cache_file = $cache_directory . $cache_key . '.html';
         $cache_file_gz = $cache_directory . $cache_key . '.gz';
-        $cache_max_life = @filemtime($cache_file) + $configs['cache_lifespan'];
+        $cache_max_life = file_exists($cache_file) ? @filemtime($cache_file) + $configs['cache_lifespan'] : null;
         $compression_enabled = $configs['page_compression'] === true;
         $accept_encoding = $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '';
         $supports_gzip = strpos($accept_encoding, 'gzip') !== false;
+
+        if (berqwp_dropin_is_page_url_excluded($url)) {
+            return;
+        }
         
         if (file_exists($cache_file) && $cache_max_life > time()) {
             $file_content = @file_get_contents($cache_file);

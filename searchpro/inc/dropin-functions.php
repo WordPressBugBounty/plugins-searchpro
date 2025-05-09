@@ -65,3 +65,38 @@ function bwp_dropin_isGzipEncoded() {
 
     return false;
 }
+
+function berqwp_dropin_is_page_url_excluded($page_url) {
+    if (empty($page_url)) {
+        return false;
+    }
+
+    $berqconfigs = new berqConfigs();
+    $configs = $berqconfigs->get_configs();
+    $pages_to_exclude = $configs['exclude_urls'];
+
+    if (strpos($page_url, '?') !== false) {
+        $page_url = explode('?', $page_url)[0];
+    }
+
+    if (in_array($page_url, $pages_to_exclude)) {
+        return true;
+    }
+
+    if (!empty($pages_to_exclude)) {
+        foreach ($pages_to_exclude as $single_page_url) {
+
+            if (substr($single_page_url, -1) !== '*') {
+                continue;
+            }
+
+            $single_page_url = str_replace('*', '', $single_page_url);
+
+            if (strpos($page_url, $single_page_url) !== false) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}

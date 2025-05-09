@@ -13,6 +13,10 @@ $pages_to_exclude = get_option('berq_exclude_urls', []);
 $total_pages = (int) $query->found_posts - count($pages_to_exclude);
 $optimized_pages = bwp_cached_pages_count();
 
+if (get_option('show_on_front') !== 'page') {
+	$total_pages++;
+}
+
 if (empty($total_pages) || $total_pages <= 0) {
     $cached_percentage = 0;
 } else {

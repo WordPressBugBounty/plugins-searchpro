@@ -48,6 +48,7 @@ class berqConfigs {
     public $config_file = WP_CONTENT_DIR . '/cache/berqwp/config.json';
     private $defaults = [
         'exclude_cookies'   => [],
+        'exclude_urls'      => [],
         'cache_lifespan'    => MONTH_IN_SECONDS,
         'page_compression'  => false,
     ];

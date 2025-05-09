@@ -58,7 +58,7 @@ if (get_option('berqwp_preload_yt_poster') === false) {
 }
 
 if (get_option('berqwp_javascript_execution_mode') === false) {
-    update_option('berqwp_javascript_execution_mode', 1);
+    update_option('berqwp_javascript_execution_mode', 4);
 }
 
 if (get_option('berqwp_interaction_delay') === false) {

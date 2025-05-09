@@ -53,12 +53,12 @@ $url_lines = implode("\n", $exclude_urls);
                 <?php esc_html_e("$plugin_name offers different JavaScript optimization modes, so every JavaScript-heavy website can unlock its true potential.", 'searchpro'); ?>
             </p>
             <label class="berq-check">
-                <input type="radio" name="berqwp_javascript_execution_mode" value="1" <?php echo get_option('berqwp_javascript_execution_mode') == 1 ? 'checked' : ''; ?>>
-                <?php esc_html_e('Sequential Blocking Execution - High Compatibility (Default)', 'searchpro'); ?>
+                <input type="radio" name="berqwp_javascript_execution_mode" value="4" <?php echo get_option('berqwp_javascript_execution_mode') == 4 ? 'checked' : ''; ?>>
+                <?php esc_html_e('Flora - High Compatibility (Default)', 'searchpro'); ?>
             </label>
             <label class="berq-check">
-                <input type="radio" name="berqwp_javascript_execution_mode" value="4" <?php echo get_option('berqwp_javascript_execution_mode') == 4 ? 'checked' : ''; ?>>
-                <?php esc_html_e('Flora - High Compatibility', 'searchpro'); ?>
+                <input type="radio" name="berqwp_javascript_execution_mode" value="1" <?php echo get_option('berqwp_javascript_execution_mode') == 1 ? 'checked' : ''; ?>>
+                <?php esc_html_e('Sequential Blocking Execution - High Compatibility', 'searchpro'); ?>
             </label>
             <label class="berq-check">
                 <input type="radio" name="berqwp_javascript_execution_mode" value="3" <?php echo get_option('berqwp_javascript_execution_mode') == 3 ? 'checked' : ''; ?>>

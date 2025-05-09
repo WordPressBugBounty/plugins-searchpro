@@ -224,7 +224,7 @@ function bwp_pass_account_requirement() {
     $license_key = get_option('berqwp_license_key');
 
     global $berq_log;
-    $berq_log->info("License key check from bwp_pass_account_requirement function.");
+    // $berq_log->info("License key check from bwp_pass_account_requirement function.");
 
 	$key_response = $berqWP->verify_license_key($license_key);
 
@@ -233,7 +233,7 @@ function bwp_pass_account_requirement() {
     }
 
     if  ($key_response->result !== 'success' || $key_response->status !== 'active') {
-        $berq_log->error("account requirement: license verification failed");
+        // $berq_log->error("account requirement: license verification failed");
         return false;
     }
 
@@ -251,6 +251,11 @@ function bwp_pass_account_requirement() {
 function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
 {
     if (empty($page_url)) {
+        return;
+    }
+
+
+    if (empty(get_option('berqwp_license_key'))) {
         return;
     }
 
@@ -1374,10 +1379,7 @@ function bwp_can_optimize_page_url($page_url) {
         return false;
     }
 
-    // Return if page is excluded from cache
-    $pages_to_exclude = get_option('berq_exclude_urls', []);
-
-    if (in_array($page_url, $pages_to_exclude)) {
+    if (berqwp_is_page_url_excluded($page_url)) {
         return false;
     }
 
@@ -1431,6 +1433,11 @@ function bwp_get_sitemap() {
             $sitemap_urls = [];
 
             if (!isset($_GET['configs_only'])) {
+
+                if (get_option('show_on_front') !== 'page') {
+                    $sitemap_urls[] = home_url('/');
+                }
+
                 // Loop through the posts and generate URLs
                 while ($query->have_posts()) {
                     $query->the_post();
@@ -1756,5 +1763,38 @@ function berqwp_is_wp_cron_broken() {
             return true;
         }
     }
+    return false;
+}
+
+function berqwp_is_page_url_excluded($page_url) {
+    if (empty($page_url)) {
+        return false;
+    }
+
+    $pages_to_exclude = get_option('berq_exclude_urls', []);
+
+    if (strpos($page_url, '?') !== false) {
+        $page_url = explode('?', $page_url)[0];
+    }
+
+    if (in_array($page_url, $pages_to_exclude)) {
+        return true;
+    }
+
+    if (!empty($pages_to_exclude)) {
+        foreach ($pages_to_exclude as $single_page_url) {
+
+            if (substr($single_page_url, -1) !== '*') {
+                continue;
+            }
+
+            $single_page_url = str_replace('*', '', $single_page_url);
+
+            if (strpos($page_url, $single_page_url) !== false) {
+                return true;
+            }
+        }
+    }
+
     return false;
 }

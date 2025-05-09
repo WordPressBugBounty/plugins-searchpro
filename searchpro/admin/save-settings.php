@@ -370,6 +370,9 @@ if (isset($_POST['berqwp_save_nonce'])) {
             }
         }, $urls_array);
 
+        $berqconfigs = new berqConfigs();
+        $berqconfigs->update_configs(['exclude_urls'=>$urls_array]);        
+
         if (isset($urls_array)) {
             update_option('berq_exclude_urls', $urls_array);
         }

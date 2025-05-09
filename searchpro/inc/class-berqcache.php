@@ -829,6 +829,10 @@ if (!class_exists('berqCache')) {
                 return;
             }
 
+            if (!current_user_can( 'edit_posts' )) {
+                return;
+            }
+
             global $wp_admin_bar;
             $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
@@ -1041,15 +1045,13 @@ if (!class_exists('berqCache')) {
             // }
 
             // Return if page is excluded from cache
-            $pages_to_exclude = get_option('berq_exclude_urls', []);
-            // $current_page_url = home_url() . $slug_uri;
             $current_page_url = bwp_get_request_url();
 
             if (strpos($current_page_url, '?') !== false) {
                 $current_page_url = explode('?', $current_page_url)[0];
             }
 
-            if (in_array($current_page_url, $pages_to_exclude)) {
+            if (berqwp_is_page_url_excluded($current_page_url)) {
                 return;
             }
 
@@ -1272,7 +1274,7 @@ if (!class_exists('berqCache')) {
             $check_connection = bwp_check_connection(true);
             if ( $check_connection['status'] == 'error' ) {
                 global $berq_log;
-                $berq_log->error('Exiting cache warmup by slug, website is unaccessible.');
+                // $berq_log->error('Exiting cache warmup by slug, website is unaccessible.');
                 return;
             }
 

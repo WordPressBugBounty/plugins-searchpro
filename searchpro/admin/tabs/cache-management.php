@@ -30,7 +30,7 @@ $cache_lifespan = $configs['cache_lifespan'];
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Max. Cache Lifespan', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e('Set the maximum cache lifespan to control how long cached pages are stored before being refreshed.', 'searchpro'); ?></p>
+            <p><?php esc_html_e("Set the maximum cache lifespan to control how long cached pages are stored before being refreshed. Note that {$plugin_name} automatically flushes the page cache when content is updated, so keeping the cache lifespan high is recommended.", 'searchpro'); ?></p>
 
             <div class="berqwp-lifespan-options">
                 <label>
@@ -74,7 +74,7 @@ $cache_lifespan = $configs['cache_lifespan'];
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Page Exclusions', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e('Exclude pages from being cached. Enter page URLs, one URL per line.', 'searchpro'); ?>
+            <p><?php esc_html_e('Exclude pages from caching. Enter one page URL per line. You can use a wildcard by adding *. For example: https://yoursite.com/campaign/*', 'searchpro'); ?>
 
             <?php if (bwp_show_docs()) { ?>
             <a href="https://berqwp.com/help-center/exclude-pages-from-being-cached/" target="_blank"><?php esc_html_e('Learn more', 'searchpro'); ?></a>
@@ -123,7 +123,7 @@ $cache_lifespan = $configs['cache_lifespan'];
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Exclude Cookies', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e("Avoid serving cache for the following cookie IDs. Enter one cookie ID per line."); ?>  
+            <p><?php esc_html_e("Prevent cached pages from being served when the following cookies are present. Enter a partial match or keyword from the cookie name to exclude it. Add one cookie ID per line. Example: woocommerce_cart_hash"); ?>  
 
             </p>
             <textarea name="berq_exclude_cookies" cols="30" rows="10"><?php echo esc_textarea($excluded_cookies); ?></textarea>
