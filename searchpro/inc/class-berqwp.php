@@ -712,8 +712,8 @@ if (!class_exists('berqWP')) {
 				bwp_notice('error', 'Cache directory not writable', "<p>The $plugin_name cache directory at /wp-content/cache/berqwp/ is not writable. Please update the directory permissions to allow the plugin to store cached files.</p>", []);
 			}
 
-			if (!is_writable($wp_config_file)) {
-				bwp_notice('error', 'wp-config.php not writable', "<p>The wp-config.php file is not writable. $plugin_name may need to write configuration settings to this file. Please adjust the file permissions.", []);
+			if (!defined('WP_CACHE') && !is_writable($wp_config_file)) {
+				bwp_notice('warning', 'wp-config.php not writable', "<p>The wp-config.php file is not writable. $plugin_name needs to write configuration settings to this file. Please adjust the file permissions or manually add the WP_CACHE constant and set it to true.</p>", []);
 			}
 
 			if (isset($_GET['page']) && $_GET['page'] == 'berqwp' && !get_transient( 'bqwp_hide_feedback_notice' ) && !get_option('bwp_quit_feedback') && $this->is_key_verified && bwp_show_account()) {
