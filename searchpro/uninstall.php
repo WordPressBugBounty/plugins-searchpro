@@ -62,7 +62,7 @@ delete_option('berqwp_enable_cwv');
 delete_option('berq_exclude_js_css');
 
 // Remove advanced-cache.php file
-$dropin_file = ABSPATH . 'wp-content/advanced-cache.php';
+$dropin_file = WP_CONTENT_DIR . '/advanced-cache.php';
 if (file_exists($dropin_file)) {
     unlink($dropin_file);
 }

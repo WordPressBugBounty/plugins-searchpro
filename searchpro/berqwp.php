@@ -3,7 +3,7 @@
  * Plugin Name:       BerqWP
  * Plugin URI:        https://berqwp.com
  * Description:       Automatically pass Core Web Vitals for WordPress and boost your speed score to 90+ for both mobile and desktop without any technical skills.
- * Version:           2.2.38
+ * Version:           2.2.41
  * Requires at least: 5.3
  * Requires PHP:      7.4
  * Author:            BerqWP
@@ -15,7 +15,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BERQWP_VERSION')) {
-	define('BERQWP_VERSION', '2.2.38');
+	define('BERQWP_VERSION', '2.2.41');
 }
 
 if (!defined('optifer_PATH')) {
@@ -75,17 +75,9 @@ require_once optifer_PATH . '/inc/common-functions.php';
 require_once optifer_PATH . '/inc/dropin-functions.php';
 require_once optifer_PATH . '/inc/classs-http.php';
 require_once optifer_PATH . '/inc/photon/class-berqPageOptimizer.php';
-require_once optifer_PATH . '/inc/photon/class-berqBufferOptimize.php';
-require_once optifer_PATH . '/inc/photon/class-styleOptimizer.php';
-require_once optifer_PATH . '/inc/photon/class-scriptOptimizer.php';
-require_once optifer_PATH . '/inc/photon/class-berqImages.php';
-require_once optifer_PATH . '/inc/photon/class-berqCDN.php';
-require_once optifer_PATH . '/inc/photon/class-berqCriticalCSS.php';
 require_once optifer_PATH . '/inc/class-berqintegrations.php';
-require_once optifer_PATH . '/inc/photon/integration/index.php';
 require_once optifer_PATH . '/inc/class-berqcache.php';
 require_once optifer_PATH . '/inc/class-berqwp.php';
-require_once optifer_PATH . '/inc/class-berqimages.php';
 require_once optifer_PATH . '/inc/class-berqnotifications.php';
 require_once optifer_PATH . '/inc/httpclient.php';
 require_once optifer_PATH . '/inc/class-berqCloudflareAPIHandler.php';
@@ -102,7 +94,7 @@ register_deactivation_hook(__FILE__, 'berqwp_deactivate_plugin');
 function berqwp_activation()
 {
 	// Specify the drop-in file path
-	$dropin_file = ABSPATH . 'wp-content/advanced-cache.php';
+	$dropin_file = WP_CONTENT_DIR . '/advanced-cache.php';
 
 	// Dynamically create the drop-in file
 	$dropin_content = file_get_contents(optifer_PATH . 'advanced-cache.php');

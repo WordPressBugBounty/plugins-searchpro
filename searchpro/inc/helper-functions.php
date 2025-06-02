@@ -134,7 +134,9 @@ function berqwp_is_slug_excludable($slug)
         "affwp_ref=",
         "affwp_campaign=",
         "hmwp_token=",
+        "/page/",
         "/search/",
+        "?",
     ];
 
     $exclude_items = apply_filters('berqwp_exclude_slug_match', $exclude_items);
@@ -295,7 +297,7 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
     $check_connection = bwp_check_connection(true);
     if ( $check_connection['status'] == 'error' ) {
         global $berq_log;
-        $berq_log->error('Exiting cache warmup by slug, website is unaccessible.');
+        // $berq_log->error('Exiting cache warmup by slug, website is unaccessible.');
         return;
     }
     
@@ -1428,6 +1430,10 @@ function bwp_get_sitemap() {
         unset($post_params['page_slug']);
         unset($post_params['page_url']);
         $post_params['key'] = '';
+        
+        $berqconfigs = new berqConfigs();
+        $configs = $berqconfigs->get_configs();
+        $post_params['cache_lifespan'] = $configs['cache_lifespan'];
 
         if ($query->have_posts()) {
             $sitemap_urls = [];
@@ -1801,4 +1807,25 @@ function berqwp_is_page_url_excluded($page_url) {
     }
 
     return false;
+}
+
+function berqwp_appendHtmlToBody($buffer, $htmlToAppend) {
+    // Load the $buffer content into Simple HTML DOM
+    $html = str_get_html($buffer);
+
+    // Find the <body> tag
+    $body = $html->find('body', 0);
+
+    // If the body tag exists, append the new HTML
+    if ($body) {
+        // Use htmlspecialchars to properly encode the inserted content
+        // Avoid breaking the HTML by not using innerhtml directly
+        $body->innertext .= $htmlToAppend;
+    } else {
+        // If no body tag exists, append the HTML to the document directly
+        $html->innertext .= $htmlToAppend;
+    }
+
+    // Return the modified HTML content
+    return $html->save();
 }

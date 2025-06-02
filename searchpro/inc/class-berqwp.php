@@ -663,7 +663,7 @@ if (!class_exists('berqWP')) {
 				$license_key = get_option('berqwp_license_key');
 
 				global $berq_log;
-				$berq_log->info("License key check for admin notices.");
+				// $berq_log->info("License key check for admin notices.");
 
 				$key_response = $this->verify_license_key($license_key);
 
@@ -1048,22 +1048,6 @@ if (!class_exists('berqWP')) {
 			}
 		}
 
-		function get_media_ids(WP_REST_Request $request)
-		{
-			require_once optifer_PATH . 'api/get_media_ids.php';
-		}
-
-		function optimize_images(WP_REST_Request $request)
-		{
-			require_once optifer_PATH . 'api/optimize_images.php';
-		}
-
-
-		function delete_images(WP_REST_Request $request)
-		{
-			require_once optifer_PATH . 'api/delete_images.php';
-		}
-
 		function clear_cache(WP_REST_Request $request)
 		{
 			require_once optifer_PATH . 'api/clear_cache.php';
@@ -1072,11 +1056,6 @@ if (!class_exists('berqWP')) {
 		function warmup_cache(WP_REST_Request $request)
 		{
 			require_once optifer_PATH . 'api/warmup_cache.php';
-		}
-
-		function store_webp(WP_REST_Request $request)
-		{
-			require_once optifer_PATH . 'api/store_webp.php';
 		}
 
 		function store_cache(WP_REST_Request $request)

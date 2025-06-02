@@ -54,7 +54,11 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
         if (file_exists($cache_file) && $cache_max_life > time()) {
             $file_content = @file_get_contents($cache_file);
             
-            if (!isset($_GET['creating_cache']) && file_exists($cache_file) && strpos($file_content, "Optimized with BerqWP's instant cache") === false) {
+            if (!isset($_GET['creating_cache']) && file_exists($cache_file)) {
+
+                if (strpos($file_content, "Optimized with BerqWP's instant cache") !== false && (filemtime($cache_file) + DAY_IN_SECONDS) < time()) {
+                    return;
+                }
 
                 // Prepare gzip cache file
                 if ($compression_enabled && $supports_gzip && file_exists($cache_file_gz)) {
@@ -83,7 +87,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
             
                 } 
     
-                header('Cache-Control: public, max-age=86400, must-revalidate');
+                header('Cache-Control: public, max-age=0, s-maxage=3600', true);
 
                 if ($compression_enabled && $supports_gzip) {
                     readgzfile($cache_file);

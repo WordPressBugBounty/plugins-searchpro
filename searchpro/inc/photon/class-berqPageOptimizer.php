@@ -61,14 +61,18 @@ class berqPageOptimizer {
             require_once optifer_PATH . '/simplehtmldom/simple_html_dom.php';
         }
         
-        if (!class_exists('scriptSeqManipulate')) {
-            require_once optifer_PATH . '/inc/class-scriptSeqManipulate.php';
-        }
-
         $buffer = $buffer.'<!-- Optimized with BerqWP\'s instant cache. --->';
+
+        $script = "
+            <script data-berqwp defer>
+                var comment = document.createComment(' This website is optimized using the BerqWP plugin. @".time()." ');
+                document.documentElement.insertBefore(comment, document.documentElement.firstChild);
+
+            </script>
+
+        ";
         
-        $berqBufferOptimize = new berqBufferOptimize();
-        $berqBufferOptimize->optimize_buffer($buffer, $this->page_slug);
+        $buffer = berqwp_appendHtmlToBody($buffer, $script);
         
         $buffer = apply_filters( 'berqwp_cache_buffer', $buffer );
         $this->store_cache($buffer);

@@ -21,6 +21,7 @@ require_once optifer_PATH . '/inc/thirdparty/plugin/FilterEverything.php';
 require_once optifer_PATH . '/inc/thirdparty/plugin/EWWW.php';
 require_once optifer_PATH . '/inc/thirdparty/plugin/TranslatePress.php';
 require_once optifer_PATH . '/inc/thirdparty/plugin/WPForms.php';
+require_once optifer_PATH . '/inc/thirdparty/plugin/WPAllImport.php';
 
 // Server
 require_once optifer_PATH . '/inc/thirdparty/server/Nginx.php';

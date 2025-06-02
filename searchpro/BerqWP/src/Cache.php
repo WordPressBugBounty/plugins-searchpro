@@ -79,6 +79,7 @@ class Cache {
     function request_cache_warmup($post_data, $async = false) {
         $client = new HttpClient($this->api_host);
         $client->setUserAgent('BerqWP');
+        $client->setTimeout(60);
 
         if ($async) {
             $client->setTimeout(1);

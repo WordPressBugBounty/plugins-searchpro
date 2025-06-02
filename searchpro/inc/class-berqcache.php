@@ -284,6 +284,13 @@ if (!class_exists('berqCache')) {
         }
 
         function purge_home($new_status, $old_status, $post) {
+
+            $can_flush_cache = apply_filters( 'berqwp_can_flush_cache_on_post_update', true );
+
+            if (!$can_flush_cache) {
+                return;
+            }
+
             $post_types = apply_filters( 'berqwp_purge_home_post_types', ['post'] );
 
             if (in_array($post->post_type, $post_types)) {
@@ -316,6 +323,16 @@ if (!class_exists('berqCache')) {
                 
                 // Check if the post type is in the list of types to be optimized
                 if ( in_array( $post->post_type, $post_types ) ) {
+
+                    // We need path with query parameters
+                    $parsed_url = parse_url($post_url);
+                    $path = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+                    $query = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+                    $path_with_query = $path . $query;
+
+                    if (berqwp_is_slug_excludable($path_with_query)) {
+                        return;
+                    }
 
                     global $berq_log;
                     $berq_log->info("Post status updated $post_url");
@@ -499,7 +516,7 @@ if (!class_exists('berqCache')) {
 
         function warmup_queue()
         {
-            $wp_content_adv_cache = ABSPATH . 'wp-content/advanced-cache.php';
+            $wp_content_adv_cache = WP_CONTENT_DIR . '/advanced-cache.php';
             $bwp_adv_cache = optifer_PATH . 'advanced-cache.php';
 
             if (
@@ -507,7 +524,7 @@ if (!class_exists('berqCache')) {
                 || (file_exists($wp_content_adv_cache) && md5_file($wp_content_adv_cache) !== md5_file($bwp_adv_cache))
                 ) {
                 // Specify the drop-in file path
-                $dropin_file = ABSPATH . 'wp-content/advanced-cache.php';
+                $dropin_file = WP_CONTENT_DIR . '/advanced-cache.php';
 
                 // Dynamically create the drop-in file
                 $dropin_content = file_get_contents(optifer_PATH . 'advanced-cache.php');
@@ -629,6 +646,12 @@ if (!class_exists('berqCache')) {
 
         function clear_cache_on_post_update($post_id, $post, $update)
         {
+            $can_flush_cache = apply_filters( 'berqwp_can_flush_cache_on_post_update', true );
+
+            if (!$can_flush_cache) {
+                return;
+            }
+
             // If this is just a revision, don't run the function.
             if (wp_is_post_revision($post_id)) {
                 return;
@@ -637,8 +660,29 @@ if (!class_exists('berqCache')) {
             $post_type = get_post_type( $post_id );
             $post_url = get_permalink($post_id);
 
+            // We need path with query parameters
+            $parsed_url = parse_url($post_url);
+            $path = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+            $query = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+            $path_with_query = $path . $query;
+
+            if (berqwp_is_slug_excludable($path_with_query)) {
+                return;
+            }
+
+            // Potentially cachable post types
+            $cachable_post_type_names = get_post_types(array(
+                'public' => true,
+                'exclude_from_search' => false,
+            ), 'names');
+            unset($cachable_post_type_names['attachment']);
+
+            if (!in_array($post_type, $cachable_post_type_names)) {
+                return;
+            }
+
             global $berq_log;
-            $berq_log->info("Post updated: $post_url");
+            $berq_log->info("Post updated [Post type - $post_type]: $post_url");
 
             self::purge_page($post_url, true);
 
@@ -1203,7 +1247,8 @@ if (!class_exists('berqCache')) {
 
                 } else {
 
-                    header('Cache-Control: public, max-age=86400, must-revalidate');
+                    // header('Cache-Control: public, max-age=86400, must-revalidate');
+                    header('Cache-Control: public, max-age=0, s-maxage=3600', true);
                     header('Vary: Cookie');
 
                     if ($compression_enabled && $supports_gzip) {
