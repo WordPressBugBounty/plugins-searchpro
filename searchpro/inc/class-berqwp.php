@@ -555,6 +555,18 @@ if (!class_exists('berqWP')) {
 					$this->is_key_verified = true;
 					$this->key_response = $key_response;
 
+					if (get_option('berqwp_can_use_fluid_images') === false) {
+
+						if ($key_response->product_ref !== 'AppSumo Deal') {
+							update_option('berqwp_can_use_fluid_images', 1);
+
+						} else {
+							update_option('berqwp_can_use_fluid_images', 0);
+
+						}
+
+					}
+
 				} else {
 					$this->is_key_verified = false;
 

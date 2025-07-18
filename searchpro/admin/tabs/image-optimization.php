@@ -50,7 +50,7 @@ if (!defined('ABSPATH'))
         <div class="berq-box-content">
             <p><?php esc_html_e('Automatically resize and deliver retina-ready WebP images according to their container size. "Fluid Images" generates and serves multiple optimized versions for mobile, tablet, laptop, and desktop screens, ensuring every device gets the perfect image for its display.', 'searchpro'); ?>
             </p>
-            <?php if (($this->key_response->product_ref == 'AppSumo Deal' && get_option('berqwp_can_use_fluid_images', false)) || $this->key_response->product_ref !== 'AppSumo Deal') { ?>
+            <?php if (($this->key_response->product_ref == 'AppSumo Deal' && get_option('berqwp_can_use_fluid_images')) || $this->key_response->product_ref !== 'AppSumo Deal') { ?>
             <label class="berq-check">
                 <input type="checkbox" name="berqwp_fluid_images" <?php checked(1, get_option('berqwp_fluid_images'), true); ?>>
                 <?php esc_html_e('Enable Fluid Images', 'searchpro'); ?>
@@ -70,7 +70,7 @@ if (!defined('ABSPATH'))
                     <p><?php esc_html_e('Automatically delivers the optimal image version for each device—mobile, tablet, or desktop.', 'searchpro'); ?></p>
                 </div>
             </div>
-            <?php if ($this->key_response->product_ref == 'AppSumo Deal' && !get_option('berqwp_can_use_fluid_images', false)) { ?>
+            <?php if ($this->key_response->product_ref == 'AppSumo Deal' && !get_option('berqwp_can_use_fluid_images')) { ?>
                 <ul>
                     <li><?php esc_html_e('Unlimited Websites', 'searchpro'); ?></li>
                     <li><?php esc_html_e('Unlimited CDN Bandwidth', 'searchpro'); ?></li>

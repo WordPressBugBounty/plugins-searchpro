@@ -22,13 +22,13 @@ if (isset($_POST['berqwp_save_nonce'])) {
             update_option('berqwp_license_key', $key);
             
             if ($key_response->product_ref == 'AppSumo Deal') {
-                update_option('berqwp_can_use_fluid_images', false);
+                update_option('berqwp_can_use_fluid_images', 0);
 
                 // sync addons
                 berqwp_sync_addons($key, home_url());
 
             } else {
-                update_option('berqwp_can_use_fluid_images', true);
+                update_option('berqwp_can_use_fluid_images', 1);
             }
 
             // trigger cache warmup

@@ -212,7 +212,7 @@ function berqwp_get_page_params($page_url, $is_forced = false)
         'version' => BERQWP_VERSION
     );
 
-    if (!get_option('berqwp_can_use_fluid_images', false)) {
+    if (!get_option('berqwp_can_use_fluid_images')) {
         $post_data['fluid_images'] = 0;
     }
 
@@ -1934,11 +1934,11 @@ function berqwp_sync_addons($license_key, $site_url)
 
         $enable_fluid_images = in_array('fluid_images', $json['active_addons']);
         if ($enable_fluid_images && !get_option('berqwp_can_use_fluid_images')) {
-            update_option('berqwp_can_use_fluid_images', true);
+            update_option('berqwp_can_use_fluid_images', 1);
             update_option('bwp_require_flush_cache', 1);
 
         } elseif (!$enable_fluid_images) {
-            update_option('berqwp_can_use_fluid_images', false);
+            update_option('berqwp_can_use_fluid_images', 0);
         }
 
     } 
