@@ -20,6 +20,7 @@ class BerqWP
 
         $this->client = new Client([
             'base_uri' => 'https://boost.berqwp.com/photon/',
+            'http_errors' => false,
             'timeout'  => 30,
             'headers'  => [
                 'User-Agent' => 'BerqWP/1.0 (https://berqwp.com)'
