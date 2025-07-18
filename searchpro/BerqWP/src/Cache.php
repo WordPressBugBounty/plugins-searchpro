@@ -4,6 +4,7 @@ namespace BerqWP;
 use BerqWP\RateLimiter;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Exception\RequestException;
 
 class Cache
 {
@@ -28,14 +29,18 @@ class Cache
             return false;
         }
 
-        $response = $this->client->post('', [
-            'timeout' => $timeout,
-            'form_params' => $post_data
-        ]);
+        try {
+            $response = $this->client->post('', [
+                'timeout' => $timeout,
+                'form_params' => $post_data
+            ]);
+    
+            if ($response->getStatusCode() === 200) {
+                return true;
+            }
+            
+        } catch (RequestException $e) {} catch (\Throwable $e) {}
 
-        if ($response->getStatusCode() === 200) {
-            return true;
-        }
 
         return false;
     }
@@ -55,32 +60,35 @@ class Cache
 
         $endpoint = '';
 
-        $requests = function ($post_data_arr) use ($endpoint) {
-            foreach ($post_data_arr as $post_data) {
-                yield new Request(
-                    'POST',
-                    $endpoint,
-                    ['Content-Type' => 'application/x-www-form-urlencoded'],
-                    http_build_query($post_data)
-                );
-            }
-        };
+        try {
+            $requests = function ($post_data_arr) use ($endpoint) {
+                foreach ($post_data_arr as $post_data) {
+                    yield new Request(
+                        'POST',
+                        $endpoint,
+                        ['Content-Type' => 'application/x-www-form-urlencoded'],
+                        http_build_query($post_data)
+                    );
+                }
+            };
+    
+            $results = [];
+            $errors = [];
+    
+            $pool = new Pool($this->client, $requests($post_data_arr), [
+                'concurrency' => 5, // Adjust as needed
+                'fulfilled' => function ($response, $index) use (&$results, $post_data_arr) {
+                    $results[$index] = $response->getBody()->getContents();
+                },
+                'rejected' => function ($reason, $index) use (&$errors, $post_data_arr) {
+                    $errors[$index] = $reason;
+                },
+            ]);
+    
+            $promise = $pool->promise();
+            $promise->wait();
 
-        $results = [];
-        $errors = [];
-
-        $pool = new Pool($this->client, $requests($post_data_arr), [
-            'concurrency' => 5, // Adjust as needed
-            'fulfilled' => function ($response, $index) use (&$results, $post_data_arr) {
-                $results[$index] = $response->getBody()->getContents();
-            },
-            'rejected' => function ($reason, $index) use (&$errors, $post_data_arr) {
-                $errors[$index] = $reason;
-            },
-        ]);
-
-        $promise = $pool->promise();
-        $promise->wait();
+        } catch (RequestException $e) {} catch (\Throwable $e) {}
 
     }
 
@@ -105,26 +113,32 @@ class Cache
     function request_cache_warmup($post_data, $async = false)
     {
 
-        $response = $this->client->post('', [
-            'timeout' => $async ? 1 : 30,
-            'form_params' => $post_data
-        ]);
-
-        return $response;
+        try {
+            $response = $this->client->post('', [
+                'timeout' => $async ? 1 : 30,
+                'form_params' => $post_data
+            ]);
+    
+            return $response;
+            
+        } catch (RequestException $e) {} catch (\Throwable $e) {}
 
     }
 
     function clear_queue($site_url, $license_key) {
-        $post_data = [
-            'site_url'          => $site_url,
-            'clear_queue'       => true,
-            'license_key'       => $license_key,
-        ];
-        $response = $this->client->post('', [
-            'form_params' => $post_data
-        ]);
+        try {
+            $post_data = [
+                'site_url'          => $site_url,
+                'clear_queue'       => true,
+                'license_key'       => $license_key,
+            ];
+            $response = $this->client->post('', [
+                'form_params' => $post_data
+            ]);
+    
+            return $response;
 
-        return $response;
+        } catch (RequestException $e) {} catch (\Throwable $e) {}
     }
 
 }

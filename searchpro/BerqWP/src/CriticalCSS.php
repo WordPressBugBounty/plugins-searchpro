@@ -1,6 +1,7 @@
 <?php
 
 namespace BerqWP;
+use GuzzleHttp\Exception\RequestException;
 
 class CriticalCSS {
     protected $client = null;
@@ -14,26 +15,36 @@ class CriticalCSS {
     function purge_url($page_url) {
         $post_data = ['flush_criticalcss_url' => $page_url, 'license_key' => $this->license_key];
 
-        $response = $this->client->post('', [
-            'form_params'   => $post_data
-        ]);
-        
-        if ($response->getStatusCode() === 200) {
-            return true;
-        }
+        try {
+
+            $response = $this->client->post('', [
+                'form_params'   => $post_data
+            ]);
+            
+            if ($response->getStatusCode() === 200) {
+                return true;
+            }
+
+        } catch (RequestException $e) {} catch (\Throwable $e) {}
+
 
         return false;
     }
 
     function purge_all($domain) {
         $post_data = ['flush_criticalcss' => $domain, 'license_key' => $this->license_key];
-        $response = $this->client->post('', [
-            'form_params'   => $post_data
-        ]);
-        
-        if ($response->getStatusCode() === 200) {
-            return true;
-        }
+
+        try {
+
+            $response = $this->client->post('', [
+                'form_params'   => $post_data
+            ]);
+            
+            if ($response->getStatusCode() === 200) {
+                return true;
+            }
+
+        } catch (RequestException $e) {} catch (\Throwable $e) {}
 
         return false;
     }

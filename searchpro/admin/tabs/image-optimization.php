@@ -48,7 +48,7 @@ if (!defined('ABSPATH'))
     <div class="berq-info-box fluid-images">
         <h3 class="berq-box-title"><?php esc_html_e('Fluid Images', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e('Automatically resize and deliver retina-ready WebP images according to their container size. "Fluid Images" generates and serves multiple optimized versions for mobile, tablet, laptop, and desktop screens, ensuring every device gets the perfect image for its display.', 'searchpro'); ?>
+            <p><?php esc_html_e('Automatically resize and deliver retina-ready WebP images according to the image container size. "Fluid Images" generates and serves multiple optimized versions for mobile, tablet, laptop, and desktop screens, ensuring every device gets the perfect image for its display.', 'searchpro'); ?>
             </p>
             <?php if (($this->key_response->product_ref == 'AppSumo Deal' && get_option('berqwp_can_use_fluid_images')) || $this->key_response->product_ref !== 'AppSumo Deal') { ?>
             <label class="berq-check">

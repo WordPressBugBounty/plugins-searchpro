@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.8
-Stable tag: 2.2.47
+Stable tag: 2.2.48
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -42,6 +42,8 @@ Since all popular page speed testing tools use similar methods, you'll get the s
 - **Zero Configuration:** BerqWP comes with optimal settings that work perfectly for 99% of users. It requires no configurations.
 
 - **Automatic Cache Warmup:** Keep your cache always primed. Automatically generate new cache to ensure every user experiences fast loading times.
+
+- **Fluid Images:** Automatically delivers container-sized, retina-ready WebP images via BerqWP CDN to boost your site speed and improve user experience across all devices.
 
 - **Instant Cache:** BerqWP instantly creates a basic optimized cache, while the fully optimized cache is generated in the background on our cloud servers.
 
@@ -231,7 +233,7 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 
 == Changelog ==
 
-= 2.2.47 =
+= 2.2.48 =
 * [Bug] Disable Guzzle HTTP errors.
 
 = 2.2.46 =
