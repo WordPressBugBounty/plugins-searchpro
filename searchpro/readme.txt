@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.8
-Stable tag: 2.2.44
+Stable tag: 2.2.45
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -231,11 +231,12 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 
 == Changelog ==
 
-= 2.2.44 =
+= 2.2.45 =
 * [New Feature] Added Fluid Images.
 * [Enhancement] Replaced custom HTTP library with Guzzle.
 * [Enhancement] Improved compatibility with Cloudflare Edge Cache.
 * [Enhancement] Cleared cache queue upon plugin/license deactivation to avoid unwanted requests.
+* [Bug] Fixed a license key verification bug.
 
 = 2.2.42 =
 * [Enhancement] Added compatibility with the WooCommerce JTL Connector plugin.

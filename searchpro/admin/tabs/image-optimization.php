@@ -75,7 +75,7 @@ if (!defined('ABSPATH'))
                     <li><?php esc_html_e('Unlimited Websites', 'searchpro'); ?></li>
                     <li><?php esc_html_e('Unlimited CDN Bandwidth', 'searchpro'); ?></li>
                 </ul>
-                <a href="https://staging.berqwp.com/addons/" target="_blank" class="fluid-images-signup">Get started - $5/month</a>
+                <a href="https://berqwp.com/addons/" target="_blank" class="fluid-images-signup">Get started - $5/month</a>
 
             <?php }?>
         </div>

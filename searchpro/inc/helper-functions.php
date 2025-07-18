@@ -1922,7 +1922,7 @@ function berqwp_sync_addons($license_key, $site_url)
         ),
     );
 
-    $response = wp_remote_post('https://staging.berqwp.com/wp-json/berqwp/active-addons', $args);
+    $response = wp_remote_post('https://berqwp.com/wp-json/berqwp/active-addons', $args);
     $response_body = wp_remote_retrieve_body($response);
     $json = json_decode($response_body, true);
 
