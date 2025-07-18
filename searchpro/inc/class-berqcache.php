@@ -122,6 +122,9 @@ if (!class_exists('berqCache')) {
             add_action('berqwp_flush_all_cache', 'bwp_cf_flush_all');
             add_action('berqwp_deactivate_plugin', 'bwp_cf_delete_rules');
             add_action('berqwp_activate_plugin', [$this, 'check_cf_rules']);
+            
+            // Clear queue list on cloud
+            add_action('berqwp_deactivate_plugin', 'berqwp_clear_cache_queue');
 
         }
 
@@ -466,7 +469,7 @@ if (!class_exists('berqCache')) {
             $home_url = bwp_admin_home_url('/');
 
             if (false === as_has_scheduled_action('warmup_cache_quickly') && (bwp_is_home_cached() === false || bwp_is_partial_cache($home_url)) && function_exists('as_enqueue_async_action')) {
-                as_enqueue_async_action('warmup_cache_quickly', [$home_url, true]);
+                as_enqueue_async_action('warmup_cache_quickly', [$home_url]);
             }
 
         }

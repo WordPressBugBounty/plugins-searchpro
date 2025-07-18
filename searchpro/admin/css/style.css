@@ -1014,4 +1014,44 @@ input.bwp-disable-cf {
   width: fit-content;
   margin-bottom: 5px;
   border: 1px solid #dbe9fe;
+}
+
+.berq-info-box .feature-blocks {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+.berq-info-box .feature-blocks .single-feature {
+  background-color: #F3F3FF;
+  padding: 13px;
+  border: 1px solid #B5B8FF;
+  border-radius: 7px;
+}
+.berq-info-box .feature-blocks .single-feature .h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0C2D66;
+}
+.berq-info-box .feature-blocks .single-feature p {
+  color: #0C2D66;
+  font-size: 14px;
+}
+
+.berq-info-box.fluid-images ul li {
+  margin-left: 20px;
+  color: #0C2D66;
+}
+
+.berq-info-box.fluid-images ul {
+  list-style: square;
+}
+
+a.fluid-images-signup {
+  font-size: 15px;
+  padding: 12px 20px;
+  text-transform: uppercase;
+  color: #fff !important;
+  background: #5057FF;
+  border-radius: 6px;
+  display: inline-block;
 }/*# sourceMappingURL=style.css.map */

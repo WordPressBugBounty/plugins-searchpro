@@ -7,7 +7,7 @@ use BerqWP\BerqWP;
 class berqEWWWW extends berqIntegrations {
     
     function __construct() {
-        add_action( 'admin_notices', [$this, 'add_notice'] );
+        add_action( 'berqwp_notices', [$this, 'add_notice'] );
     }
 
     function add_notice() {

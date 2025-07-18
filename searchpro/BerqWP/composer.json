@@ -3,11 +3,17 @@
     "description": "BerqWP PHP SDK",
     "type": "library",
     "require": {
-        "php": ">=7.4"
+        "php": ">=7.4",
+        "guzzlehttp/guzzle": "^7.0"
     },
     "autoload": {
         "psr-4": {
             "BerqWP\\": "src/"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "7.4.0"
         }
     }
 }

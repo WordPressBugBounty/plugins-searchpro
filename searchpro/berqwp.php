@@ -3,7 +3,7 @@
  * Plugin Name:       BerqWP
  * Plugin URI:        https://berqwp.com
  * Description:       Automatically pass Core Web Vitals for WordPress and boost your speed score to 90+ for both mobile and desktop without any technical skills.
- * Version:           2.2.42
+ * Version:           2.2.44
  * Requires at least: 5.3
  * Requires PHP:      7.4
  * Author:            BerqWP
@@ -15,7 +15,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BERQWP_VERSION')) {
-	define('BERQWP_VERSION', '2.2.42');
+	define('BERQWP_VERSION', '2.2.44');
 }
 
 if (!defined('optifer_PATH')) {
@@ -31,7 +31,8 @@ if (!defined('optifer_cache')) {
 }
 
 if (!defined('BERQ_SERVER')) {
-	define('BERQ_SERVER', 'https://berqwp.com/');
+	// define('BERQ_SERVER', 'https://berqwp.com/');
+	define('BERQ_SERVER', 'https://staging.berqwp.com/');
 }
 
 if (!defined('BERQ_SECRET')) {
@@ -84,8 +85,15 @@ register_deactivation_hook(__FILE__, 'berqwp_deactivate_plugin');
 
 function berqwp_activation()
 {
+
 	// Specify the drop-in file path
-	$dropin_file = WP_CONTENT_DIR . '/advanced-cache.php';
+	if (defined('BERQWP_ADVANCED_CACHE_PATH')) {
+		$dropin_file = BERQWP_ADVANCED_CACHE_PATH;
+
+	} else {
+		$dropin_file = WP_CONTENT_DIR . '/advanced-cache.php';
+
+	}
 
 	// Dynamically create the drop-in file
 	$dropin_content = file_get_contents(optifer_PATH . 'advanced-cache.php');
@@ -96,19 +104,29 @@ function berqwp_activation()
 	// Enable wp cache in wp-config.php
     berqwp_enable_advanced_cache(true);
 
-	// if (function_exists('wp_cache_flush')) {
-	// 	wp_cache_flush(); // Clear the entire object cache.
-	// }
+	if (empty(get_option('berqwp_license_key'))) {
+		set_transient( 'bqwp_hide_feedback_notice', true, 60*60 ); // Hide for one hour
+		set_transient('berqwp_redirect', true, 1);
 
-	set_transient( 'bqwp_hide_feedback_notice', true, 60*60 ); // Hide for one hour
-	set_transient('berqwp_redirect', true, 1);
+	}
+
+	update_option('berqwp_sync_addons', true);
+
 
 	do_action('berqwp_activate_plugin');
 }
 
 function berqwp_deactivate_plugin() {
-    // Specify the drop-in file path
-    $dropin_file = ABSPATH . 'wp-content/advanced-cache.php';
+
+	// Specify the drop-in file path
+    if (defined('BERQWP_ADVANCED_CACHE_PATH')) {
+		$dropin_file = BERQWP_ADVANCED_CACHE_PATH;
+
+	} else {
+		$dropin_file = WP_CONTENT_DIR . '/advanced-cache.php';
+
+	}
+
 
     // Check if the drop-in file exists and delete it
     if (file_exists($dropin_file)) {

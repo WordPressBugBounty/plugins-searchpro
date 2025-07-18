@@ -45,6 +45,41 @@ if (!defined('ABSPATH'))
             </div>
         </div>
     </div>
+    <div class="berq-info-box fluid-images">
+        <h3 class="berq-box-title"><?php esc_html_e('Fluid Images', 'searchpro'); ?></h3>
+        <div class="berq-box-content">
+            <p><?php esc_html_e('Automatically resize and deliver retina-ready WebP images according to their container size. "Fluid Images" generates and serves multiple optimized versions for mobile, tablet, laptop, and desktop screens, ensuring every device gets the perfect image for its display.', 'searchpro'); ?>
+            </p>
+            <?php if (($this->key_response->product_ref == 'AppSumo Deal' && get_option('berqwp_can_use_fluid_images', false)) || $this->key_response->product_ref !== 'AppSumo Deal') { ?>
+            <label class="berq-check">
+                <input type="checkbox" name="berqwp_fluid_images" <?php checked(1, get_option('berqwp_fluid_images'), true); ?>>
+                <?php esc_html_e('Enable Fluid Images', 'searchpro'); ?>
+            </label>
+            <?php } ?>
+            <div class="feature-blocks">
+                <div class="single-feature">
+                    <div class="h5"><?php esc_html_e('Container-Based Resizing', 'searchpro'); ?></div>
+                    <p><?php esc_html_e('Generates and delivers multiple image sizes based on the actual each image container.', 'searchpro'); ?></p>
+                </div>
+                <div class="single-feature">
+                    <div class="h5"><?php esc_html_e('Retina-Ready', 'searchpro'); ?></div>
+                    <p><?php esc_html_e('Serves high-quality, retina-ready WebP images for sharper visuals on all modern devices.', 'searchpro'); ?></p>
+                </div>
+                <div class="single-feature">
+                    <div class="h5"><?php esc_html_e('Device-Aware', 'searchpro'); ?></div>
+                    <p><?php esc_html_e('Automatically delivers the optimal image version for each device—mobile, tablet, or desktop.', 'searchpro'); ?></p>
+                </div>
+            </div>
+            <?php if ($this->key_response->product_ref == 'AppSumo Deal' && !get_option('berqwp_can_use_fluid_images', false)) { ?>
+                <ul>
+                    <li><?php esc_html_e('Unlimited Websites', 'searchpro'); ?></li>
+                    <li><?php esc_html_e('Unlimited CDN Bandwidth', 'searchpro'); ?></li>
+                </ul>
+                <a href="https://staging.berqwp.com/addons/" target="_blank" class="fluid-images-signup">Get started - $5/month</a>
+
+            <?php }?>
+        </div>
+    </div>
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Disable WebP Images', 'searchpro'); ?></h3>
         <div class="berq-box-content">

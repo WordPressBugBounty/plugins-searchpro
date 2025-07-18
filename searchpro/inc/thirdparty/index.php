@@ -23,6 +23,7 @@ require_once optifer_PATH . '/inc/thirdparty/plugin/TranslatePress.php';
 require_once optifer_PATH . '/inc/thirdparty/plugin/WPForms.php';
 require_once optifer_PATH . '/inc/thirdparty/plugin/WPAllImport.php';
 require_once optifer_PATH . '/inc/thirdparty/plugin/WooJTLConnector.php';
+require_once optifer_PATH . '/inc/thirdparty/plugin/Polylang.php';
 
 // Server
 require_once optifer_PATH . '/inc/thirdparty/server/Nginx.php';

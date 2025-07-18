@@ -59,7 +59,8 @@ if (!class_exists('berqWP')) {
 			add_action('admin_init', [$this, 'save_settings']);
 
 			// Sitemap for cache warmup
-			add_action('wp', 'bwp_get_sitemap');
+			// add_action('wp', 'bwp_get_sitemap');
+			add_action( 'init', 'bwp_get_sitemap');
 
 			// BerqWP display logs
 			add_action('init', 'bwp_display_logs');
@@ -114,7 +115,21 @@ if (!class_exists('berqWP')) {
 
 			// Create dropin plugin file
 			add_action( 'init', 'berqwp_setup_dropin' );
+
+			// Update settings via API
+			add_action('init', 'bwp_update_configs_webhook');
+
+			// Sync addons from cloud
+			add_action('init', [$this, 'sync_addons']);
 			
+		}
+
+		function sync_addons() {
+			$license_key = get_option('berqwp_license_key', false);
+			if (get_option('berqwp_sync_addons') && $this->key_response->product_ref == 'AppSumo Deal' && !empty($license_key)) {
+                berqwp_sync_addons($license_key, home_url());
+				delete_option('berqwp_sync_addons');
+            }
 		}
 
 		function revoke_license() {
@@ -694,7 +709,7 @@ if (!class_exists('berqWP')) {
 			if ( $check_rest['status'] == 'error' ) {
 				bwp_notice('error', 'Website Unreachable: Connection Blocked', "<p>$plugin_name server is unable to access this website, please whitelist our server IP address. <a href='https://berqwp.com/help-center/get-started-with-berqwp/' target='_blank'>Find our server IP address here.</a></p>", [
 					[
-						'href'	=> esc_attr(add_query_arg(['bwp_connection_test'=>true], wp_get_referer())),
+						'href'	=> esc_attr(add_query_arg(['bwp_connection_test'=>true], get_admin_url())),
 						'text'	=> 'Check again',
 						'classes'	=> '',
 					]
@@ -964,6 +979,30 @@ if (!class_exists('berqWP')) {
 
 					}
 
+				}
+
+				if ($action !== 'slm_check') {
+					$api_params = array(
+						'registered_domain' 		=> $domain,
+						'slm_action' 				=> 'slm_check',
+						'secret_key' 				=> BERQ_SECRET,
+						'license_key' 				=> $license_key,
+						'version' 					=> BERQWP_VERSION,
+						't' 						=> '',
+					);
+
+					$berq_log->info('Making request 3');
+
+					$query_string = http_build_query($api_params);
+					$client = new HttpClient(BERQ_SERVER);
+					$client->setUserAgent('BerqWP');
+					$client->post('?'.$query_string, $api_params);
+
+					$berq_log->info(print_r($client->getContent(), true));
+
+					if ($client->ok()) {
+						$response = $client->getContent();
+					}
 				}
 
 				if (empty($response)) {

@@ -20,6 +20,16 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
         if (!empty($key_response) && $key_response->result == 'success' && ($key_response->message == 'License key activated' || $key_response->status == 'active')) {
             update_option('berqwp_license_key', $key);
+            
+            if ($key_response->product_ref == 'AppSumo Deal') {
+                update_option('berqwp_can_use_fluid_images', false);
+
+                // sync addons
+                berqwp_sync_addons($key, home_url());
+
+            } else {
+                update_option('berqwp_can_use_fluid_images', true);
+            }
 
             // trigger cache warmup
             do_action('berqwp_cache_warmup');
@@ -77,8 +87,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
         
         delete_transient('berq_lic_response_cache');
         delete_option('berqwp_license_key');
-        // if (!empty($key_response) && $key_response->result == 'success') {
-        // }
+        berqwp_clear_cache_queue();
 
         global $berqNotifications;
         $berqNotifications->success("$plugin_name license key has been deactivated.");
@@ -225,6 +234,17 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_disable_webp', 1);
     } else {
         update_option('berqwp_disable_webp', 0);
+    }
+
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_fluid_images')) {
+        update_option('bwp_require_flush_cache', 1);
+    }
+
+    if (isset($_POST['berqwp_fluid_images'])) {
+        update_option('berqwp_fluid_images', 1);
+    } else {
+        update_option('berqwp_fluid_images', 0);
     }
 
     // If the option is changed require flush cache

@@ -2,7 +2,7 @@
 
 // if uninstall.php is not called by WordPress, die
 if (!defined('WP_UNINSTALL_PLUGIN')) {
-    die;
+	die;
 }
 
 if (!defined('optifer_PATH')) {
@@ -60,9 +60,17 @@ delete_option('berqwp_optimize_post_types');
 delete_option('berqwp_optimize_taxonomies');
 delete_option('berqwp_enable_cwv');
 delete_option('berq_exclude_js_css');
+delete_option('berqwp_fluid_images');
 
 // Remove advanced-cache.php file
-$dropin_file = WP_CONTENT_DIR . '/advanced-cache.php';
+if (defined('BERQWP_ADVANCED_CACHE_PATH')) {
+	$dropin_file = BERQWP_ADVANCED_CACHE_PATH;
+
+} else {
+	$dropin_file = WP_CONTENT_DIR . '/advanced-cache.php';
+
+}
+
 if (file_exists($dropin_file)) {
-    unlink($dropin_file);
+	unlink($dropin_file);
 }

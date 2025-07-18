@@ -33,14 +33,14 @@ add_action('rest_api_init', function () {
         )
     );
 
-    register_rest_route(
-        'optifer/v1',
-        '/store-javascript-cache',
-        array(
-            'methods' => 'POST',
-            'callback' => [$this, 'store_javascript_cache'],
-            'permission_callback' => 'berq_rest_verify_license_callback',
-        )
-    );
+    // register_rest_route(
+    //     'optifer/v1',
+    //     '/store-javascript-cache',
+    //     array(
+    //         'methods' => 'POST',
+    //         'callback' => [$this, 'store_javascript_cache'],
+    //         'permission_callback' => 'berq_rest_verify_license_callback',
+    //     )
+    // );
     
 });

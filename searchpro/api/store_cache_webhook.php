@@ -31,19 +31,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET['berqwp_webhook']) && 
     }
 
     $status = sanitize_text_field($data['status']);
-    $key = sanitize_text_field($data['key']);
     $html = base64_decode($data['html']);
     $page_slug = strtolower($data['page_slug']);
     $license_key_hash = sanitize_text_field($data['license_key_hash']);
     $page_url = strtolower($data['page_url']);
+    $license_key = get_option('berqwp_license_key');
 
     if ($status == 'success' && !empty($data['html'])) {
 
         // Allow other plugins to modify cache html
         $html = apply_filters( 'berqwp_cache_buffer', $html );
 
-
-        if (empty($license_key_hash) || $license_key_hash !== md5(get_option('berqwp_license_key'))) {
+        if (empty($license_key_hash) || empty($license_key) || $license_key_hash !== md5($license_key)) {
             echo json_encode(['status' => 'error']);
             http_response_code(403);
             exit;

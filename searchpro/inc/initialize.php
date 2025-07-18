@@ -53,6 +53,10 @@ if (get_option('berqwp_lazyload_youtube_embed') === false) {
     update_option('berqwp_lazyload_youtube_embed', 1);
 }
 
+if (get_option('berqwp_fluid_images') === false) {
+    update_option('berqwp_fluid_images', 1);
+}
+
 if (get_option('berqwp_preload_yt_poster') === false) {
     update_option('berqwp_preload_yt_poster', 0);
 }
