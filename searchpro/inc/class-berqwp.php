@@ -561,7 +561,8 @@ if (!class_exists('berqWP')) {
 							update_option('berqwp_can_use_fluid_images', 1);
 
 						} else {
-							update_option('berqwp_can_use_fluid_images', 0);
+							// update_option('berqwp_can_use_fluid_images', 0);
+							update_option('berqwp_sync_addons', true);
 
 						}
 

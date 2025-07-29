@@ -164,7 +164,7 @@ function berqwp_get_page_params($page_url, $is_forced = false)
     $cache_file = $cache_directory . $page_url . '.html';
     // $key = uniqid();
     $key = '';
-    $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
+    // $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
 
     // if (!file_exists($cache_file) || (file_exists($cache_file) && $cache_max_life < time()) || (file_exists($cache_file) && bwp_is_partial_cache($slug) === true)) {
     //     // Priority 1
@@ -296,7 +296,7 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
 
     $cache_directory = bwp_get_cache_dir();
     $cache_file = $cache_directory . $page_url . '.html';
-    $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
+    // $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
 
     if (!file_exists($cache_file) && bwp_pass_account_requirement() === false) {
         return;
@@ -317,7 +317,7 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
     }
 
     // Hook to modify cache lifespan
-    $cache_max_life = apply_filters('berqwp_cache_lifespan', $cache_max_life);
+    // $cache_max_life = apply_filters('berqwp_cache_lifespan', $cache_max_life);
 
     // if (file_exists($cache_file) && bwp_is_partial_cache($page_url) === false && $cache_max_life > time()) {
     //     return;

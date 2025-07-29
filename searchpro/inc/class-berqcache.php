@@ -292,7 +292,7 @@ if (!class_exists('berqCache')) {
 
             if (in_array($post->post_type, $post_types)) {
                 global $berq_log;
-                $berq_log->info('Purging homepage. Triggered by post type: ' . $post->post_type);
+                $berq_log->info('Purging homepage. Triggered by post type: ' . $post->post_type . ' ' . $old_status . ' ' . $new_status);
                 $home_url = home_url('/');
                 self::purge_page($home_url);
                 warmup_cache_by_url($home_url);
