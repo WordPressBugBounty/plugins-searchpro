@@ -281,34 +281,22 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
         return;
     }
 
+    // Avoid caching file URLs e.g .php .html
     if (berqwp_is_file_url($page_url)) {
         return;
     }
 
-    $slug = bwp_url_into_path($page_url);
-    if (berqwp_is_slug_excludable($slug)) {
-        return;
-    }
-
+    // We don't want to cache page URL with query params
     if (strpos($page_url, '?') !== false) {
         return;
     }
 
-    $cache_directory = bwp_get_cache_dir();
-    $cache_file = $cache_directory . $page_url . '.html';
-    // $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
-
-    if (!file_exists($cache_file) && bwp_pass_account_requirement() === false) {
+    // Return if page url or page path (slug) is excluded
+    if (bwp_can_optimize_page_url($page_url)) {
         return;
     }
 
-    // Return if page is excluded from cache
-    $pages_to_exclude = get_option('berq_exclude_urls', []);
-
-    if (in_array($page_url, $pages_to_exclude)) {
-        return;
-    }
-
+    // Return if Photon Engine cache can't access this site
     $check_connection = bwp_check_connection(true);
     if ($check_connection['status'] == 'error') {
         global $berq_log;
@@ -316,49 +304,8 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
         return;
     }
 
-    // Hook to modify cache lifespan
-    // $cache_max_life = apply_filters('berqwp_cache_lifespan', $cache_max_life);
-
-    // if (file_exists($cache_file) && bwp_is_partial_cache($page_url) === false && $cache_max_life > time()) {
-    //     return;
-    // }
-
-    // API endpoint URL
-    $api_endpoint = 'https://boost.berqwp.com/photon/';
-
-    if (get_site_url() == 'http://berq-test.local') {
-        $api_endpoint = 'http://dev-berqwp.local/photon/';
-    }
-
-    // Modify photon engine endpoint for testing purposes
-    $api_endpoint = apply_filters('berqwp_photon_endpoint', $api_endpoint);
-
+    // Prepare post data for this page
     $post_data = berqwp_get_page_params($page_url, $is_forced);
-
-    // Set up the request arguments
-    $args = array(
-        'body' => $post_data,  // Pass the POST data here
-        'method' => 'POST',
-        'sslverify' => false,
-        // 'blocking'          => false,
-        'timeout' => $is_forced === true ? 20 : 0.1,
-        'headers' => array(
-            'Content-Type' => 'application/x-www-form-urlencoded', // Adjust content type if needed
-        ),
-    );
-
-    // // Send the POST request
-    // $response = wp_remote_post($api_endpoint, $args);
-
-    // // Check for errors and handle the response
-    // if (is_wp_error($response)) {
-    //     // There was an error with the request
-    //     error_log('Error: ' . $response->get_error_message());
-    // }
-
-    // $client = new HttpClient('https://boost.berqwp.com');
-    // $client->setUserAgent('BerqWP');
-    // $client->post('/photon/', $post_data, ['Content-Type' => 'application/x-www-form-urlencoded']);
 
     global $berq_log;
     $berq_log->info('warming page: ' . $page_url);
@@ -1352,12 +1299,6 @@ function bwp_can_optimize_page_url($page_url)
     return true;
 }
 
-// function bwp_url_with_get_home_url($url) {
-//     $url_path = bwp_url_into_path($url);
-//     $url = get_home_url().$url_path;
-//     return $url;
-// }
-
 function bwp_get_sitemap()
 {
     if (isset($_GET['berqwp_sitemap'])) {
@@ -1863,21 +1804,25 @@ function berqwp_setup_dropin()
 
     $bwp_adv_cache = optifer_PATH . 'advanced-cache.php';
 
-    if (
-        (!file_exists($adv_cache_path) && get_option('berqwp_enable_sandbox') !== 1)
-        || (file_exists($adv_cache_path) && md5_file($adv_cache_path) !== md5_file($bwp_adv_cache))
-    ) {
+    if (!file_exists($adv_cache_path) || (file_exists($adv_cache_path) && is_writable($adv_cache_path))) {
+        if (
+            (!file_exists($adv_cache_path) && get_option('berqwp_enable_sandbox') !== 1)
+            || (file_exists($adv_cache_path) && md5_file($adv_cache_path) !== md5_file($bwp_adv_cache))
+        ) {
 
-        // Dynamically create the drop-in file
-        $dropin_content = file_get_contents(optifer_PATH . 'advanced-cache.php');
+            // Dynamically create the drop-in file
+            $dropin_content = file_get_contents(optifer_PATH . 'advanced-cache.php');
 
-        // Write the drop-in content to the file, replacing any existing file
-        file_put_contents($adv_cache_path, $dropin_content);
+            // Write the drop-in content to the file, replacing any existing file
+            file_put_contents($adv_cache_path, $dropin_content);
 
-        // Enable wp cache in wp-config.php
-        berqwp_enable_advanced_cache(true);
+            // Enable wp cache in wp-config.php
+            berqwp_enable_advanced_cache(true);
+
+        }
 
     }
+
 
     // if (get_option('berqwp_enable_sandbox') == 1 && file_exists($adv_cache_path)) {
     //     unlink($adv_cache_path);
@@ -1922,6 +1867,9 @@ function berqwp_sync_addons($license_key, $site_url)
         ),
     );
 
+    global $berq_log;
+    $berq_log->info("Trigger addon sync");
+
     $response = wp_remote_post('https://berqwp.com/wp-json/berqwp/active-addons', $args);
     $response_body = wp_remote_retrieve_body($response);
     $json = json_decode($response_body, true);
@@ -1941,6 +1889,6 @@ function berqwp_sync_addons($license_key, $site_url)
             update_option('berqwp_can_use_fluid_images', 0);
         }
 
-    } 
+    }
 
 }
