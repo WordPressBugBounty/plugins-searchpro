@@ -47,7 +47,6 @@ if (!class_exists('berqWP')) {
 			'debloat/debloat.php',
 			'perfmatters/perfmatters.php',
 			'phastpress/phastpress.php',
-			// 'hide-my-wp/index.php',
 		];
 
 		function __construct()

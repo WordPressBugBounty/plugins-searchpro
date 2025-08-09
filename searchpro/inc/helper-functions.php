@@ -292,7 +292,7 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
     }
 
     // Return if page url or page path (slug) is excluded
-    if (bwp_can_optimize_page_url($page_url)) {
+    if (!bwp_can_optimize_page_url($page_url)) {
         return;
     }
 
@@ -332,7 +332,9 @@ function bwp_is_home_cached()
 
 function bwp_cache_current_page()
 {
-    global $bwp_current_page;
+    global $bwp_current_page, $berq_log;
+
+    // $berq_log->info('Shutdown hook fired.');
 
     if (empty($bwp_current_page)) {
         return;
