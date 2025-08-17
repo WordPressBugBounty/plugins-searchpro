@@ -22,13 +22,13 @@ if (isset($_POST['berqwp_save_nonce'])) {
             update_option('berqwp_license_key', $key);
             
             if ($key_response->product_ref == 'AppSumo Deal') {
-                update_option('berqwp_can_use_fluid_images', 0);
+                update_option('berqwp_can_use_fluid_images', 0, false);
 
                 // sync addons
                 berqwp_sync_addons($key, home_url());
 
             } else {
-                update_option('berqwp_can_use_fluid_images', 1);
+                update_option('berqwp_can_use_fluid_images', 1, false);
             }
 
             // trigger cache warmup
@@ -116,7 +116,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
                 'apitoken'  => $apitoken,
                 'zoneid'    => $zoneid,
                 'email'     => $email,
-            ] );
+            ], false );
 
             $berqCloudflareAPIHandler->add_rule();
             $berqCloudflareAPIHandler->purge_all_cache();

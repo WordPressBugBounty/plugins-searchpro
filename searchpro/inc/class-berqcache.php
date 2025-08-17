@@ -288,6 +288,10 @@ if (!class_exists('berqCache')) {
                 return;
             }
 
+            if ($new_status == 'auto-draft') {
+                return;
+            }
+
             $post_types = apply_filters( 'berqwp_purge_home_post_types', ['post'] );
 
             if (in_array($post->post_type, $post_types)) {

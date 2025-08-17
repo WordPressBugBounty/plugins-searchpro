@@ -1018,60 +1018,24 @@ if (!function_exists('str_contains')) {
     }
 }
 
-function bwp_check_rest_api($force_check = false)
+function bwp_check_connection($short_live = false)
 {
+    
+    $transient_key = "berqwp_connection_status";
+
     // Allow cache busting by passing $force_check = true
-    if ($force_check) {
-        delete_transient('berqwp_rest_api_status');
+    // if ($force_check) {
+    //     delete_transient($transient_key);
+    // }
+
+    if ($short_live) {
+        $transient_key = "berqwp_connection_status_sl";
     }
 
     // Check if the result is cached
-    $cached_status = get_transient('berqwp_rest_api_status');
+    $cached_status = get_transient($transient_key);
 
-    if ($cached_status && !$force_check) {
-        return $cached_status;
-    }
-
-    // Perform the actual REST API check
-    $response = wp_safe_remote_get(rest_url(), ['timeout' => 10]);
-
-    if (is_wp_error($response)) {
-        $result = array(
-            'status' => 'error',
-            'message' => 'The REST API is not working. Error: ' . $response->get_error_message(),
-        );
-    } else {
-        $status_code = wp_remote_retrieve_response_code($response);
-
-        if ($status_code == 200) {
-            $result = array(
-                'status' => 'success',
-                'message' => 'The REST API is working correctly.',
-            );
-        } else {
-            $result = array(
-                'status' => 'error',
-                'message' => 'The REST API returned an unexpected status code: ' . $status_code,
-            );
-        }
-    }
-
-    set_transient('berqwp_rest_api_status', $result, 60 * 60 * 24);
-
-    return $result;
-}
-
-function bwp_check_connection($force_check = false)
-{
-    // Allow cache busting by passing $force_check = true
-    if ($force_check) {
-        delete_transient('berqwp_connection_status');
-    }
-
-    // Check if the result is cached
-    $cached_status = get_transient('berqwp_connection_status');
-
-    if ($cached_status && !$force_check) {
+    if ($cached_status) {
         return $cached_status;
     }
 
@@ -1079,10 +1043,11 @@ function bwp_check_connection($force_check = false)
     $response = wp_safe_remote_get('https://boost.berqwp.com/photon/?connection_test=1&url=' . bwp_admin_home_url('/?utm_source=' . time()), ['timeout' => 60]);
 
     if (is_wp_error($response)) {
-        $result = array(
-            'status' => 'error',
-            'message' => 'The site is not accessible. Error: ' . $response->get_error_message(),
-        );
+        return false; // Skip if server is unreachable
+        // $result = array(
+        //     'status' => 'error',
+        //     'message' => 'The site is not accessible. Error: ' . $response->get_error_message(),
+        // );
     } else {
         $body = wp_remote_retrieve_body($response);
 
@@ -1099,7 +1064,13 @@ function bwp_check_connection($force_check = false)
         }
     }
 
-    set_transient('berqwp_connection_status', $result, 60 * 60 * 24);
+    if ($short_live) {
+        set_transient($transient_key, $result, 60 * 5);
+
+    } else {
+        set_transient($transient_key, $result, 60 * 60 * 24);
+
+    }
 
     return $result;
 }

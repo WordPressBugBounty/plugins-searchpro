@@ -718,17 +718,6 @@ if (!class_exists('berqWP')) {
 				}
 			}
 
-			// Check rest api
-			/*$check_rest = bwp_check_rest_api();
-			if ( $check_rest['status'] == 'error' ) {
-				?>
-				<div class="notice notice-error">
-					<p><strong>Error:</strong> The WordPress REST API is disabled. <?php echo $plugin_name; ?> plugin will not function correctly without the
-						REST API. Please enable the REST API for full functionality.</p>
-				</div>
-				<?php
-			}*/
-
 			// Check connection
 			$check_rest = bwp_check_connection(!empty($_GET['bwp_connection_test']) === true);
 			if ($check_rest['status'] == 'error') {
