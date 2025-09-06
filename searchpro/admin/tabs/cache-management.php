@@ -11,7 +11,7 @@ $param_lines = implode("\n", $ignore_params);
 
 $post_type_names = get_post_types(array(
     'public' => true,
-    'exclude_from_search' => false,
+    // 'exclude_from_search' => false,
 ), 'names');
 unset($post_type_names['attachment']);
 

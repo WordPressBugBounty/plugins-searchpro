@@ -7,7 +7,7 @@ use BerqWP\BerqWP;
 class berqWooCommerce extends berqIntegrations {
     function __construct() {
         add_action( 'woocommerce_product_set_stock_status', [$this, 'flush_product_cache'] );
-        add_action( 'woocommerce_delete_product_transients', [$this, 'flush_product_cache'] );
+        // add_action( 'woocommerce_delete_product_transients', [$this, 'flush_product_cache'] );
 
         add_action( 'wc_delete_related_product_transients_async', function () {
             add_filter( 'berqwp_can_flush_cache_on_post_update', '__return_false' );
@@ -46,6 +46,9 @@ class berqWooCommerce extends berqIntegrations {
         if ( get_post_type( $post_id ) != 'product' ) {
             return;
         }
+
+        global $berq_log;
+        $berq_log->info("Flush product cache $post_id");
 
         // Get the full URL of the product
         $product_url = get_permalink( $post_id );

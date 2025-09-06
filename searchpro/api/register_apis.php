@@ -13,15 +13,16 @@ add_action('rest_api_init', function () {
         )
     );
 
-    register_rest_route(
-        'optifer/v1',
-        '/warmup-cache',
-        array(
-            'methods' => 'POST',
-            'callback' => [$this, 'warmup_cache'],
-            'permission_callback' => '__return_true',
-        )
-    );
+    /* Not being used */
+    // register_rest_route(
+    //     'optifer/v1',
+    //     '/warmup-cache',
+    //     array(
+    //         'methods' => 'POST',
+    //         'callback' => [$this, 'warmup_cache'],
+    //         'permission_callback' => '__return_true',
+    //     )
+    // );
 
     register_rest_route(
         'optifer/v1',

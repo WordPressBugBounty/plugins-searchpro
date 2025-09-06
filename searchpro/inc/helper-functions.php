@@ -1018,10 +1018,15 @@ if (!function_exists('str_contains')) {
     }
 }
 
-function bwp_check_connection($short_live = false)
+function bwp_check_connection($short_live = false, $force = false)
 {
     
     $transient_key = "berqwp_connection_status";
+
+    if ($force) {
+        delete_transient('berqwp_connection_status');
+        delete_transient('berqwp_connection_status_sl');
+    } 
 
     // Allow cache busting by passing $force_check = true
     // if ($force_check) {

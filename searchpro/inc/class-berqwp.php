@@ -719,7 +719,7 @@ if (!class_exists('berqWP')) {
 			}
 
 			// Check connection
-			$check_rest = bwp_check_connection(!empty($_GET['bwp_connection_test']) === true);
+			$check_rest = bwp_check_connection(false, !empty($_GET['bwp_connection_test']) === true);
 			if ($check_rest['status'] == 'error') {
 				bwp_notice('error', 'Website Unreachable: Connection Blocked', "<p>$plugin_name server is unable to access this website, please whitelist our server IP address. <a href='https://berqwp.com/help-center/get-started-with-berqwp/' target='_blank'>Find our server IP address here.</a></p>", [
 					[
@@ -852,7 +852,6 @@ if (!class_exists('berqWP')) {
 			// Get post type names
 			$post_type_names = get_post_types(array(
 				'public' => true,
-				'exclude_from_search' => false,
 			), 'names');
 			unset($post_type_names['attachment']);
 

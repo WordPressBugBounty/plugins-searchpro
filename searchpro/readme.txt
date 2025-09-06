@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.8
-Stable tag: 2.2.53
+Stable tag: 2.2.54
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -233,6 +233,10 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 
 == Changelog ==
 
+= 2.2.54 =
+* [Enhancement] Added compatibility with the Complianz plugin.
+* [Bug] Fixed an issue causing unwanted automatic WooCommerce product cache flushes.
+
 = 2.2.53 =
 * [Bug] Prevent flushing homepage cache when auto-saving post drafts.
 * [Bug] Fixed false "connection block" warnings.
@@ -241,8 +245,8 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 * [Bug] Fixed an issue where the page cache refresh was not triggering after a post update.
 
 = 2.2.51 =
-* [Enhancement] = Increased license key cache lifespan to one month.
-* [Bug] = Prevented overwriting of advanced-cache.php file if it's not writable.
+* [Enhancement] Increased license key cache lifespan to one month.
+* [Bug] Prevented overwriting of advanced-cache.php file if it's not writable.
 
 = 2.2.49 =
 * [Bug] Fixed PHP filemtime warnings.
