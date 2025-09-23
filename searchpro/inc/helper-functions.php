@@ -1048,7 +1048,7 @@ function bwp_check_connection($short_live = false, $force = false)
     $response = wp_safe_remote_get('https://boost.berqwp.com/photon/?connection_test=1&url=' . bwp_admin_home_url('/?utm_source=' . time()), ['timeout' => 60]);
 
     if (is_wp_error($response)) {
-        return false; // Skip if server is unreachable
+        return ['status' => 'success']; // Skip if server is unreachable
         // $result = array(
         //     'status' => 'error',
         //     'message' => 'The site is not accessible. Error: ' . $response->get_error_message(),
