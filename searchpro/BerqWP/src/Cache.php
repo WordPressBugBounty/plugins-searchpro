@@ -2,9 +2,9 @@
 
 namespace BerqWP;
 use BerqWP\RateLimiter;
-use GuzzleHttp\Pool;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Exception\RequestException;
+use BerqWP\GuzzleHttp\Pool;
+use BerqWP\GuzzleHttp\Psr7\Request;
+use BerqWP\GuzzleHttp\Exception\RequestException;
 
 class Cache
 {
@@ -100,12 +100,12 @@ class Cache
             mkdir($this->cache_directory, 0755, true);
         }
 
-        $cache_file = $this->cache_directory . md5($page_url) . '.html';
+        // $cache_file = $this->cache_directory . md5($page_url) . '.html';
 
-        file_put_contents($cache_file, $html);
+        // file_put_contents($cache_file, $html);
 
         $cache_file = $this->cache_directory . md5($page_url) . '.gz';
-        $html = gzencode($html);
+        $html = gzencode($html, 9);
         file_put_contents($cache_file, $html);
 
     }
@@ -125,10 +125,11 @@ class Cache
 
     }
 
-    function clear_queue($site_url, $license_key) {
+    function clear_queue($site_url, $site_id, $license_key) {
         try {
             $post_data = [
                 'site_url'          => $site_url,
+                'site_id'          => $site_id,
                 'clear_queue'       => true,
                 'license_key'       => $license_key,
             ];

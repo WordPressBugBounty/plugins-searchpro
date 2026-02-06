@@ -33,17 +33,19 @@ function bwp_get_request_url() {
 }
 
 function bwp_serve_advanced_cache($serve_from = 'plugin') {
-    if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'POST' && $_SERVER['REQUEST_METHOD'] !== 'PURGE' && !bwp_is_user_logged_in() && !bwp_is_ajax() && !berqDetectCrawler::is_crawler() && bwp_pass_cookie_requirement()) {
+    if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'GET' && !bwp_is_user_logged_in() && !bwp_is_ajax() && !berqDetectCrawler::is_crawler() && bwp_pass_cookie_requirement()) {
         $berqconfigs = new berqConfigs();
         $configs = $berqconfigs->get_configs();
         $url = bwp_get_request_url();
-        $url = dropin_remove_ignore_params($url);
+        $url = @dropin_remove_ignore_params($url);
         $cache_key = md5($url);
         $cache_directory = WP_CONTENT_DIR . '/cache/berqwp/html/';
         $cache_file = $cache_directory . $cache_key . '.html';
         $cache_file_gz = $cache_directory . $cache_key . '.gz';
+        $cache_file = $cache_file_gz;
         $cache_max_life = file_exists($cache_file) ? @filemtime($cache_file) + $configs['cache_lifespan'] : null;
-        $compression_enabled = $configs['page_compression'] === true;
+        // $compression_enabled = $configs['page_compression'] === true;
+        $compression_enabled = true;
         $accept_encoding = $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '';
         $supports_gzip = strpos($accept_encoding, 'gzip') !== false;
 
@@ -61,7 +63,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
                 }
 
                 // Prepare gzip cache file
-                if ($compression_enabled && $supports_gzip && file_exists($cache_file_gz)) {
+                if ($compression_enabled && file_exists($cache_file_gz)) {
                     $cache_file = $cache_file_gz;
                     // header('Content-Encoding: gzip');
                     header_remove('Content-Encoding');
@@ -89,8 +91,13 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
     
                 header('Cache-Control: public, max-age=0, s-maxage=3600', true);
 
-                if ($compression_enabled && $supports_gzip) {
-                    readgzfile($cache_file);
+                // if ($compression_enabled && $supports_gzip) {
+                if ($compression_enabled) {
+                    header('Vary: Accept-Encoding');
+                    header('Content-Encoding: gzip', true);
+                    header('Content-Length: ' . filesize($cache_file), true);
+                    // readgzfile($cache_file);
+                    readfile($cache_file);
                     exit();
                 }
         

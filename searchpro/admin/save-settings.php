@@ -356,6 +356,25 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berq_opt_mode', $val);
     }
 
+    if (isset($_POST['berq_exclude_cdn'])) {
+        $keywords = sanitize_textarea_field($_POST['berq_exclude_cdn']);
+        $keywords = explode("\n", $keywords);
+
+        $keywords = array_map(function ($kw) {
+            return trim($kw);
+        }, $keywords);
+
+        $keywords = array_filter($keywords, function ($kw) {
+            return !empty($kw);
+        });
+
+        if (bwp_is_option_updated('berq_exclude_cdn')) {
+            update_option('bwp_require_flush_cache', 1);
+        }
+
+        update_option('berq_exclude_cdn', $keywords);
+    }
+
     if (isset($_POST['berq_exclude_urls'])) {
         $urls = sanitize_textarea_field($_POST['berq_exclude_urls']);
         $urls_array = explode("\n", $urls);
@@ -366,14 +385,23 @@ if (isset($_POST['berqwp_save_nonce'])) {
                 $url = trim($url);
                 
                 // Delete cache for this url
-                berqCache::delete_page_cache_files(bwp_url_into_path($url));
+                // berqCache::delete_page_cache_files(bwp_url_into_path($url));
+                berqCache::purge_page($url);
 
                 return $url;
             }
         }, $urls_array);
 
+        $urls_array = array_filter($urls_array, function($item) {
+            return !empty($item);
+        });
+
+        if (empty($urls_array)) {
+            $urls_array = [];
+        }
+
         $berqconfigs = new berqConfigs();
-        $berqconfigs->update_configs(['exclude_urls'=>$urls_array]);        
+        $berqconfigs->update_configs(['exclude_urls'=>$urls_array]);    
 
         if (isset($urls_array)) {
             update_option('berq_exclude_urls', $urls_array);

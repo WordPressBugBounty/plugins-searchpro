@@ -2,8 +2,8 @@
 Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
-Tested up to: 6.8
-Stable tag: 2.2.55
+Tested up to: 6.9
+Stable tag: 3.1.11
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -74,6 +74,8 @@ Since all popular page speed testing tools use similar methods, you'll get the s
 - **Web Vitals Analytics:** With BerqWP, you gain access to our Web Vitals Analytics on the BerqWP website. It enables you to track and monitor core web vitals and the website performance experienced by actual visitors.
 
 - **Supports Cloudflare Edge Cache:** BerqWP automatically configures the correct cache rules for your website, delivering page cache through Cloudflare's global network, significantly reducing server response time. Simply connect your Cloudflare account in the plugin settings to get started.
+
+- **Page Cache Rules:** Define rules to automatically flush a page’s cache when a specific post type is updated.
 
 - **Much more!**
 
@@ -233,8 +235,84 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 
 == Changelog ==
 
+= 3.1.11 =
+* [Bug] Fixed partial uploads of static files by verifying uploads using file hashes.
+* [Bug] Fixed broken images.
+* [Bug] Fixed an issue where new content changes were not reflected.
+
+= 3.0.19 =
+* [Bug] Fixed an issue where cache was not being served without the advanced-cache drop-in plugin.
+
+= 3.0.18 =
+* [Bug] Fixed a CSS issue caused by Hide My WP URL rewrite.
+
+= 3.0.17 =
+* [Bug] Fixed an issue where CSS files were not being uploaded to the Photon Engine.
+
+= 3.0.16 =
+* [Bug] Fixed 403 cache being stored.
+
+= 3.0.15 =
+* [Enhancement] Replaced CURL with Guzzle for multipart file upload.
+
+= 3.0.14 =
+* [Enhancement] Reset uploaded assets cache when cache warmup is triggered.
+
+= 3.0.12 =
+* [Bug] Fixed pages getting failed during cache warmup.
+
+= 3.0.11 =
+* [Bug] Fixed HTML download failure during cache warmup.
+
+= 3.0.05 =
+* [Enhancement] Improved handling of locally stored external static files.
+
+= 3.0.04 =
+* [Bug] Fixed exclude CSS & JS not working.
+
+= 3.0.03 =
+* [Bug] Avoid optimization for error pages.
+
+= 3.0.02 =
+* [Bug] Fixed sandbox mode not working.
+
+= 3.0.01 =
+* [Enhancement] Introduced a new plugin-to-server request architecture to fully resolve server-related issues.
+* [Enhancement] Added a dedicated CDN tab with a CDN exclusion option.
+* [Bug] Fixed a fatal error caused by duplicate Guzzle instances.
+
+= 2.2.63 =
+* [Bug] Fixed issue where partial cached pages were going blank.
+* [Bug] Corrected typo in initialize.php (site_url → site_id).
+* [Bug] Improved prevention of BerqWP config file reset.
+
+= 2.2.62 =
+* [Bug] Fixed the plugin checking for simple_html_dom.php inside the plugin directory.
+
+= 2.2.61 =
+* [Bug] Fixed an issue where the config file could reset under stressful server conditions.
+* [Bug] Resolved a conflict with the HTMLSimpleDOM library.
+
+= 2.2.59 =
+* [Enhancement] Added support for pages with the .htm extension.
+* [Bug] Fixed empty cache being stored.
+
+= 2.2.58 =
+* [Enhancement] Added support for pages with the .html extension.
+* [Bug] Fixed Fixed an issue where the Flush and Force Cache links were not appearing for post types other than "post".
+
+= 2.2.57 =
+* [Bug] Fixed cache storage failure on websites with a low PHP post data limit.
+
+= 2.2.56 =
+* [New Feature] Added cache rules for single posts to allow automatic cache flushing.
+* [New Feature] Added option to force cache for any page.
+* [New Feature] Added manual cache warmup via the admin bar.
+* [Enhancement] Improved integration with Yoast SEO URL cleanup feature.
+* [Bug] Fixed Polylang language switch issue.
+
 = 2.2.55 =
-* [Bug] Fixed false “Connection Blocked” warnings during server maintenance.
+* [Bug] Fixed false "Connection Blocked" warnings during server maintenance.
 
 = 2.2.54 =
 * [Enhancement] Added compatibility with the Complianz plugin.

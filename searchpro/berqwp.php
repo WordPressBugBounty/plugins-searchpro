@@ -3,7 +3,7 @@
  * Plugin Name:       BerqWP
  * Plugin URI:        https://berqwp.com
  * Description:       Automatically pass Core Web Vitals for WordPress and boost your speed score to 90+ for both mobile and desktop without any technical skills.
- * Version:           2.2.55
+ * Version:           3.1.11
  * Requires at least: 5.3
  * Requires PHP:      7.4
  * Author:            BerqWP
@@ -15,7 +15,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BERQWP_VERSION')) {
-	define('BERQWP_VERSION', '2.2.55');
+	define('BERQWP_VERSION', '3.1.11');
 }
 
 if (!defined('optifer_PATH')) {
@@ -52,7 +52,8 @@ global $bwp_current_page;
 $bwp_current_page = null;
 
 // Initialize BerqWP SDK
-require_once optifer_PATH . '/BerqWP/vendor/autoload.php';
+require_once optifer_PATH . '/BerqWP/vendor-scoped/autoload.php';
+require_once optifer_PATH . '/BerqWP/src/Vendor/SimpleHtmlDom/simple_html_dom.php';
 
 require_once optifer_PATH . '/inc/crawler/berqDetectCrawler.php';
 require_once optifer_PATH . '/inc/class-berqconfigs.php';
@@ -72,11 +73,14 @@ require_once optifer_PATH . '/inc/class-berqwp.php';
 require_once optifer_PATH . '/inc/class-berqnotifications.php';
 require_once optifer_PATH . '/inc/httpclient.php';
 require_once optifer_PATH . '/inc/class-berqCloudflareAPIHandler.php';
+require_once optifer_PATH . '/inc/class-berqUpload.php';
+require_once optifer_PATH . '/inc/class-berqHeartbeat.php';
+require_once optifer_PATH . '/admin/class-berqPageRules.php';
 
 if (get_option('berqwp_enable_sandbox') == 0) {
 	bwp_serve_advanced_cache();
 }
-register_shutdown_function('bwp_cache_current_page');
+// register_shutdown_function('bwp_cache_current_page');
 
 // Redirect to BerqWP admin page after activation
 register_activation_hook(__FILE__, 'berqwp_activation');

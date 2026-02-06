@@ -20,7 +20,7 @@ if (!defined('optifer_cache')) {
 use BerqWP\BerqWP;
 
 // Initialize BerqWP SDK
-require_once optifer_PATH . '/BerqWP/vendor/autoload.php';
+require_once optifer_PATH . '/BerqWP/vendor-scoped/autoload.php';
 
 // Load functions
 require_once optifer_PATH . '/inc/helper-functions.php';
@@ -61,6 +61,7 @@ delete_option('berqwp_optimize_taxonomies');
 delete_option('berqwp_enable_cwv');
 delete_option('berq_exclude_js_css');
 delete_option('berqwp_fluid_images');
+delete_option('berqwp_cache_rules');
 
 // Remove advanced-cache.php file
 if (defined('BERQWP_ADVANCED_CACHE_PATH')) {

@@ -72,7 +72,9 @@ if (!class_exists('berqWP')) {
 
 			add_filter('plugin_action_links_searchpro/berqwp.php', [$this, 'plugin_settings_links']);
 
-			add_action('wp_ajax_berqwp_fetch_remote_html', [$this, 'fetch_remote_html']);
+			// add_action('wp_ajax_berqwp_fetch_remote_html', [$this, 'fetch_remote_html']);
+
+			add_action('wp_ajax_berqwp_refresh_cache_stats', [$this, 'refresh_cache_stats']);
 
 			add_action('wp_ajax_berqwp_get_optimized_pages', [$this, 'berqwp_get_optimized_pages']);
 
@@ -80,18 +82,18 @@ if (!class_exists('berqWP')) {
 
 			// add_filter( 'action_scheduler_queue_runner_concurrent_batches', [$this, 'ashp_increase_concurrent_batches'] );
 
-			add_filter('action_scheduler_retention_period', function ($period) {
-				return DAY_IN_SECONDS;
-			});
+			// add_filter('action_scheduler_retention_period', function ($period) {
+			// 	return DAY_IN_SECONDS;
+			// });
 
-			add_filter('action_scheduler_default_cleaner_statuses', function ($statuses) {
-				$statuses[] = 'failed';
-				return $statuses;
-			});
+			// add_filter('action_scheduler_default_cleaner_statuses', function ($statuses) {
+			// 	$statuses[] = 'failed';
+			// 	return $statuses;
+			// });
 
-			add_filter('action_scheduler_cleanup_batch_size', function ($batch_size) {
-				return 100;
-			});
+			// add_filter('action_scheduler_cleanup_batch_size', function ($batch_size) {
+			// 	return 100;
+			// });
 
 			// Refresh license key
 			add_action('admin_post_bwp_refresh_license', [$this, 'handle_refresh_license_action']);
@@ -106,8 +108,8 @@ if (!class_exists('berqWP')) {
 			add_action('template_redirect', [$this, 'page_compression_test']);
 
 			// Run daily maintenance tasks
-			add_action('init', [$this, 'schedule_daily_maintenance']);
-			add_action('berqwp_daily_maintenance_hook', [$this, 'daily_maintenance']);
+			// add_action('init', [$this, 'schedule_daily_maintenance']);
+			// add_action('berqwp_daily_maintenance_hook', [$this, 'daily_maintenance']);
 
 			// Revoke License
 			add_action('init', [$this, 'revoke_license']);
@@ -120,7 +122,6 @@ if (!class_exists('berqWP')) {
 
 			// Sync addons from cloud
 			add_action('init', [$this, 'sync_addons']);
-
 		}
 
 		function sync_addons()
@@ -181,7 +182,6 @@ if (!class_exists('berqWP')) {
 					}
 				}
 			}
-
 		}
 
 		function schedule_daily_maintenance()
@@ -198,12 +198,17 @@ if (!class_exists('berqWP')) {
 				$accept_encoding = $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '';
 				$supports_gzip = strpos($accept_encoding, 'gzip') !== false;
 
-				if ($supports_gzip) {
-					header('Content-Type: text/html; charset=utf-8');
-					header_remove('Content-Encoding');
-					// header('Content-Encoding: gzip');
-					readgzfile($test_file_path);
-				}
+				// if ($supports_gzip) {
+				header('Content-Type: text/html; charset=utf-8');
+				// header_remove('Content-Encoding');
+				// header('Content-Encoding: gzip');
+				// readgzfile($test_file_path);
+
+				header('Vary: Accept-Encoding');
+				header('Content-Encoding: gzip', true);
+				header('Content-Length: ' . filesize($test_file_path), true);
+				readfile($test_file_path);
+				// }
 				// header('Content-Type: text/html');
 				// header('Content-Encoding: gzip');
 				// readfile($test_file_path);
@@ -342,15 +347,14 @@ if (!class_exists('berqWP')) {
 				$cache_directory = bwp_get_cache_dir();
 				$cache_key = md5($url);
 				// $cache_key = md5($slug);
-				$cache_file = $cache_directory . $cache_key . '.html';
+				$cache_file = $cache_directory . $cache_key . '.gz';
 
-				if (file_exists($cache_file)) {
+				if (is_file($cache_file)) {
 					$status = '<span class="bwp-cache-tag completed">Completed</span>';
 
-					if (bwp_is_partial_cache($url) === true) {
-						$status = '<span class="bwp-cache-tag part-completed">Partial cache</span>';
-					}
-
+					// if (bwp_is_partial_cache($url) === true) {
+					// 	$status = '<span class="bwp-cache-tag part-completed">Partial cache</span>';
+					// }
 				} else {
 					$status = '<span class="bwp-cache-tag">Pending</span>';
 				}
@@ -383,6 +387,18 @@ if (!class_exists('berqWP')) {
 			$query = new WP_Query($args);
 			$total_posts = $query->found_posts; // Get the total number of records
 
+			$valid_posts_query = new WP_Query([
+				'post_type' => $post_types,
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'post_status' => ['publish'],
+			]);
+			$valid_posts = array_filter($valid_posts_query->posts, function ($post_id) {
+				$url = get_permalink($post_id);
+				return bwp_can_optimize_page_url($url);
+			});
+			$total_posts = count($valid_posts);
+
 			if ($query->have_posts()) {
 				while ($query->have_posts()) {
 					$query->the_post();
@@ -406,15 +422,14 @@ if (!class_exists('berqWP')) {
 					$cache_directory = bwp_get_cache_dir();
 					$cache_key = md5($url);
 					// $cache_key = md5($slug);
-					$cache_file = $cache_directory . $cache_key . '.html';
+					$cache_file = $cache_directory . $cache_key . '.gz';
 
-					if (file_exists($cache_file)) {
+					if (is_file($cache_file)) {
 						$status = '<span class="bwp-cache-tag completed">Completed</span>';
 
-						if (bwp_is_partial_cache($url) === true) {
-							$status = '<span class="bwp-cache-tag part-completed">Partial cache</span>';
-						}
-
+						// if (bwp_is_partial_cache($url) === true) {
+						// 	$status = '<span class="bwp-cache-tag part-completed">Partial cache</span>';
+						// }
 					} else {
 						$status = '<span class="bwp-cache-tag">Pending</span>';
 					}
@@ -462,6 +477,47 @@ if (!class_exists('berqWP')) {
 			return $concurrent_batches * 2;
 		}
 
+		function refresh_cache_stats()
+		{
+
+			check_ajax_referer('wp_rest', 'nonce');
+
+			$post_types = get_option('berqwp_optimize_post_types');
+			$args = array(
+				'post_type' => $post_types,
+				'posts_per_page' => -1,
+				'fields' => 'ids',
+				'post_status' => 'publish'
+			);
+			$query = new WP_Query($args);
+			$pages_to_exclude = get_option('berq_exclude_urls', []);
+			$total_pages = (int) $query->found_posts - count($pages_to_exclude);
+			$optimized_pages = bwp_cached_pages_count();
+
+			if (get_option('show_on_front') !== 'page') {
+				$total_pages++;
+			}
+
+			if (empty($total_pages) || $total_pages <= 0) {
+				$cached_percentage = 0;
+			} else {
+				$cached_percentage = round(($optimized_pages / $total_pages) * 100, 2);
+			}
+			if ($cached_percentage > 100) {
+				$cached_percentage = 100;
+			}
+
+			if ($cached_percentage < 0) {
+				$cached_percentage = 0;
+			}
+
+			$server_queue = get_option('berqwp_server_queue', []);
+
+			wp_send_json_success(['cache_count' => $optimized_pages, 'cache_percentage' => $cached_percentage, 'total' => $total_pages, 'server_queue' => count($server_queue)]);
+
+			die(); // Always exit in AJAX functions
+		}
+
 		function fetch_remote_html()
 		{
 
@@ -499,22 +555,21 @@ if (!class_exists('berqWP')) {
 					update_option('berqwp_license_key', $key);
 
 					if (is_admin()) {
-						?>
+?>
 						<div class="notice notice-success is-dismissible">
 							<?php esc_html_e('The BerqWP license has been activated for your parent multisite.', 'searchpro'); ?>
 						</div>
-						<?php
+					<?php
 					}
-
 				} elseif ($key_response->result == 'error') {
 					$error = $key_response->message;
 
 					if (is_admin()) {
-						?>
+					?>
 						<div class="notice notice-error is-dismissible">
 							<?php echo esc_html($error); ?>
 						</div>
-						<?php
+					<?php
 
 					}
 				}
@@ -548,11 +603,11 @@ if (!class_exists('berqWP')) {
 				// $this->disable_emoji();
 			}
 
-			if (is_admin() && isset($_GET['bwp_get_ip'])) {
-				$ip = file_get_contents('https://api.ipify.org');
-				echo 'Server Public IP Address: ' . $ip;
-				exit;
-			}
+			// if (is_admin() && isset($_GET['bwp_get_ip'])) {
+			// 	$ip = file_get_contents('https://api.ipify.org');
+			// 	echo 'Server Public IP Address: ' . $ip;
+			// 	exit;
+			// }
 
 			if (is_admin() && !empty(get_option('berqwp_license_key'))) {
 				$license_key = get_option('berqwp_license_key');
@@ -571,15 +626,11 @@ if (!class_exists('berqWP')) {
 
 						if ($key_response->product_ref !== 'AppSumo Deal') {
 							update_option('berqwp_can_use_fluid_images', 1);
-
 						} else {
 							update_option('berqwp_can_use_fluid_images', 0);
 							update_option('berqwp_sync_addons', true);
-
 						}
-
 					}
-
 				} else {
 					$this->is_key_verified = false;
 
@@ -613,75 +664,11 @@ if (!class_exists('berqWP')) {
 				header('location: ' . esc_url(get_site_url() . add_query_arg($_GET)));
 				exit;
 			}
-
 		}
 
 		function save_settings()
 		{
 			require_once optifer_PATH . '/admin/save-settings.php';
-		}
-
-		function berqwp_cleanup_completed_and_failed_tasks()
-		{
-
-			if (!get_transient('berqwp_action_cleanup')) {
-				set_transient('berqwp_action_cleanup', true, 60 * 60 * 10);
-
-				global $berq_log;
-				$berq_log->info("* * * * * * * * *");
-				$berq_log->info("* Task Cleanup");
-				$berq_log->info("* * * * * * * * *");
-
-				global $wpdb;
-
-				// Define the hook name
-				$hook_name = 'warmup_cache_by_slug';
-
-				// Count the number of completed and failed actions for the given hook
-				$count = $wpdb->get_var(
-					$wpdb->prepare(
-						"SELECT COUNT(*) FROM {$wpdb->prefix}actionscheduler_actions WHERE hook = %s AND (status = 'complete' OR status = 'failed')",
-						$hook_name
-					)
-				);
-
-				$berq_log->info("Completed + failed task count: $count");
-
-				// Check if the count exceeds 50
-				if ($count > 50) {
-					$delete_count = $count - 50; // Calculate how many rows to delete
-
-					$berq_log->info("Deleting last $delete_count");
-
-					$wpdb->query(
-						$wpdb->prepare(
-							"DELETE FROM {$wpdb->prefix}actionscheduler_actions WHERE hook = %s AND (status = 'complete' OR status = 'failed') ORDER BY scheduled_date_gmt ASC LIMIT %d",
-							$hook_name,
-							$delete_count
-						)
-					);
-				}
-
-				// clear logs, keep the last 1000
-				if (class_exists('ActionScheduler_QueueRunner')) {
-					global $wpdb;
-					$table_name = $wpdb->prefix . 'actionscheduler_logs';
-
-					// Count the total number of logs
-					$total_logs = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
-
-					// Set the limit to keep the latest 1000 logs
-					$limit = max(0, $total_logs - 1000);
-
-					// Delete logs beyond the limit
-					$wpdb->query("DELETE FROM $table_name WHERE log_date_gmt < (SELECT log_date_gmt FROM $table_name ORDER BY log_date_gmt DESC LIMIT 1 OFFSET $limit)");
-				}
-
-				$berq_log->info("* * * * * * * * * *");
-				$berq_log->info("* Task Cleanup End");
-				$berq_log->info("* * * * * * * * * *");
-
-			}
 		}
 
 		function notices()
@@ -714,26 +701,21 @@ if (!class_exists('berqWP')) {
 					<div class="notice notice-error">
 						<p><strong>Error:</strong> <?php echo $plugin_name; ?> license key has expired. Please renew your subscription.</p>
 					</div>
-					<?php
+				<?php
 				}
 			}
 
 			// Check connection
-			$check_rest = bwp_check_connection(false, !empty($_GET['bwp_connection_test']) === true);
-			if ($check_rest['status'] == 'error') {
-				bwp_notice('error', 'Website Unreachable: Connection Blocked', "<p>$plugin_name server is unable to access this website, please whitelist our server IP address. <a href='https://berqwp.com/help-center/get-started-with-berqwp/' target='_blank'>Find our server IP address here.</a></p>", [
-					[
-						'href' => esc_attr(add_query_arg(['bwp_connection_test' => true], get_admin_url())),
-						'text' => 'Check again',
-						'classes' => '',
-					]
-				]);
-				?>
-				<!-- <div class="notice notice-error">
-					<p><strong>Error:</strong> <?php echo $plugin_name; ?> server is unable to access this website, please whitelist our server IP address. <a href="https://berqwp.com/help-center/get-started-with-berqwp/" target="_blank">Find our server IP address here.</a></p>
-				</div> -->
-				<?php
-			}
+			// $check_rest = bwp_check_connection(false, !empty($_GET['bwp_connection_test']) === true);
+			// if ($check_rest['status'] == 'error') {
+			// 	bwp_notice('error', 'Website Unreachable: Connection Blocked', "<p>$plugin_name server is unable to access this website, please whitelist our server IP address. <a href='https://berqwp.com/help-center/get-started-with-berqwp/' target='_blank'>Find our server IP address here.</a></p>", [
+			// 		[
+			// 			'href' => esc_attr(add_query_arg(['bwp_connection_test' => true], get_admin_url())),
+			// 			'text' => 'Check again',
+			// 			'classes' => '',
+			// 		]
+			// 	]);
+			// }
 
 			// Check Permissions
 			$cache_directory = WP_CONTENT_DIR . '/cache/berqwp/';
@@ -749,7 +731,6 @@ if (!class_exists('berqWP')) {
 
 			if (defined('BERQWP_ADVANCED_CACHE_PATH')) {
 				$adv_cache_path = BERQWP_ADVANCED_CACHE_PATH;
-
 			} else {
 				$adv_cache_path = WP_CONTENT_DIR . '/advanced-cache.php';
 			}
@@ -789,6 +770,45 @@ if (!class_exists('berqWP')) {
 				// echo wp_kses_post($notice);
 			}
 
+			// purge single page notice
+			if (get_transient('berq_purge_page_notice')) {
+				$flushed_page = esc_url(get_transient('berq_purge_page_notice'));
+				delete_transient('berq_purge_page_notice');
+				bwp_notice('success', '', "<p>Page cache has been flushed for $flushed_page.</p>", []);
+			}
+
+			// purge all cache notice
+			if (get_transient('berq_cache_cleared_notice')) {
+				delete_transient('berq_cache_cleared_notice');
+				bwp_notice('success', '', '<p>The cache has been cleared. Our automatic cache warm-up system will generate the cache. Alternatively, you can
+                        visit any page to create its cache immediately.</p>', []);
+			}
+
+			// purge cdn cache notice
+			if (get_transient('berq_purge_cdn_notice')) {
+				delete_transient('berq_purge_cdn_notice');
+				bwp_notice('success', '', '<p>The CDN and page cache have been flushed.</p>', []);
+			}
+
+			// purge critical css cache notice
+			if (get_transient('berq_purge_criticalcss_notice')) {
+				delete_transient('berq_purge_criticalcss_notice');
+				bwp_notice('success', '', '<p>Critical CSS cache has been flushed from the cloud.</p>', []);
+			}
+
+			// cache warmup notice
+			if (get_transient('berq_cache_warmup_notice')) {
+				delete_transient('berq_cache_warmup_notice');
+				bwp_notice('success', 'Cache Warmup Queued', '<p>The cache warmup has been added to the queue. Your website pages will be optimized in the background and ready soon.</p>', []);
+			}
+
+			// force page cache notice
+			if (get_transient('berq_force_cache_notice')) {
+				$forced_page = esc_url(get_transient('berq_force_cache_notice'));
+				delete_transient('berq_force_cache_notice');
+				bwp_notice('success', '', "<p>The cache for page ($forced_page) has been queued with high priority and will be generated soon.</p>", []);
+			}
+
 			if (get_option('bwp_require_flush_cache', false)) {
 				bwp_notice('warning', 'Cache Flush Required', '<p>To apply the changes, please flush the cache.</p>', [
 					[
@@ -797,16 +817,6 @@ if (!class_exists('berqWP')) {
 						'classes' => '',
 					]
 				]);
-			}
-
-			if (berq_is_localhost()) {
-				?>
-				<div class="notice notice-warning">
-					<?php
-					echo wp_kses_post(__("<p><b>Localhost Detected:</b> $plugin_name doesn't operate in a localhost environment.</p>", 'searchpro'));
-					?>
-				</div>
-				<?php
 			}
 
 
@@ -841,7 +851,7 @@ if (!class_exists('berqWP')) {
 
 					<input type="submit" class="button-secondary alignright" value="Deactivate Conflicting Plugins">
 				</form>
-				<?php
+<?php
 				echo wp_kses_post("<ul>$plugins_to_deactivate</ul>");
 				echo '</div>';
 			}
@@ -850,9 +860,7 @@ if (!class_exists('berqWP')) {
 		function berq_post_types()
 		{
 			// Get post type names
-			$post_type_names = get_post_types(array(
-				'public' => true,
-			), 'names');
+			$post_type_names = get_post_types(['public' => true, 'exclude_from_search' => false], 'names');
 			unset($post_type_names['attachment']);
 
 			// var_dump($post_type_names);
@@ -862,9 +870,6 @@ if (!class_exists('berqWP')) {
 
 			// Save the names in a WordPress option
 			update_option('berqwp_post_type_names', $post_type_names);
-
-			//  Cleanup actions
-			// $this->berqwp_cleanup_completed_and_failed_tasks();
 		}
 
 		function plugin_settings_links($links)
@@ -995,14 +1000,12 @@ if (!class_exists('berqWP')) {
 						$client->setUserAgent('BerqWP');
 						$client->post('?' . $query_string, $api_params);
 
-						$berq_log->info(print_r($client->getContent(), true));
+						// $berq_log->info(print_r($client->getContent(), true));
 
 						if ($client->ok()) {
 							$response = $client->getContent();
 						}
-
 					}
-
 				}
 
 				if ($action !== 'slm_check') {
@@ -1022,7 +1025,7 @@ if (!class_exists('berqWP')) {
 					$client->setUserAgent('BerqWP');
 					$client->post('?' . $query_string, $api_params);
 
-					$berq_log->info(print_r($client->getContent(), true));
+					// $berq_log->info(print_r($client->getContent(), true));
 
 					if ($client->ok()) {
 						$response = $client->getContent();
@@ -1047,7 +1050,6 @@ if (!class_exists('berqWP')) {
 							$domain_found = true;
 							break;
 						}
-
 					}
 
 					if ($domain_found) {
@@ -1055,7 +1057,6 @@ if (!class_exists('berqWP')) {
 						// set_transient($transient_key, $cached_response, 24 * HOUR_IN_SECONDS);
 						update_option($transient_key, $cached_response);
 						update_option($expire_transient_key, time() + MONTH_IN_SECONDS);
-
 					} else {
 
 						delete_option($transient_key);
@@ -1063,7 +1064,6 @@ if (!class_exists('berqWP')) {
 						delete_option('berqwp_license_key');
 
 						return false;
-
 					}
 				}
 
@@ -1084,7 +1084,6 @@ if (!class_exists('berqWP')) {
 
 			// Return the cached response
 			return $cached_response;
-
 		}
 
 		// Disable emoji functionality
@@ -1113,25 +1112,25 @@ if (!class_exists('berqWP')) {
 			}
 		}
 
-		function clear_cache(WP_REST_Request $request)
-		{
-			require_once optifer_PATH . 'api/clear_cache.php';
-		}
+		// function clear_cache(WP_REST_Request $request)
+		// {
+		// 	require_once optifer_PATH . 'api/clear_cache.php';
+		// }
 
-		function warmup_cache(WP_REST_Request $request)
-		{
-			require_once optifer_PATH . 'api/warmup_cache.php';
-		}
+		// function warmup_cache(WP_REST_Request $request)
+		// {
+		// 	require_once optifer_PATH . 'api/warmup_cache.php';
+		// }
 
-		function store_cache(WP_REST_Request $request)
-		{
-			require_once optifer_PATH . 'api/store_cache.php';
-		}
+		// function store_cache(WP_REST_Request $request)
+		// {
+		// 	require_once optifer_PATH . 'api/store_cache.php';
+		// }
 
-		function store_javascript_cache(WP_REST_Request $request)
-		{
-			require_once optifer_PATH . 'api/store_javascript_cache.php';
-		}
+		// function store_javascript_cache(WP_REST_Request $request)
+		// {
+		// 	require_once optifer_PATH . 'api/store_javascript_cache.php';
+		// }
 
 		function register_menu()
 		{
@@ -1150,12 +1149,8 @@ if (!class_exists('berqWP')) {
 				require_once optifer_PATH . 'admin/admin-page.php';
 			} else {
 				require_once optifer_PATH . 'admin/intro-page.php';
-
 			}
-
 		}
-
-
 	}
 
 	global $berqWP;

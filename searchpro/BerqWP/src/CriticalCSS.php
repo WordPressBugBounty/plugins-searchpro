@@ -1,7 +1,7 @@
 <?php
 
 namespace BerqWP;
-use GuzzleHttp\Exception\RequestException;
+use BerqWP\GuzzleHttp\Exception\RequestException;
 
 class CriticalCSS {
     protected $client = null;

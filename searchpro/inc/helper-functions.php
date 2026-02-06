@@ -1,8 +1,11 @@
 <?php
+
+use BerqWP\BerqWP;
+use function BerqWP\Vendor\SimpleHtmlDom\berqwp_str_get_html;
+
 if (!defined('ABSPATH'))
     exit;
 
-use BerqWP\BerqWP;
 
 function berqwp_is_slug_excludable($slug)
 {
@@ -17,7 +20,6 @@ function berqwp_is_slug_excludable($slug)
         "elementor_library=",
         "add_to_wishlist=",
         "robots.txt",
-        ".html",
         ".php",
         "run_warmup=",
         "et-compare-page=",
@@ -139,6 +141,8 @@ function berqwp_is_slug_excludable($slug)
         "?",
         "/embed",
         "/view-order/",
+        "/redirect/",
+        "/elementskit-content/",
     ];
 
     $exclude_items = apply_filters('berqwp_exclude_slug_match', $exclude_items);
@@ -160,16 +164,9 @@ function berqwp_get_page_params($page_url, $is_forced = false)
     }
 
     $page_slug = bwp_url_into_path($page_url);
-    $cache_directory = bwp_get_cache_dir();
-    $cache_file = $cache_directory . $page_url . '.html';
-    // $key = uniqid();
     $key = '';
-    // $cache_max_life = @filemtime($cache_file) + (18 * 60 * 60);
-
-    // if (!file_exists($cache_file) || (file_exists($cache_file) && $cache_max_life < time()) || (file_exists($cache_file) && bwp_is_partial_cache($slug) === true)) {
-    //     // Priority 1
-    //     $key = '';
-    // }
+    $berqconfigs = new berqConfigs();
+    $berqwp_configs = $berqconfigs->get_configs();
 
     $optimization_mode = get_option('berq_opt_mode');
 
@@ -185,6 +182,7 @@ function berqwp_get_page_params($page_url, $is_forced = false)
 
     // Data to send as POST parameters
     $post_data = array(
+        'site_id' => $berqwp_configs['site_id'],
         'license_key' => get_option('berqwp_license_key'),
         'page_url' => $page_url,
         'page_slug' => $page_slug,
@@ -209,6 +207,7 @@ function berqwp_get_page_params($page_url, $is_forced = false)
         'preload_cookiebanner' => get_option('berqwp_preload_cookiebanner'),
         'css_optimization' => get_option('berq_css_optimization'),
         'js_optimization' => get_option('berq_js_optimization'),
+        'exclude_cdn' => get_option('berq_exclude_cdn', []),
         'version' => BERQWP_VERSION
     );
 
@@ -216,14 +215,20 @@ function berqwp_get_page_params($page_url, $is_forced = false)
         $post_data['fluid_images'] = 0;
     }
 
-    if (defined('BERQ_STAGING') || $is_forced) {
+    if (defined('BERQ_STAGING')) {
         $post_data['run_queue'] = 1;
         $post_data['doing_queue'] = true;
     }
 
+    if ($page_url == home_url('/')) {
+        $is_forced = true;
+    }
+
+    if ($is_forced) {
+        $post_data['force'] = true;
+    }
+
     return $post_data;
-
-
 }
 
 function bwp_pass_account_requirement()
@@ -263,10 +268,10 @@ function bwp_pass_account_requirement()
 
 function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
 {
+
     if (empty($page_url)) {
         return;
     }
-
 
     if (empty(get_option('berqwp_license_key'))) {
         return;
@@ -281,7 +286,8 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
         return;
     }
 
-    // Avoid caching file URLs e.g .php .html
+    // Avoid caching file URLs e.g .php
+    // Allow .html
     if (berqwp_is_file_url($page_url)) {
         return;
     }
@@ -296,17 +302,6 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
         return;
     }
 
-    // Return if Photon Engine cache can't access this site
-    $check_connection = bwp_check_connection(true);
-    if ($check_connection['status'] == 'error') {
-        global $berq_log;
-        // $berq_log->error('Exiting cache warmup by slug, website is unaccessible.');
-        return;
-    }
-
-    // Prepare post data for this page
-    $post_data = berqwp_get_page_params($page_url, $is_forced);
-
     global $berq_log;
     $berq_log->info('warming page: ' . $page_url);
 
@@ -317,15 +312,28 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
         $timeout = 1;
     }
 
-    $berqwp->request_cache($post_data, $timeout);
+    $queue = get_option('berqwp_optimize_queue', []);
+    $key = md5($page_url);
 
+    if (!isset($queue[$key])) {
+        $queue[$key] = [
+            'url' => $page_url,
+            'added' => time(),
+            'priority' => $is_forced ? 1 : 5,
+            'attempts' => 0
+        ];
+
+        update_option('berqwp_optimize_queue', $queue, false);
+    }
+
+    // $berqwp->request_cache($post_data, $timeout);
 }
 
 function bwp_is_home_cached()
 {
     $slug_md5 = md5(bwp_admin_home_url('/'));
     $cache_directory = bwp_get_cache_dir();
-    $cache_file = $cache_directory . $slug_md5 . '.html';
+    $cache_file = $cache_directory . $slug_md5 . '.gz';
 
     return file_exists($cache_file);
 }
@@ -375,15 +383,10 @@ function bwp_cache_current_page()
 
     warmup_cache_by_url($bwp_current_page, false, false);
     $bwp_current_page = null;
-
 }
 
 function bwp_is_partial_cache($identifier)
 {
-
-    if (!function_exists('str_get_html')) {
-        require_once optifer_PATH . '/simplehtmldom/simple_html_dom.php';
-    }
 
     $cache_directory = bwp_get_cache_dir();
     $cache_key = md5($identifier);
@@ -393,7 +396,7 @@ function bwp_is_partial_cache($identifier)
         $buffer = file_get_contents($cache_file);
 
         if (!empty($buffer)) {
-            $html = str_get_html($buffer);
+            $html = berqwp_str_get_html($buffer);
 
             if ($html !== false) {
                 $style_tag = $html->find('style#berqwp-critical-css', 0);
@@ -402,12 +405,10 @@ function bwp_is_partial_cache($identifier)
                     return true;
                 }
             }
-
         }
     }
 
     return false;
-
 }
 
 function berq_is_localhost()
@@ -538,7 +539,6 @@ function berqwp_current_page_cache_file()
     $cache_file = $cache_directory . $cache_key . '.html';
 
     return $cache_file;
-
 }
 
 function berqwp_get_LCP_details($url, $device = 'mobile')
@@ -645,32 +645,50 @@ function berqwp_enable_advanced_cache($status)
 }
 
 // Copied from Nginx Helper plugin
+// function berqwp_unlink_recursive($dir)
+// {
+
+//     if (!is_dir($dir)) {
+//         return;
+//     }
+
+//     $dh = opendir($dir);
+
+//     if (!$dh) {
+//         return;
+//     }
+
+//     // phpcs:ignore -- WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Variable assignment required for recursion.
+//     while (false !== ($obj = readdir($dh))) {
+
+//         if ('.' === $obj || '..' === $obj) {
+//             continue;
+//         }
+
+//         if (!@unlink($dir . '/' . $obj)) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+//             berqwp_unlink_recursive($dir . '/' . $obj, false);
+//         }
+//     }
+
+//     closedir($dh);
+// }
+
 function berqwp_unlink_recursive($dir)
 {
 
     if (!is_dir($dir)) {
-        return;
+        return false;
     }
 
-    $dh = opendir($dir);
+    $files = glob($dir . '/*'); // get all files in the directory
 
-    if (!$dh) {
-        return;
-    }
-
-    // phpcs:ignore -- WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Variable assignment required for recursion.
-    while (false !== ($obj = readdir($dh))) {
-
-        if ('.' === $obj || '..' === $obj) {
-            continue;
-        }
-
-        if (!@unlink($dir . '/' . $obj)) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-            berqwp_unlink_recursive($dir . '/' . $obj, false);
+    foreach ($files as $file) {
+        if (is_file($file)) {
+            if (!unlink($file)) {
+                error_log("Failed to delete file: $file");
+            }
         }
     }
-
-    closedir($dh);
 }
 
 function berqwp_get_last_modified_timestamp()
@@ -741,7 +759,7 @@ function bwp_is_gzip_supported()
 function bwp_cached_pages_count()
 {
     $cache_directory = optifer_cache . DIRECTORY_SEPARATOR . 'html';
-    $cache_files = glob($cache_directory . DIRECTORY_SEPARATOR . "*.html");
+    $cache_files = glob($cache_directory . DIRECTORY_SEPARATOR . "*.gz");
     return count($cache_files);
 }
 
@@ -884,7 +902,6 @@ function berq_rest_verify_license_callback(WP_REST_Request $request)
         global $berq_log;
         $berq_log->error("Exiting... Invalid license key.");
         return new WP_Error('rest_invalid_nonce', __('Invalid license key', 'searchpro'), array('status' => 403));
-
     }
 
     return true; // Return true to allow the request
@@ -892,7 +909,7 @@ function berq_rest_verify_license_callback(WP_REST_Request $request)
 
 function bwp_dash_notification($msg = '', $status = 'warning')
 {
-    ?>
+?>
     <div class="berqwp-notification <?php echo esc_attr($status) ?>">
         <?php
 
@@ -910,7 +927,7 @@ function bwp_dash_notification($msg = '', $status = 'warning')
         echo esc_html($msg);
         ?>
     </div>
-    <?php
+<?php
 }
 
 function bwp_can_warmup_cache($identifier)
@@ -920,7 +937,6 @@ function bwp_can_warmup_cache($identifier)
 
         set_transient('bwp_warmup_lock_' . md5($identifier), true, 100);
         return true;
-
     }
 
     return false;
@@ -1008,7 +1024,6 @@ function update_image_url_extension($image_url, $file_extension)
     $new_image_url = implode('.', $url_arr);
 
     return $new_image_url;
-
 }
 
 if (!function_exists('str_contains')) {
@@ -1020,13 +1035,13 @@ if (!function_exists('str_contains')) {
 
 function bwp_check_connection($short_live = false, $force = false)
 {
-    
+
     $transient_key = "berqwp_connection_status";
 
     if ($force) {
         delete_transient('berqwp_connection_status');
         delete_transient('berqwp_connection_status_sl');
-    } 
+    }
 
     // Allow cache busting by passing $force_check = true
     // if ($force_check) {
@@ -1047,7 +1062,7 @@ function bwp_check_connection($short_live = false, $force = false)
     // Perform the actual REST API check
     $response = wp_safe_remote_get('https://boost.berqwp.com/photon/?connection_test=1&url=' . bwp_admin_home_url('/?utm_source=' . time()), ['timeout' => 60]);
 
-    if (is_wp_error($response)) {
+    if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) {
         return ['status' => 'success']; // Skip if server is unreachable
         // $result = array(
         //     'status' => 'error',
@@ -1071,10 +1086,8 @@ function bwp_check_connection($short_live = false, $force = false)
 
     if ($short_live) {
         set_transient($transient_key, $result, 60 * 5);
-
     } else {
         set_transient($transient_key, $result, 60 * 60 * 24);
-
     }
 
     return $result;
@@ -1389,7 +1402,6 @@ function bwp_show_account()
     }
 
     return true;
-
 }
 
 function bwp_show_docs()
@@ -1404,7 +1416,6 @@ function bwp_show_docs()
     }
 
     return true;
-
 }
 
 function bwp_admin_home_url($relative_path = '')
@@ -1442,7 +1453,6 @@ function bwp_intersect_str($str1, $str2)
         }
 
         $str2 = implode('/', $arr2);
-
     }
 
     return $str2;
@@ -1456,11 +1466,9 @@ function bwp_is_tab($tab_id)
         if (sanitize_text_field($_GET['tab_id']) == $tab_id) {
             // echo ' style="display:block" ';
             echo ' style="visibility:visible;opacity:1;height:auto;" ';
-
         } else {
             // echo ' style="display:none" ';
             echo ' style="visibility:hidden;opacity:0;height:0;overflow:hidden;" ';
-
         }
     } else {
 
@@ -1482,7 +1490,6 @@ function bwp_is_tab_nav($tab_id)
         if (sanitize_text_field($_GET['tab_id']) == $tab_id) {
             echo ' active ';
         }
-
     } else {
 
         if ($tab_id == $default_tab) {
@@ -1493,7 +1500,7 @@ function bwp_is_tab_nav($tab_id)
 
 function bwp_notice($status = '', $title = null, $message = null, $btn = [], $dismissible = false)
 {
-    ?>
+?>
     <div
         class="bwp-notice <?php echo 'status-' . esc_attr($status); ?> <?php echo $dismissible ? 'dismissible' : ''; ?> <?php echo empty($title) ? 'no-title' : ''; ?>">
         <?php if ($dismissible) { ?>
@@ -1538,20 +1545,20 @@ function bwp_notice($status = '', $title = null, $message = null, $btn = [], $di
                         if (empty($bwp_btn['text'])) {
                             $bwp_btn['text'] = '';
                         }
-                        ?>
+                    ?>
                         <a target="<?php echo esc_attr($bwp_btn['target']) ?? ''; ?>"
                             href="<?php echo esc_attr($bwp_btn['href']) ?? ''; ?>"
                             class="bwp-btn <?php echo esc_attr($bwp_btn['classes']) ?? ''; ?>">
                             <?php echo esc_html__($bwp_btn['text'], 'searchpro') ?? ''; ?>
                         </a>
-                        <?php
+                    <?php
                     }
                     ?>
                 </div>
             <?php } ?>
         </div>
     </div>
-    <?php
+<?php
 }
 
 function bwp_is_option_updated($option_name)
@@ -1622,9 +1629,7 @@ function bwp_display_logs()
         echo '<h2>BerqWP Logs</h2>';
         echo '<pre style="background:#f4f4f4;padding:15px;border:1px solid #ddd;">' . esc_html($logs) . '</pre>';
         exit;
-
     }
-
 }
 
 function bwp_cf_flush_all()
@@ -1738,7 +1743,7 @@ function berqwp_is_page_url_excluded($page_url)
 function berqwp_appendHtmlToBody($buffer, $htmlToAppend)
 {
     // Load the $buffer content into Simple HTML DOM
-    $html = str_get_html($buffer);
+    $html = berqwp_str_get_html($buffer);
 
     if (!$html) {
         return $buffer;
@@ -1765,7 +1770,6 @@ function berqwp_setup_dropin()
 {
     if (defined('BERQWP_ADVANCED_CACHE_PATH')) {
         $adv_cache_path = BERQWP_ADVANCED_CACHE_PATH;
-
     } else {
         $adv_cache_path = WP_CONTENT_DIR . '/advanced-cache.php';
     }
@@ -1796,9 +1800,7 @@ function berqwp_setup_dropin()
 
             // Enable wp cache in wp-config.php
             berqwp_enable_advanced_cache(true);
-
         }
-
     }
 
 
@@ -1815,14 +1817,21 @@ function berqwp_is_file_url($url)
 
     $extension = pathinfo($parsed['path'], PATHINFO_EXTENSION);
 
+    // allow html pages
+    if (strtolower($extension) === 'html' || strtolower($extension) === 'htm') {
+        return false;
+    }
+
     // Returns true if there is a file extension, false otherwise
     return !empty($extension);
 }
 
 function berqwp_clear_cache_queue()
 {
+    $berqconfigs = new berqConfigs();
+    $site_id = $berqconfigs->get_configs()['site_id'];
     $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
-    $berqwp->clear_cache_queue(home_url());
+    $berqwp->clear_cache_queue(home_url(), $site_id);
 }
 
 function berqwp_sync_addons($license_key, $site_url)
@@ -1862,11 +1871,53 @@ function berqwp_sync_addons($license_key, $site_url)
         if ($enable_fluid_images && !get_option('berqwp_can_use_fluid_images')) {
             update_option('berqwp_can_use_fluid_images', 1);
             update_option('bwp_require_flush_cache', 1);
-
         } elseif (!$enable_fluid_images) {
             update_option('berqwp_can_use_fluid_images', 0);
         }
-
     }
+}
 
+function berqwp_validate_url_array($urls)
+{
+    $home_host = parse_url(home_url(), PHP_URL_HOST);
+    $home_scheme = parse_url(home_url(), PHP_URL_SCHEME);
+
+    $urls = array_filter($urls, function ($url) use ($home_host) {
+        $url_host = parse_url($url, PHP_URL_HOST);
+
+        // Relative URLs → treat as same host
+        if (empty($url_host)) {
+            return true;
+        }
+
+        return $url_host === $home_host;
+    });
+
+    $urls = array_map(function ($url) use ($home_scheme) {
+        // Skip invalid URLs
+        if (!is_string($url) || $url === '') {
+            return $url;
+        }
+
+        $parts = parse_url($url);
+
+        // Relative URL → leave as-is
+        if (empty($parts['scheme'])) {
+            return $url;
+        }
+
+        // Rebuild URL with home scheme
+        $parts['scheme'] = $home_scheme;
+
+        $new_url  = $parts['scheme'] . '://';
+        $new_url .= $parts['host'] ?? '';
+        $new_url .= isset($parts['port']) ? ':' . $parts['port'] : '';
+        $new_url .= $parts['path'] ?? '';
+        $new_url .= isset($parts['query']) ? '?' . $parts['query'] : '';
+        $new_url .= isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
+
+        return $new_url;
+    }, $urls);
+
+    return $urls;
 }

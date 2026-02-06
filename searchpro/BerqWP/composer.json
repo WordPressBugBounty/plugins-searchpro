@@ -6,12 +6,27 @@
         "php": ">=7.4",
         "guzzlehttp/guzzle": "^7.0"
     },
+    "require-dev": {
+        "humbug/php-scoper": "^0.18"
+    },
     "autoload": {
         "psr-4": {
             "BerqWP\\": "src/"
-        }
+        },
+        "classmap": [
+            "src/Vendor/SimpleHtmlDom/simple_html_dom.php"
+        ]
+    },
+    "scripts": {
+        "scope": "@php vendor/bin/php-scoper add-prefix --config=scoper.inc.php --output-dir=vendor-scoped --force --no-interaction",
+        "build": [
+            "@scope",
+            "echo 'Build complete. Scoped dependencies in vendor-scoped/'"
+        ]
     },
     "config": {
+        "disable-tls": true,
+        "secure-http": false,
         "platform": {
             "php": "7.4.0"
         }

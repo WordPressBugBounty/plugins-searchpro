@@ -7,14 +7,17 @@ use BerqWP\BerqWP;
 class berqWooCommerce extends berqIntegrations {
     function __construct() {
         add_action( 'woocommerce_product_set_stock_status', [$this, 'flush_product_cache'] );
-        // add_action( 'woocommerce_delete_product_transients', [$this, 'flush_product_cache'] );
+
+        if (!class_exists('\JtlWooCommerceConnector\Controllers\ProductController')) {
+            add_action( 'woocommerce_delete_product_transients', [$this, 'flush_product_cache'] );
+        }
 
         add_action( 'wc_delete_related_product_transients_async', function () {
             add_filter( 'berqwp_can_flush_cache_on_post_update', '__return_false' );
         } );
 
         add_action('woocommerce_scheduled_sales', [$this, 'product_sale_end_actions']);
-        add_filter('berqwp_purge_home_post_types', [$this, 'purge_home']);
+        // add_filter('berqwp_purge_home_post_types', [$this, 'purge_home']);
         
     }
 

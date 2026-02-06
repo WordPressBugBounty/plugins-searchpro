@@ -1,5 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
+$berqconfigs = new berqConfigs();
+$berqwp_configs = $berqconfigs->get_configs();
 
 if (get_option('berqwp_enable_sandbox') === false) {
     update_option('berqwp_enable_sandbox', 0, false);
@@ -89,6 +91,16 @@ if (get_option('berq_ignore_urls_params') === false) {
     update_option('berq_ignore_urls_params', ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'msclkid'], false);
 }
 
+if (empty($berqwp_configs['site_id'])) {
+    $blog_id     = get_current_blog_id();
+    $network_id  = function_exists('get_current_network_id') ? get_current_network_id() : 1;
+    $siteurl     = get_option('siteurl');
+    $site_id = md5("berqwp|$network_id|$blog_id|$siteurl");
+
+    $berqconfigs->update_configs(['site_id' => $site_id]);
+}
+
+
 // if (get_option('berq_exclude_urls', null) == null) {
 //     $exclude_urls = [];
 
@@ -116,16 +128,23 @@ if (get_option('berq_exclude_urls', []) !== null) {
     if (class_exists('WooCommerce')) {
         $cart_url = wc_get_cart_url();
         $checkout_url = wc_get_checkout_url();
+        $should_update = false;
 
         if (!empty($cart_url) && !in_array($cart_url, $urls) && trailingslashit($cart_url) !== trailingslashit(home_url())) {
             $urls[] = esc_url($cart_url);
+            $should_update = true;
         }
 
         if (!empty($checkout_url) && !in_array($checkout_url, $urls) && trailingslashit($checkout_url) !== trailingslashit(home_url())) {
             $urls[] = esc_url($checkout_url);
+            $should_update = true;
         }
 
-        update_option('berq_exclude_urls', $urls, false);
+        if ($should_update) {
+            $berqconfigs->update_configs(['exclude_urls'=>$urls]);
+            update_option('berq_exclude_urls', $urls, false);
+
+        }
 
     }
 }

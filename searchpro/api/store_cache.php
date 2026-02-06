@@ -7,6 +7,7 @@ $html = base64_decode($request->get_param('html'));
 $slug = $request->get_param('page_slug');
 
 if ($status == 'success' && !empty($request->get_param('html'))) {
+    global $berq_log;
 
     // Allow other plugins to modify cache html
     $html = apply_filters( 'berqwp_cache_buffer', $html );
@@ -20,6 +21,11 @@ if ($status == 'success' && !empty($request->get_param('html'))) {
     }
 
     $cache_file = $cache_directory . md5($slug) . '.html';
+
+    if ($html) {
+        $berq_log->info("Empty html cache: $page_url");
+        exit;
+    }
     
     // update_option( md5($slug), $key );
     file_put_contents($cache_file, $html);
@@ -33,7 +39,6 @@ if ($status == 'success' && !empty($request->get_param('html'))) {
     
     do_action('berqwp_stored_page_cache', $slug);
     
-    global $berq_log;
     $berq_log->info("Stored cache for $slug");
 
     // Cache is stored which means connection is stable

@@ -238,7 +238,6 @@ class ignoreParams {
         'ksref',
         'l',
         'label',
-        'lang',
         'ldtag_cl',
         'level1',
         'level2',

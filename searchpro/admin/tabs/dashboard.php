@@ -38,6 +38,7 @@ if ($cached_percentage < 0) {
     <?php if (bwp_show_docs()) { ?>
     <div class="berq-info-box guide">
         <div class="berq-box-content">
+            <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-marked-icon lucide-book-marked"><path d="M10 2v8l3-3 3 3V2"/><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg></div>
             <p><?php esc_html_e('Guide:', 'searchpro'); ?> <a href="https://berqwp.com/help-center/get-started-with-berqwp/" target="_blank"><?php esc_html_e('Get Started With BerqWP', 'searchpro'); ?></a></p>
         </div>
             
@@ -45,7 +46,7 @@ if ($cached_percentage < 0) {
     <?php } ?>
 
     <?php 
-    if (!bwp_is_home_cached() || (bwp_is_home_cached() && bwp_is_partial_cache(bwp_admin_home_url('/'))) ) {
+    if (!bwp_is_home_cached()) {
         bwp_dash_notification("We're currently building the cache for this website's homepage, which may take up to 5 minutes. Thank you for your patience, good things are worth the wait.", 'warning');
     }
     ?>
@@ -80,7 +81,7 @@ if ($cached_percentage < 0) {
                 $cache_directory = bwp_get_cache_dir();
                 // $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
                 $home_url = bwp_admin_home_url('/');
-                $is_home_ready = file_exists($cache_directory . md5($home_url) . '.html') && bwp_is_partial_cache($home_url) === false;
+                $is_home_ready = file_exists($cache_directory . md5($home_url) . '.gz');
                 $msg = '';
 
                 if (get_option('berqwp_enable_sandbox')) {
@@ -107,7 +108,7 @@ if ($cached_percentage < 0) {
                 $cache_directory = bwp_get_cache_dir();
                 // $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
                 $home_url = bwp_admin_home_url('/');
-                $is_home_ready = file_exists($cache_directory . md5($home_url) . '.html') && bwp_is_partial_cache($home_url) === false;
+                $is_home_ready = file_exists($cache_directory . md5($home_url) . '.gz');
                 $msg = '';
 
                 if (get_option('berqwp_enable_sandbox')) {
@@ -126,7 +127,7 @@ if ($cached_percentage < 0) {
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Cached Pages', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <div class="cache-percentage"><p><b><?php echo $cached_percentage; ?>%</b> (<?php echo $cached_pages; ?>) of your pages are currently cached.</p></div>
+            <div class="cache-percentage"><p><b><?php echo $cached_percentage; ?>%</b> (<?php echo $cached_pages; ?>) of your pages are currently cached. <span class="bwp-cache-count"></span><span class="bwp-pending-optimization"></span></p></div>
             <div class="cached-pages-bar">
                 <div class="progress-bar" style="width:<?php echo $cached_percentage; ?>%"></div>
             </div>
@@ -227,17 +228,6 @@ if ($cached_percentage < 0) {
             <label class="berq-check">
                 <input type="checkbox" name="berqwp_enable_sandbox" <?php checked(1, get_option('berqwp_enable_sandbox'), true); ?>>
                 <?php esc_html_e('Enable sandbox', 'searchpro'); ?>
-            </label>
-        </div>
-    </div>
-
-    <div class="berq-info-box">
-        <h3 class="berq-box-title"><?php esc_html_e("$plugin_name CDN", 'searchpro'); ?></h3>
-        <div class="berq-box-content">
-            <p><?php esc_html_e("$plugin_name CDN delivers static files instantly to enhance website performance and user experience.", 'searchpro'); ?></p>
-            <label class="berq-check">
-                <input type="checkbox" name="berqwp_enable_cdn" <?php checked(1, get_option('berqwp_enable_cdn'), true); ?>>
-                <?php esc_html_e("Enable $plugin_name CDN", 'searchpro'); ?>
             </label>
         </div>
     </div>

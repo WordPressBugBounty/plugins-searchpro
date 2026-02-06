@@ -1,8 +1,10 @@
+body {
+  background-color: #F7FAFF !important;
+}
+
 .berqwp-dashbaord {
   font-family: "Source Sans 3", sans-serif !important;
-  margin: 20px 0px;
-  background-color: #fff;
-  border-radius: 10px;
+  background-color: #F7FAFF;
   transition: all 0.3s ease;
 }
 .berqwp-dashbaord.sticky {
@@ -17,11 +19,11 @@
 }
 
 .berqwp-header {
-  padding: 16px 20px;
+  padding: 16px 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f7faff;
+  padding-top: 25px;
 }
 
 .berqwp-header img {
@@ -66,16 +68,16 @@ a.berqwp-support {
   display: flex;
   flex-wrap: wrap;
   position: relative;
-  background-color: #0d2958;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
 
 .berqwp-tabs {
-  width: 300px;
+  width: 280px;
   align-self: start;
-  position: sticky;
+  position: relative;
   top: 30px;
+  padding-left: 30px;
 }
 
 .sticky .berqwp-tabs {
@@ -86,17 +88,20 @@ a.berqwp-support {
 .berqwp-tab {
   padding: 18px 20px;
   font-size: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1294117647);
   cursor: pointer;
   color: #fff;
-  font-weight: 500;
+  background-color: transparent;
+  color: #363636;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 15px 20px;
+  font-size: 15px;
 }
 
 .berqwp-tab-content {
-  width: calc(100% - 300px);
+  width: calc(100% - 280px);
   padding: 0 25px;
   padding-top: 25px;
-  overflow: hidden;
   background: #F7FAFF;
   border-bottom-right-radius: 10px;
 }
@@ -106,7 +111,7 @@ a.berqwp-support {
 }
 
 h2.berq-tab-title {
-  color: #465774;
+  color: #353535;
   font-size: 25px;
   font-style: normal;
   font-weight: 600;
@@ -226,10 +231,18 @@ button.berqwp-save.cf:hover {
 }
 
 .berqwp-tab.active {
-  background: #f7faff;
-  color: #0d2958;
-  box-shadow: inset 5px 0px 0px 0px #1f72ff;
+  background-color: #ece8ff;
   border-bottom: none;
+  color: #fff;
+  font-weight: 400;
+  /* background-color: #fff; */
+  color: #000;
+}
+
+.berqwp-tab.active p {
+  color: #000000;
+  font-size: 13px;
+  margin-top: 5px;
 }
 
 p.berq-cache-lifespan {
@@ -489,6 +502,7 @@ table.berq-image-settings {
 }
 
 .berqwp-tab p {
+  display: none;
   margin: 0;
   margin-top: 10px;
   font-size: 13px;
@@ -497,7 +511,6 @@ table.berq-image-settings {
 }
 
 .berqwp-header::before {
-  content: "";
   background: #0d2958;
   position: absolute;
   width: 300px;
@@ -505,12 +518,10 @@ table.berq-image-settings {
   left: 0;
   top: 0;
   z-index: 0;
-  border-top-left-radius: 10px;
 }
 
 .berqwp-header {
   position: relative;
-  border-top-right-radius: 10px;
 }
 
 .berqwp-header img {
@@ -571,7 +582,7 @@ table.berq-image-settings {
 }
 
 .berq-info-box.guide {
-  background-color: #4567a1;
+  background-color: #273f67;
 }
 
 .slider.slider-horizontal {
@@ -1054,4 +1065,26 @@ a.fluid-images-signup {
   background: #5057FF;
   border-radius: 6px;
   display: inline-block;
+}
+
+div#wpcontent {
+  padding-left: 0;
+}
+
+.berqwp-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.berqwp-tab .icon svg {
+  width: 20px;
+  color: #000;
+}
+
+.berq-info-box.guide .berq-box-content {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #fff;
 }/*# sourceMappingURL=style.css.map */

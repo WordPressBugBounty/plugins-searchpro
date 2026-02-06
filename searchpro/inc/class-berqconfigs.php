@@ -4,6 +4,7 @@ if (!defined('ABSPATH')) exit;
 class berqConfigs {
     public $config_file = WP_CONTENT_DIR . '/cache/berqwp/config.json';
     private $defaults = [
+        'site_id'           => '',
         'exclude_cookies'   => [],
         'exclude_urls'      => [],
         'cache_lifespan'    => MONTH_IN_SECONDS,
@@ -40,6 +41,11 @@ class berqConfigs {
     private function get_file_config() {
         if (file_exists($this->config_file)) {
             $contents = file_get_contents($this->config_file);
+
+            if ($contents === false) {
+                return false;
+            }
+
             return json_decode($contents, true) ?: [];
         }
         return [];
@@ -51,15 +57,26 @@ class berqConfigs {
 
     public function get_configs() {
         $file_config = $this->get_file_config();
+
+        if ($file_config === false) {
+            return false;
+        }
+
         return $this->merge_with_defaults($file_config);
     }
 
     public function update_configs($new_config) {
         // Get current config (with defaults)
         $current_config = $this->get_configs();
+
+        if ($current_config === false) {
+            return false;
+        }
         
         // Merge new values with existing config
         $updated_config = array_merge($current_config, $new_config);
+
+        // var_dump($updated_config);
         
         // Save the complete configuration
         return $this->save_config($updated_config);

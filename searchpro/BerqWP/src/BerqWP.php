@@ -3,7 +3,7 @@ namespace BerqWP;
 use BerqWP\Cache;
 use BerqWP\CriticalCSS;
 use BerqWP\CDN;
-use GuzzleHttp\Client;
+use BerqWP\GuzzleHttp\Client;
 
 
 class BerqWP
@@ -21,6 +21,7 @@ class BerqWP
         $this->client = new Client([
             'base_uri' => 'https://boost.berqwp.com/photon/',
             'http_errors' => false,
+            'verify' => false,
             'timeout'  => 30,
             'headers'  => [
                 'User-Agent' => 'BerqWP/1.0 (https://berqwp.com)'
@@ -58,9 +59,9 @@ class BerqWP
         return $cache->request_cache_warmup($post_data);
     }
 
-    function clear_cache_queue($site_url) {
+    function clear_cache_queue($site_url, $site_id) {
         $cache = new Cache($this->client, $this->cache_directory, $this->storage_dir);
-        return $cache->clear_queue($site_url, $this->license_key);
+        return $cache->clear_queue($site_url, $site_id, $this->license_key);
     }
 
 }

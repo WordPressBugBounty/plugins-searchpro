@@ -6,8 +6,6 @@ $cached_pages = bwp_cached_pages_count();
 $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 $berqconfigs = new berqConfigs();
 $configs = $berqconfigs->get_configs();
-
-do_action('berqwp_notices');
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,42 +16,25 @@ do_action('berqwp_notices');
     href="<?php echo esc_attr(optifer_URL . '/admin/css/bootstrap-slider.min.css?v=' . BERQWP_VERSION); ?>">
 <link rel="stylesheet" href="<?php echo esc_attr(optifer_URL . '/admin/css/bootstrap.min.css?v=' . BERQWP_VERSION); ?>">
 
-<div class="wrap">
-    <h1 style="display:none">BerqWP</h1>
-    <div></div>
+<div class="wrap1">
+    <!-- <h1 style="display:none">BerqWP</h1>
+    <div></div> -->
     <div class="berqwp-dashbaord">
         <div class="berqwp-header">
-            <img src="<?php 
+            <img src="<?php
 
-            if (defined('BERQWP_LOGO')) {
-                echo esc_attr( BERQWP_LOGO );
-            } else {
-                echo esc_attr(optifer_URL . '/admin/img/berqwp-logo-light.png'); 
+                        if (defined('BERQWP_LOGO')) {
+                            echo esc_attr(BERQWP_LOGO);
+                        } else {
+                            echo esc_attr(optifer_URL . '/admin/img/logo.png');
+                        }
 
-            }
-            
-            ?>" alt="BerqWP Logo">
+                        ?>" alt="BerqWP Logo">
             <div class="berqwp-header-right">
                 <?php if (bwp_show_docs()) { ?>
-                <a href="https://wordpress.org/support/plugin/searchpro/reviews/#new-post" target="_blank"
-                    class="berqwp-support">
-                    <?php esc_html_e('Write a review', 'searchpro'); ?>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M11.0001 3C10.7349 3 10.4805 3.10536 10.293 3.29289C10.1054 3.48043 10.0001 3.73478 10.0001 4C10.0001 4.26522 10.1054 4.51957 10.293 4.70711C10.4805 4.89464 10.7349 5 11.0001 5H13.5861L7.29308 11.293C7.19757 11.3852 7.12139 11.4956 7.06898 11.6176C7.01657 11.7396 6.98898 11.8708 6.98783 12.0036C6.98668 12.1364 7.01198 12.2681 7.06226 12.391C7.11254 12.5139 7.18679 12.6255 7.28069 12.7194C7.37458 12.8133 7.48623 12.8875 7.60913 12.9378C7.73202 12.9881 7.8637 13.0134 7.99648 13.0123C8.12926 13.0111 8.26048 12.9835 8.38249 12.9311C8.50449 12.8787 8.61483 12.8025 8.70708 12.707L15.0001 6.414V9C15.0001 9.26522 15.1054 9.51957 15.293 9.70711C15.4805 9.89464 15.7349 10 16.0001 10C16.2653 10 16.5197 9.89464 16.7072 9.70711C16.8947 9.51957 17.0001 9.26522 17.0001 9V4C17.0001 3.73478 16.8947 3.48043 16.7072 3.29289C16.5197 3.10536 16.2653 3 16.0001 3H11.0001Z"
-                            fill="#465774" />
-                        <path
-                            d="M5 5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V15C3 15.5304 3.21071 16.0391 3.58579 16.4142C3.96086 16.7893 4.46957 17 5 17H13C13.5304 17 14.0391 16.7893 14.4142 16.4142C14.7893 16.0391 15 15.5304 15 15V12C15 11.7348 14.8946 11.4804 14.7071 11.2929C14.5196 11.1054 14.2652 11 14 11C13.7348 11 13.4804 11.1054 13.2929 11.2929C13.1054 11.4804 13 11.7348 13 12V15H5V7H8C8.26522 7 8.51957 6.89464 8.70711 6.70711C8.89464 6.51957 9 6.26522 9 6C9 5.73478 8.89464 5.48043 8.70711 5.29289C8.51957 5.10536 8.26522 5 8 5H5Z"
-                            fill="#465774" />
-                    </svg>
-
-                </a>
-                <?php } ?>
-                <?php if ($this->key_response->product_ref !== 'Free Account') { ?>
-
-                    <?php if (bwp_show_docs()) { ?>
-                    <a href="https://berqwp.com/support/" target="_blank" class="berqwp-support">
-                        <?php esc_html_e('Contact support', 'searchpro'); ?>
+                    <a href="https://wordpress.org/support/plugin/searchpro/reviews/#new-post" target="_blank"
+                        class="berqwp-support">
+                        <?php esc_html_e('Write a review', 'searchpro'); ?>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M11.0001 3C10.7349 3 10.4805 3.10536 10.293 3.29289C10.1054 3.48043 10.0001 3.73478 10.0001 4C10.0001 4.26522 10.1054 4.51957 10.293 4.70711C10.4805 4.89464 10.7349 5 11.0001 5H13.5861L7.29308 11.293C7.19757 11.3852 7.12139 11.4956 7.06898 11.6176C7.01657 11.7396 6.98898 11.8708 6.98783 12.0036C6.98668 12.1364 7.01198 12.2681 7.06226 12.391C7.11254 12.5139 7.18679 12.6255 7.28069 12.7194C7.37458 12.8133 7.48623 12.8875 7.60913 12.9378C7.73202 12.9881 7.8637 13.0134 7.99648 13.0123C8.12926 13.0111 8.26048 12.9835 8.38249 12.9311C8.50449 12.8787 8.61483 12.8025 8.70708 12.707L15.0001 6.414V9C15.0001 9.26522 15.1054 9.51957 15.293 9.70711C15.4805 9.89464 15.7349 10 16.0001 10C16.2653 10 16.5197 9.89464 16.7072 9.70711C16.8947 9.51957 17.0001 9.26522 17.0001 9V4C17.0001 3.73478 16.8947 3.48043 16.7072 3.29289C16.5197 3.10536 16.2653 3 16.0001 3H11.0001Z"
@@ -64,6 +45,22 @@ do_action('berqwp_notices');
                         </svg>
 
                     </a>
+                <?php } ?>
+                <?php if ($this->key_response->product_ref !== 'Free Account') { ?>
+
+                    <?php if (bwp_show_docs()) { ?>
+                        <a href="https://berqwp.com/support/" target="_blank" class="berqwp-support">
+                            <?php esc_html_e('Contact support', 'searchpro'); ?>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M11.0001 3C10.7349 3 10.4805 3.10536 10.293 3.29289C10.1054 3.48043 10.0001 3.73478 10.0001 4C10.0001 4.26522 10.1054 4.51957 10.293 4.70711C10.4805 4.89464 10.7349 5 11.0001 5H13.5861L7.29308 11.293C7.19757 11.3852 7.12139 11.4956 7.06898 11.6176C7.01657 11.7396 6.98898 11.8708 6.98783 12.0036C6.98668 12.1364 7.01198 12.2681 7.06226 12.391C7.11254 12.5139 7.18679 12.6255 7.28069 12.7194C7.37458 12.8133 7.48623 12.8875 7.60913 12.9378C7.73202 12.9881 7.8637 13.0134 7.99648 13.0123C8.12926 13.0111 8.26048 12.9835 8.38249 12.9311C8.50449 12.8787 8.61483 12.8025 8.70708 12.707L15.0001 6.414V9C15.0001 9.26522 15.1054 9.51957 15.293 9.70711C15.4805 9.89464 15.7349 10 16.0001 10C16.2653 10 16.5197 9.89464 16.7072 9.70711C16.8947 9.51957 17.0001 9.26522 17.0001 9V4C17.0001 3.73478 16.8947 3.48043 16.7072 3.29289C16.5197 3.10536 16.2653 3 16.0001 3H11.0001Z"
+                                    fill="#465774" />
+                                <path
+                                    d="M5 5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V15C3 15.5304 3.21071 16.0391 3.58579 16.4142C3.96086 16.7893 4.46957 17 5 17H13C13.5304 17 14.0391 16.7893 14.4142 16.4142C14.7893 16.0391 15 15.5304 15 15V12C15 11.7348 14.8946 11.4804 14.7071 11.2929C14.5196 11.1054 14.2652 11 14 11C13.7348 11 13.4804 11.1054 13.2929 11.2929C13.1054 11.4804 13 11.7348 13 12V15H5V7H8C8.26522 7 8.51957 6.89464 8.70711 6.70711C8.89464 6.51957 9 6.26522 9 6C9 5.73478 8.89464 5.48043 8.70711 5.29289C8.51957 5.10536 8.26522 5 8 5H5Z"
+                                    fill="#465774" />
+                            </svg>
+
+                        </a>
                     <?php } ?>
                 <?php } else { ?>
                     <a href="https://berqwp.com/dashboard/" target="_blank" class="upgrade-btn">
@@ -75,36 +72,49 @@ do_action('berqwp_notices');
         <div class="berqwp-dashbord-body">
             <div class="berqwp-tabs">
                 <div class="berqwp-tab <?php bwp_is_tab_nav('dashboard'); ?>" data-tab="dashboard">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard-icon lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></div>
                     <?php esc_html_e('Dashboard', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('Flush Cache, Sandbox Mode, Cached Pages', 'searchpro'); ?>
                     </p>
                 </div>
                 <div class="berqwp-tab <?php bwp_is_tab_nav('cache-management'); ?>" data-tab="cache-management">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gauge-icon lucide-gauge"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg></div>
                     <?php esc_html_e('Cache Management', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('Exclude Pages, Ignore URL Parameters', 'searchpro'); ?>
                     </p>
                 </div>
+                <div class="berqwp-tab <?php bwp_is_tab_nav('content-delivery-network'); ?>" data-tab="content-delivery-network">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-earth-icon lucide-earth"><path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"/><path d="M7 3.34V5a3 3 0 0 0 3 3a2 2 0 0 1 2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.1.9-2 2-2h3.17"/><path d="M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"/><circle cx="12" cy="12" r="10"/></svg></div>
+                    <?php esc_html_e('Content Delivery Network', 'searchpro'); ?>
+                    <p>
+                        <?php esc_html_e('Exclude Pages, Ignore URL Parameters', 'searchpro'); ?>
+                    </p>
+                </div>
                 <div class="berqwp-tab <?php bwp_is_tab_nav('image-optimization'); ?>" data-tab="image-optimization">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-images-icon lucide-images"><path d="m22 11-1.296-1.296a2.4 2.4 0 0 0-3.408 0L11 16"/><path d="M4 8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2"/><circle cx="13" cy="7" r="1" fill="currentColor"/><rect x="8" y="2" width="14" height="14" rx="2"/></svg></div>
                     <?php esc_html_e('Image Optimization', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('WebP Images, Image Resize, Lazy Load', 'searchpro'); ?>
                     </p>
                 </div>
                 <div class="berqwp-tab <?php bwp_is_tab_nav('script-manager'); ?>" data-tab="script-manager">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-code-corner-icon lucide-file-code-corner"><path d="M4 12.15V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2h-3.35"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m5 16-3 3 3 3"/><path d="m9 22 3-3-3-3"/></svg></div>
                     <?php esc_html_e('Script Manager', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('JavaScript Modes, Emojis, YouTube', 'searchpro'); ?>
                     </p>
                 </div>
                 <div class="berqwp-tab <?php bwp_is_tab_nav('integration'); ?>" data-tab="integration">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-blocks-icon lucide-blocks"><path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"/><rect x="14" y="2" width="8" height="8" rx="1"/></svg></div>
                     <?php esc_html_e('Integration', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('Cloudflare Edge Cache', 'searchpro'); ?>
                     </p>
                 </div>
                 <div class="berqwp-tab <?php bwp_is_tab_nav('activate-license'); ?>" data-tab="activate-license">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings2-icon lucide-settings-2"><path d="M14 17H5"/><path d="M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg></div>
                     <?php esc_html_e('License', 'searchpro'); ?>
                     <p>
                         <?php esc_html_e('Deactivate License Key', 'searchpro'); ?>
@@ -112,14 +122,16 @@ do_action('berqwp_notices');
                 </div>
             </div>
             <div class="berqwp-tab-content">
+                <?php do_action('berqwp_notices'); ?>
                 <form action="" method="post">
                     <?php
                     wp_nonce_field('berqwp_save_settings', 'berqwp_save_nonce');
                     ?>
-                    <input type="hidden" name="bwp_current_tab_id" value="<?php echo !empty($_GET['tab_id']) ? sanitize_text_field( $_GET['tab_id'] ) : 'dashboard'; ?>">
+                    <input type="hidden" name="bwp_current_tab_id" value="<?php echo !empty($_GET['tab_id']) ? sanitize_text_field($_GET['tab_id']) : 'dashboard'; ?>">
                     <?php
                     require_once optifer_PATH . '/admin/tabs/dashboard.php';
                     require_once optifer_PATH . '/admin/tabs/cache-management.php';
+                    require_once optifer_PATH . '/admin/tabs/content-delivery-network.php';
                     require_once optifer_PATH . '/admin/tabs/image-optimization.php';
                     require_once optifer_PATH . '/admin/tabs/script-manager.php';
                     require_once optifer_PATH . '/admin/tabs/integration.php';
@@ -135,10 +147,16 @@ do_action('berqwp_notices');
 <script src="<?php echo esc_attr(optifer_URL . '/admin/js/bootstrap-slider.js?v=' . BERQWP_VERSION); ?>"></script>
 <script src="//cdn.datatables.net/2.1.0/js/dataTables.min.js"></script>
 <script>
-    (function ($) {
-        $(document).ready(function () {
+    (function($) {
+        $(document).ready(function() {
+            const bwp_controllers = [];
             $('.bwp_feedback').hide();
             let berq_nounce = '<?php echo esc_html(wp_create_nonce('wp_rest')); ?>';
+
+            window.addEventListener('beforeunload', () => {
+                bwp_controllers.forEach(c => c.abort());
+            });
+
 
             function numberWithCommas(x) {
                 return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -168,7 +186,7 @@ do_action('berqwp_notices');
                     // step: 1
                 });
 
-                $(".optimzation-slider").mousemove(function (event) {
+                $(".optimzation-slider").mousemove(function(event) {
                     let val = $("#berq_opt_mode").val();
 
                     if ($(".slider-tick:nth-child(1)").is(":hover") || $('.tooltip-inner').html() == '1') {
@@ -188,7 +206,7 @@ do_action('berqwp_notices');
                     }
                 })
 
-                $("#berq_opt_mode").on("slide slideStop", function (slideEvt) {
+                $("#berq_opt_mode").on("slide slideStop", function(slideEvt) {
                     let val = $("#berq_opt_mode").val();
 
                     if (val == 1) {
@@ -213,28 +231,75 @@ do_action('berqwp_notices');
                 $.ajax({
                     url: '<?php echo esc_html(get_site_url()); ?>/wp-json/optifer/v1/clear-cache',
                     method: 'POST',
-                    beforeSend: function (xhr) {
+                    beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-WP-Nonce', berq_nounce);
                     },
-                    success: function (response) {
+                    success: function(response) {
 
                     }
                 })
             }
 
+            function berq_refresh_cache_stats() {
+                const controller = new AbortController();
+                bwp_controllers.push(controller);
+
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'berqwp_refresh_cache_stats',
+                        nonce: berq_nounce,
+                    },
+                    signal: controller.signal,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-WP-Nonce', berq_nounce);
+                    },
+                    success: function(data) {
+
+                        if (data.success) {
+
+                            $('.cache-percentage').html(`${data.data.cache_percentage}% (${data.data.cache_count}) of your pages are currently cached.`);
+                            
+                            $('.cached-pages-bar .progress-bar').css('width', `${data.data.cache_percentage}%`);
+
+                            // if (data.data.server_queue > 0) {
+                            //     $('.bwp-pending-optimization').html(`${data.data.server_queue} pending optimization`);
+
+                            // } else {
+                            //     $('.bwp-pending-optimization').html('');
+                            // }
+                        }
+
+                    },
+                    error: function() {
+                        console.log('Error in AJAX request.');
+                    }
+                });
+            }
+
             init_opt_slider();
 
-            $('.berqwp-tab').click(function () {
+            $('.berqwp-tab').click(function() {
                 let tab = $(this).attr('data-tab');
                 $("html, body").animate({
                     scrollTop: $(".berqwp-dashbaord").offset().top - 30
                 }, 200);
 
-                $('.berqwp-tab-content > form > div').css({'visibility':'hidden','opacity':0,'height':'0px','overflow':'hidden'});
+                $('.berqwp-tab-content > form > div').css({
+                    'visibility': 'hidden',
+                    'opacity': 0,
+                    'height': '0px',
+                    'overflow': 'hidden'
+                });
                 $('.berqwp-tab').removeClass('active');
                 $(this).addClass('active');
                 // $(`.berqwp-tab-content #${tab}`).show();
-                $(`.berqwp-tab-content #${tab}`).css({'visibility':'visible','opacity':1,'height':'auto'});
+                $(`.berqwp-tab-content #${tab}`).css({
+                    'visibility': 'visible',
+                    'opacity': 1,
+                    'height': 'auto'
+                });
 
                 let tab_id = $(`.berqwp-tab-content #${tab}`).attr('id');
                 $('input[name="bwp_current_tab_id"]').val(tab_id);
@@ -247,7 +312,7 @@ do_action('berqwp_notices');
                 if (url.searchParams.has('tab_id')) {
                     // Update the 'tab_id' parameter value
                     url.searchParams.set('tab_id', tab_id);
-                    
+
                     // Update the address bar with the new URL (without reloading the page)
                     window.history.replaceState(null, null, url.toString());
                 }
@@ -258,14 +323,30 @@ do_action('berqwp_notices');
 
             // let tab_id = $('input[name="bwp_current_tab_id"]').val();
             // $(`.berqwp-tab[data-tab="${tab_id}"]`).trigger('click');
+            let is_admin_page_active = true;
+
+            // Visibility tracking - pause when tab hidden
+            document.addEventListener('visibilitychange', function() {
+                is_admin_page_active = !document.hidden;
+            });
+
+            berq_refresh_cache_stats();
+
+            setInterval(function() {
+
+                if (!is_admin_page_active) return;
+
+                berq_refresh_cache_stats();
+
+            }, 10000)
 
             <?php
             $cache_directory = bwp_get_cache_dir();
             // $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
             $home_url = bwp_admin_home_url('/');
-            $home_cache_file = $cache_directory . md5($home_url) . '.html';
+            $home_cache_file = $cache_directory . md5($home_url) . '.gz';
             $is_home_ready = file_exists($home_cache_file);
-            if ($is_home_ready && bwp_is_partial_cache($home_url) === false) { ?>
+            if ($is_home_ready) { ?>
 
                 $.ajax({
                     method: 'GET',
@@ -275,7 +356,7 @@ do_action('berqwp_notices');
                         key: 'AIzaSyBBEiQZ4IEVS2owZIbHSo4evOT-l-5BEHg',
                         strategy: 'mobile'
                     },
-                    success: function (data) {
+                    success: function(data) {
                         let mobileSpeedScore = data.lighthouseResult.categories.performance.score * 100;
                         if (mobileSpeedScore >= 90) {
                             $('.without-berqwp .berq-speed-score').css('background', `radial-gradient(closest-side, white 79%, transparent 80% 100%), conic-gradient(#2eb91e ${mobileSpeedScore}%, #caffd1 0)`);
@@ -309,29 +390,29 @@ do_action('berqwp_notices');
                     }
                 });
 
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'berqwp_fetch_remote_html',
-                        nonce: berq_nounce,
-                    },
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('X-WP-Nonce', berq_nounce);
-                    },
-                    success: function (data) {
-                        // 'data' contains the HTML content from the specified URL
-                        if ($(data).is('[data-berqwp]')) {
-                            console.log('HTML contains data-berqwp attribute.');
-                        } else {
-                            $('.with-berqwp').addClass('cache-not-deleted');
-                            console.log('HTML does not contain data-berqwp attribute.');
-                        }
-                    },
-                    error: function () {
-                        console.log('Error in AJAX request.');
-                    }
-                });
+                // $.ajax({
+                //     url: ajaxurl,
+                //     type: 'POST',
+                //     data: {
+                //         action: 'berqwp_fetch_remote_html',
+                //         nonce: berq_nounce,
+                //     },
+                //     beforeSend: function (xhr) {
+                //         xhr.setRequestHeader('X-WP-Nonce', berq_nounce);
+                //     },
+                //     success: function (data) {
+                //         // 'data' contains the HTML content from the specified URL
+                //         if ($(data).is('[data-berqwp]')) {
+                //             console.log('HTML contains data-berqwp attribute.');
+                //         } else {
+                //             $('.with-berqwp').addClass('cache-not-deleted');
+                //             console.log('HTML does not contain data-berqwp attribute.');
+                //         }
+                //     },
+                //     error: function () {
+                //         console.log('Error in AJAX request.');
+                //     }
+                // });
 
 
                 $.ajax({
@@ -342,7 +423,7 @@ do_action('berqwp_notices');
                         key: 'AIzaSyBBEiQZ4IEVS2owZIbHSo4evOT-l-5BEHg',
                         strategy: 'desktop'
                     },
-                    success: function (data) {
+                    success: function(data) {
                         let mobileSpeedScore = data.lighthouseResult.categories.performance.score * 100;
 
                         if (mobileSpeedScore >= 80 && $('.bwp_feedback')) {
@@ -507,115 +588,123 @@ do_action('berqwp_notices');
     })(jQuery)
 </script>
 <?php
-    if (function_exists('pll_current_language')) {
-        $lang = !empty(pll_current_language()) ? pll_current_language() : 'all';
-        echo "<script>ajaxurl = ajaxurl + '?lang=$lang';</script>";
-    }
+if (function_exists('pll_current_language')) {
+    $lang = !empty(pll_current_language()) ? pll_current_language() : 'all';
+    echo "<script>ajaxurl = ajaxurl + '?lang=$lang';</script>";
+}
 ?>
 <script>
-        (function ($) {
-            // $(document).ready(function () {
-            //     let table = new DataTable('.optimized-pages > table', {
-            //         // "paging": false, // Disable pagination
-            //         "searching": false, // Disable the search box
-            //         "pageLength": 5,
-            //         "info": false, // Disable the info text (e.g., "Showing 1 to 10 of 57 entries")
-            //         "lengthChange": false
-            //     });
-            // })
-        
+    (function($) {
+        // $(document).ready(function () {
+        //     let table = new DataTable('.optimized-pages > table', {
+        //         // "paging": false, // Disable pagination
+        //         "searching": false, // Disable the search box
+        //         "pageLength": 5,
+        //         "info": false, // Disable the info text (e.g., "Showing 1 to 10 of 57 entries")
+        //         "lengthChange": false
+        //     });
+        // })
 
-            jQuery(document).ready(function($) {
-                var dataTable = $('.optimized-pages > table').DataTable({
-                    ordering: false,
-                    paging: true,
-                    searching: true,
-                    processing: true,
-                    serverSide: true,
-                    info: false,
-                    lengthChange: false,
-                    pageLength: 5,
-                    ajax: function(data, callback, settings) {
-                        var start = settings._iDisplayStart;
-                        var length = settings._iDisplayLength;
 
-                        $.ajax({
-                            url: ajaxurl, // WordPress AJAX URL
-                            type: 'POST',
-                            data: {
-                                action: 'berqwp_get_optimized_pages',
-                                start: start,
-                                length: length,
-                                search: data.search.value
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    callback({
-                                        draw: data.draw,
-                                        recordsTotal: response.data.total_entries, // Total number of records
-                                        recordsFiltered: response.data.records_filtered, // Total after filtering
-                                        data: response.data.optimized_pages // Data for the current page
-                                    });
-                                } else {
-                                    console.error("Error fetching data:", response);
-                                }
-                            },
-                            error: function(error) {
-                                console.error("AJAX error:", error);
+        jQuery(document).ready(function($) {
+            var dataTable = $('.optimized-pages > table').DataTable({
+                ordering: false,
+                paging: true,
+                searching: true,
+                processing: true,
+                serverSide: true,
+                info: false,
+                lengthChange: false,
+                pageLength: 5,
+                ajax: function(data, callback, settings) {
+                    var start = settings._iDisplayStart;
+                    var length = settings._iDisplayLength;
+
+                    $.ajax({
+                        url: ajaxurl, // WordPress AJAX URL
+                        type: 'POST',
+                        data: {
+                            action: 'berqwp_get_optimized_pages',
+                            start: start,
+                            length: length,
+                            search: data.search.value
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                callback({
+                                    draw: data.draw,
+                                    recordsTotal: response.data.total_entries, // Total number of records
+                                    recordsFiltered: response.data.records_filtered, // Total after filtering
+                                    data: response.data.optimized_pages // Data for the current page
+                                });
+                            } else {
+                                console.error("Error fetching data:", response);
                             }
-                        });
-                    },
-                    columns: [
-                        { data: 'url', title: "Page URL" },            // Map 'url' to the first column
-                        { data: 'status', title: "Cache Status" },     // Map 'status' to the second column
-                        { data: 'last_modified', title: "Last Optimized Date" } // Map 'last_modified' to the third column
-                    ]
-                });
+                        },
+                        error: function(error) {
+                            console.error("AJAX error:", error);
+                        }
+                    });
+                },
+                columns: [{
+                        data: 'url',
+                        title: "Page URL"
+                    }, // Map 'url' to the first column
+                    {
+                        data: 'status',
+                        title: "Cache Status"
+                    }, // Map 'status' to the second column
+                    {
+                        data: 'last_modified',
+                        title: "Last Optimized Date"
+                    } // Map 'last_modified' to the third column
+                ]
             });
+        });
 
-            $('[name="berqwp_lazyload_youtube_embed"]').on('change', function() {
-                if ($(this).is(':checked')) {
-                    $('[name="berqwp_preload_yt_poster"]').parent().show();
-                } else {
-                    $('[name="berqwp_preload_yt_poster"]').parent().hide();
-                }
-            });
-            
-            // $(document).ready(function () {
-            //     const stickyDiv = $('.berqwp-dashbaord');
-            //     const offset = stickyDiv.offset().top;
+        $('[name="berqwp_lazyload_youtube_embed"]').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('[name="berqwp_preload_yt_poster"]').parent().show();
+            } else {
+                $('[name="berqwp_preload_yt_poster"]').parent().hide();
+            }
+        });
 
-            //     $(window).on('scroll', function () {
-            //         if ($(this).scrollTop() + 30 >= offset) {
-            //             stickyDiv.addClass('sticky');
-            //             stickyDiv.parent().css('paddingBottom', '100vh');
-            //             setTimeout(function() {
-            //                 var resizeEvent = new Event('resize');
-            //                 window.dispatchEvent(resizeEvent);
-            //                 document.dispatchEvent(resizeEvent);
-            //             }, 300)
-            //         } else {
-            //             stickyDiv.removeClass('sticky');
-            //             stickyDiv.parent().css('paddingBottom', '0vh');
-            //             setTimeout(function() {
-            //                 var resizeEvent = new Event('resize');
-            //                 window.dispatchEvent(resizeEvent);
-            //                 document.dispatchEvent(resizeEvent);
-            //             }, 300)
-            //         }
-            //     });
-            // });
+        // $(document).ready(function () {
+        //     const stickyDiv = $('.berqwp-dashbaord');
+        //     const offset = stickyDiv.offset().top;
 
-
-
+        //     $(window).on('scroll', function () {
+        //         if ($(this).scrollTop() + 30 >= offset) {
+        //             stickyDiv.addClass('sticky');
+        //             stickyDiv.parent().css('paddingBottom', '100vh');
+        //             setTimeout(function() {
+        //                 var resizeEvent = new Event('resize');
+        //                 window.dispatchEvent(resizeEvent);
+        //                 document.dispatchEvent(resizeEvent);
+        //             }, 300)
+        //         } else {
+        //             stickyDiv.removeClass('sticky');
+        //             stickyDiv.parent().css('paddingBottom', '0vh');
+        //             setTimeout(function() {
+        //                 var resizeEvent = new Event('resize');
+        //                 window.dispatchEvent(resizeEvent);
+        //                 document.dispatchEvent(resizeEvent);
+        //             }, 300)
+        //         }
+        //     });
+        // });
 
 
 
 
-        })(jQuery)
+
+
+
+    })(jQuery)
 </script>
 <script>
-    (function($){
+    (function($) {
         $(document).ready(function() {
             let cache_lifespan_options = $('input[name="berqwp_cache_lifespan"]');
 
@@ -629,12 +718,12 @@ do_action('berqwp_notices');
     })(jQuery)
 </script>
 <script>
-    (function($){
+    (function($) {
         $(document).ready(function() {
             let enable_compression_btn = $('a.berqwp-enable-page-compression');
             let berq_nounce = '<?php echo esc_html(wp_create_nonce('wp_rest')); ?>';
 
-            enable_compression_btn.click(function(e){
+            enable_compression_btn.click(function(e) {
                 e.preventDefault();
 
                 let loader = enable_compression_btn.find('.berqwp-loader');
@@ -645,11 +734,11 @@ do_action('berqwp_notices');
                         action: 'berqwp_enable_page_compression',
                         nonce: berq_nounce,
                     },
-                    beforeSend: function (xhr) {
+                    beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-WP-Nonce', berq_nounce);
                         loader.show();
                     },
-                    success: function (data) {
+                    success: function(data) {
                         loader.hide();
 
                         if (data.success === true) {
@@ -663,9 +752,9 @@ do_action('berqwp_notices');
                             alert("Page compression test failed: Your web server doesn't support Gzip compression.");
                         }
 
-                        
+
                     },
-                    error: function () {
+                    error: function() {
                         loader.hide();
                         alert("Page compression test failed: Please check your internet connection.");
                     }

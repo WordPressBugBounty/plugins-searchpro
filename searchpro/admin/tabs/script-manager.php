@@ -103,7 +103,7 @@ $url_lines = implode("\n", $exclude_urls);
         </h3>
         <div class="berq-box-content">
             <p>
-                <?php esc_html_e('Preload the cookie banner on the initial page load, may sometimes cause a drop in the PageSpeed score. Currently supports Complianz, CookieYes, Real Cookie Banner, CYTRIO and My Agile Privacy.', 'searchpro'); ?>
+                <?php esc_html_e('Preload the cookie banner on the initial page load, may sometimes cause a drop in the PageSpeed score. Currently supports Complianz, CookieYes, Real Cookie Banner, CYTRIO, GetTerms and My Agile Privacy.', 'searchpro'); ?>
             </p>
             <label class="berq-check">
                 <input type="checkbox" name="berqwp_preload_cookiebanner" <?php checked(1, get_option('berqwp_preload_cookiebanner'), true); ?>>

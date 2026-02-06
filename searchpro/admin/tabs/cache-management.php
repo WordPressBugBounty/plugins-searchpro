@@ -11,14 +11,16 @@ $param_lines = implode("\n", $ignore_params);
 
 $post_type_names = get_post_types(array(
     'public' => true,
-    // 'exclude_from_search' => false,
+    'exclude_from_search' => false,
 ), 'names');
 unset($post_type_names['attachment']);
 
-$taxonomy_names = get_taxonomies(array(
-    'public' => true,
-    'show_in_rest' => true
-), 'names');
+$taxonomy_names = get_taxonomies([
+    'public'             => true,
+    'publicly_queryable' => true,
+    'rewrite'            => true,
+    'show_ui'            => true, // optional but useful
+], 'names');
 
 $excluded_cookies = implode("\n", $configs['exclude_cookies']);
 $cache_lifespan = $configs['cache_lifespan'];
@@ -48,7 +50,7 @@ $cache_lifespan = $configs['cache_lifespan'];
             </div>
         </div>
     </div>
-    <div class="berq-info-box">
+    <!-- <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Page Compression', 'searchpro'); ?></h3>
         <div class="berq-box-content">
             <p><?php esc_html_e('Deliver GZIP-compressed page cache files, reducing page size by up to 70%.', 'searchpro'); ?></p>
@@ -64,21 +66,23 @@ $cache_lifespan = $configs['cache_lifespan'];
 
                 <?php } else { ?>
 
-                    <a href="#" class="berq-btn berqwp-enable-page-compression"><div class="berqwp-loader"></div><?php esc_html_e('Enable page compression', 'searchpro'); ?></a>
+                    <a href="#" class="berq-btn berqwp-enable-page-compression">
+                        <div class="berqwp-loader"></div><?php esc_html_e('Enable page compression', 'searchpro'); ?>
+                    </a>
 
                 <?php } ?>
 
             </div>
         </div>
-    </div>
+    </div> -->
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Page Exclusions', 'searchpro'); ?></h3>
         <div class="berq-box-content">
             <p><?php esc_html_e('Exclude pages from caching. Enter one page URL per line. You can use a wildcard by adding *. For example: https://yoursite.com/campaign/*', 'searchpro'); ?>
 
-            <?php if (bwp_show_docs()) { ?>
-            <a href="https://berqwp.com/help-center/exclude-pages-from-being-cached/" target="_blank"><?php esc_html_e('Learn more', 'searchpro'); ?></a>
-            <?php } ?>
+                <?php if (bwp_show_docs()) { ?>
+                    <a href="https://berqwp.com/help-center/exclude-pages-from-being-cached/" target="_blank"><?php esc_html_e('Learn more', 'searchpro'); ?></a>
+                <?php } ?>
 
             </p>
             <textarea name="berq_exclude_urls" cols="30" rows="10"><?php echo esc_textarea($url_lines); ?></textarea>
@@ -89,33 +93,33 @@ $cache_lifespan = $configs['cache_lifespan'];
         <div class="berq-box-content">
             <p><?php esc_html_e('Choose which post types and archive pages should be cached.', 'searchpro'); ?></p>
             <div class="optimize-post-types">
-            <?php
-                foreach($post_type_names as $key => $value) {
-                    ?>
+                <?php
+                foreach ($post_type_names as $key => $value) {
+                ?>
                     <div>
-                        <input type="checkbox" name="berqwp_optimize_post_types[]" value="<?php echo esc_attr($key); ?>" <?php checked(1, in_array($value, get_option('berqwp_optimize_post_types')), true); ?> >
+                        <input type="checkbox" name="berqwp_optimize_post_types[]" value="<?php echo esc_attr($key); ?>" <?php checked(1, in_array($value, get_option('berqwp_optimize_post_types')), true); ?>>
 
                         <?php
                         $post_counts = wp_count_posts($value);
-                        $published_count = isset($post_counts->publish) ? $post_counts->publish : 0; 
-                        echo esc_html(ucfirst($key) . " ($published_count)"); 
+                        $published_count = isset($post_counts->publish) ? $post_counts->publish : 0;
+                        echo esc_html(ucfirst($key) . " ($published_count)");
 
                         ?>
                     </div>
-                    <?php
-                } 
-                foreach($taxonomy_names as $key => $value) {
-                    ?>
+                <?php
+                }
+                foreach ($taxonomy_names as $key => $value) {
+                ?>
                     <div>
-                        <input type="checkbox" name="berqwp_optimize_taxonomies[]" value="<?php echo esc_attr($key); ?>" <?php checked(1, in_array($value, get_option('berqwp_optimize_taxonomies')), true); ?> >
+                        <input type="checkbox" name="berqwp_optimize_taxonomies[]" value="<?php echo esc_attr($key); ?>" <?php checked(1, in_array($value, get_option('berqwp_optimize_taxonomies')), true); ?>>
 
                         <?php
-                        echo esc_html(ucfirst($key)); 
+                        echo esc_html(ucfirst($key));
                         ?>
                     </div>
-                    <?php
-                } 
-            ?>
+                <?php
+                }
+                ?>
 
             </div>
         </div>
@@ -123,7 +127,7 @@ $cache_lifespan = $configs['cache_lifespan'];
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Exclude Cookies', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e("Prevent cached pages from being served when the following cookies are present. Enter a partial match or keyword from the cookie name to exclude it. Add one cookie ID per line. Example: woocommerce_cart_hash"); ?>  
+            <p><?php esc_html_e("Prevent cached pages from being served when the following cookies are present. Enter a partial match or keyword from the cookie name to exclude it. Add one cookie ID per line. Example: woocommerce_cart_hash"); ?>
 
             </p>
             <textarea name="berq_exclude_cookies" cols="30" rows="10"><?php echo esc_textarea($excluded_cookies); ?></textarea>
@@ -132,11 +136,11 @@ $cache_lifespan = $configs['cache_lifespan'];
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Ignore URL Parameters', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e("Ignore page URL parameters, these parameters will be disregarded and won't be cached separately. Enter one parameter per line."); ?> 
-            
-            <?php if (bwp_show_docs()) { ?>
-            <a href="https://berqwp.com/help-center/ignore-url-parameters/" target="_blank"><?php esc_html_e('Learn more', 'searchpro'); ?></a>
-            <?php } ?>    
+            <p><?php esc_html_e("Ignore page URL parameters, these parameters will be disregarded and won't be cached separately. Enter one parameter per line."); ?>
+
+                <?php if (bwp_show_docs()) { ?>
+                    <a href="https://berqwp.com/help-center/ignore-url-parameters/" target="_blank"><?php esc_html_e('Learn more', 'searchpro'); ?></a>
+                <?php } ?>
 
             </p>
             <textarea name="berq_ignore_urls_params" cols="30" rows="10"><?php echo esc_textarea($param_lines); ?></textarea>

@@ -37,12 +37,12 @@ class berqPageOptimizer {
         // update_option( md5($slug), $key );
         file_put_contents($cache_file, $buffer);
         
-        if (bwp_is_gzip_supported()) {
+        // if (bwp_is_gzip_supported()) {
             // $cache_file = $cache_directory . md5($this->page_slug) . '.gz';
             $cache_file = $cache_directory . md5($url) . '.gz';
-            $buffer = gzencode($buffer, 9);
+            $buffer = gzencode($buffer);
             file_put_contents($cache_file, $buffer);
-        }
+        // }
         
         
         do_action('berqwp_stored_page_cache', $this->page_slug);
@@ -56,15 +56,11 @@ class berqPageOptimizer {
         if (empty($buffer)) {
             return $buffer;
         }
-
-        if (!function_exists('str_get_html')) {
-            require_once optifer_PATH . '/simplehtmldom/simple_html_dom.php';
-        }
         
         $buffer = $buffer.'<!-- Optimized with BerqWP\'s instant cache. --->';
 
         $script = "
-            <script data-berqwp defer>
+            <script defer>
                 var comment = document.createComment(' This website is optimized using the BerqWP plugin. @".time()." ');
                 document.documentElement.insertBefore(comment, document.documentElement.firstChild);
 
