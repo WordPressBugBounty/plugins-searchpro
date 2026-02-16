@@ -42,7 +42,7 @@ class berqHeartbeat
         ];
 
 ?>
-        <script id="wpo-heartbeat">
+        <script id="bwp-heartbeat">
             (function() {
                 var config = <?php echo json_encode($config); ?>;
                 var active = true;
@@ -277,8 +277,13 @@ class berqHeartbeat
         // Sort by priority
         uasort($queue, fn($a, $b) => $a['priority'] - $b['priority']);
 
+        // remove active pages
+        $pending_queue = array_filter($queue, function ($item) {
+            return empty($item['status']) || $item['status'] !== 'active';
+        });
+
         // Process one item
-        $key = array_key_first($queue);
+        $key = array_key_first($pending_queue);
         $item = $queue[$key];
 
         // if (!empty($item) && in_array($item['url'], get_option('berqwp_server_queue', []))) {
@@ -303,30 +308,20 @@ class berqHeartbeat
                 unset($queue[$key]);
             }
 
-            // error_log(sprintf(
-            //     'BWP2: Processed %s - %d assets in %.2fs',
-            //     $item['url'],
-            //     $result['stats']['total_assets'] ?? 0,
-            //     $result['processing_time'] ?? 0
-            // ));
-
-            // // Store package ID if uploaded
-            // if (!empty($result['upload_result']['data']['package_id'])) {
-            //     set_transient(
-            //         'wpo_package_' . $key,
-            //         $result['upload_result']['data']['package_id'],
-            //         DAY_IN_SECONDS
-            //     );
-            // }
 
         } catch (Exception $e) {
-            error_log('BWP2 Error: ' . $e->getMessage());
+            // error_log('BWP2 Error: ' . $e->getMessage());
+
+            global $berq_log;
+            $berq_log->info("Heartbeat page {$item['url']} failed");
+
+            $queue[$key]['status'] = 'pending';
             $queue[$key]['attempts']++;
             $queue[$key]['priority'] += 2;
         }
 
         // Remove items with too many attempts
-        $queue = array_filter($queue, fn($item) => $item['attempts'] < 5);
+        $queue = array_filter($queue, fn($item) => $item['attempts'] < 3);
 
         update_option($this->queue_key, $queue, false);
     }

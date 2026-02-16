@@ -148,6 +148,7 @@ if (!class_exists('berqCache')) {
         function warmup_html($html)
         {
             $current_page_url = bwp_get_request_url();
+            $queue = get_option('berqwp_optimize_queue', []);
 
             if (empty($html)) {
                 global $berq_log;
@@ -168,16 +169,39 @@ if (!class_exists('berqCache')) {
             // Remove ignored params from the slug
             // $slug = berqwp_remove_ignore_params($slug_uri);
             $page_url = berqwp_remove_ignore_params($current_page_url);
+            $key = md5($page_url);
 
             $html = preg_replace('/\?bwp_preload=\d+&/', '?', $html);
             $html = preg_replace('/\?bwp_preload=\d+/', '', $html);
             $html = preg_replace('/bwp_preload%3D\d+(%26)?/', '', $html);
 
             try {
-                berqUpload::process_page($page_url, $html);
-            } catch (\Throwable $e) {
+                $result = berqUpload::process_page($page_url, $html);
+
+                if (!$result['success']) {
+                    throw new Exception('BerqWP Page Queue Processing failed');
+                }
+
+                unset($queue[$key]);
+
+            } catch (Exception $e) {
+
+                global $berq_log;
+                $berq_log->info("Page $page_url failed, adding back into queue");
+
+                $queue[$key]['status'] = 'pending';
+                $queue[$key]['attempts']++;
+                $queue[$key]['priority'] += 2;
+
             }
 
+            // Remove items with too many attempts
+            $queue = array_filter($queue, fn($item) => $item['attempts'] < 3);
+
+            global $berq_log;
+            $berq_log->info("Queue count: ".count($queue));
+
+            update_option('berqwp_optimize_queue', $queue, false);
             usleep(0.5 * 1000000);
 
             $this->do_preload();
@@ -192,14 +216,21 @@ if (!class_exists('berqCache')) {
                 $queue = get_option('berqwp_optimize_queue', []);
             }
 
-            $queue_values = array_values($queue);
+            // remove active pages
+            $pending_queue = array_filter($queue, function ($item) {
+                return empty($item['status']) || $item['status'] !== 'active';
+            });
+
+            $queue_values = array_values($pending_queue);
 
             if (!empty($queue_values[0])) {
                 $preload_url = $queue_values[0]['url'];
 
                 // Remove from original queue using the MD5 key
-                $key_to_remove = array_key_first($queue);
-                unset($queue[$key_to_remove]);
+                $key = array_key_first($queue);
+                // unset($queue[$key_to_remove]);
+
+                $queue[$key]['status'] = 'active';
                 update_option('berqwp_optimize_queue', $queue, false);
 
                 // Preload URL
@@ -409,9 +440,12 @@ if (!class_exists('berqCache')) {
                 return;
             }
 
-            if (!is_admin()) {
-                return;
-            }
+            // if statement skips when scheduled post publishes 
+            // with admin wp cron request
+            // if (!is_admin()) {
+            //     $berq_log->info('Trasition post status admin' . ' ' . $new_status);
+            //     return;
+            // }
 
             $post_types = apply_filters('berqwp_purge_home_post_types', ['post']);
 
@@ -420,7 +454,7 @@ if (!class_exists('berqCache')) {
                 $berq_log->info('Purging homepage. Triggered by post type: ' . $post->post_type . ' ' . $old_status . ' ' . $new_status);
                 $home_url = home_url('/');
                 self::purge_page($home_url);
-                warmup_cache_by_url($home_url);
+                warmup_cache_by_url($home_url, true);
             }
 
             $blog_page_id = get_option('page_for_posts');
@@ -587,6 +621,9 @@ if (!class_exists('berqCache')) {
             // update_option('berqwp_uploaded_assets', [], false);
 
             $urls = array_unique($urls);
+
+            global $berq_log;
+            $berq_log->info("Warming cache for " . count($urls) . " pages.");
 
             foreach ($urls as $url) {
                 $key = md5($url);

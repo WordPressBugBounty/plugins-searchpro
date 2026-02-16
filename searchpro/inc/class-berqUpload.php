@@ -150,6 +150,7 @@ class berqUpload
 
         $parsed_url = wp_parse_url(get_site_url());
         $domain = $parsed_url['host'];
+        $queue_failed = null;
 
         if (empty(self::$resources)) {
 
@@ -166,13 +167,19 @@ class berqUpload
 
             $body['html'] = base64_encode(gzencode($html));
             $post_data = berqwp_get_page_params($url);
+
+            if (self::is_forced($url)) {
+                $post_data['force'] = 1;
+            }
+
             $body['params'] = json_encode($post_data);
 
-            self::handle_upload($body, [], true);
+            $queue_failed = self::handle_upload($body, [], true);
 
             $end = microtime(true);
             $timeMs = ($end - $start) * 1000;
             $berq_log->info("page queue 1 $timeMs ms");
+            
         } else {
 
             $start = microtime(true);
@@ -184,15 +191,22 @@ class berqUpload
                     'assets' => array_map(fn($a) => ['url' => $a['url'], 'hash' => hash_file('sha256', $a['path'])], $chunk),
                 ];
 
+                $is_last_chunk = $index === count($chunks) - 1;
+
                 $body = [
                     'action' => 'prepare_assets',
                     'meta' => json_encode($meta),
                     'domain' => $domain,
                 ];
 
-                if ($index === count($chunks) - 1) {
+                if ($is_last_chunk) {
                     $body['html'] = base64_encode(gzencode($html));
                     $post_data = berqwp_get_page_params($url);
+
+                    if (self::is_forced($url)) {
+                        $post_data['force'] = 1;
+                    }
+
                     $body['params'] = json_encode($post_data);
                 }
 
@@ -201,7 +215,11 @@ class berqUpload
                     $body["asset_$i"] = curl_file_create($asset['path'], $asset['type'], basename($asset['path']));
                 }
 
-                self::handle_upload($body, $chunk, $index === count($chunks) - 1);
+                $upload_result = self::handle_upload($body, $chunk, $is_last_chunk);
+
+                if ($is_last_chunk) {
+                    $queue_failed = $upload_result;
+                }
 
                 unset($chunk);
             }
@@ -213,9 +231,21 @@ class berqUpload
             $berq_log->info("page queue 2 $timeMs ms");
         }
 
+        if ($queue_failed === false) {
+            return ["success" => false];
+        }
+
         return [
             "success" => true
         ];
+    }
+
+    public static function is_forced($page_url)
+    {
+        $queue = get_option('berqwp_optimize_queue', []);
+        $key = md5($page_url);
+
+        return !empty($queue[$key]) && !empty($queue[$key]['force']);
     }
 
     static function handle_upload($body, $chunk = [], $is_last = false)
@@ -332,6 +362,10 @@ class berqUpload
                 }
 
                 update_option('berqwp_server_queue', $server_queue, false);
+            }
+
+            if ($is_last && !is_array($json)) {
+                return false;
             }
 
             // Throw exception on HTTP error
@@ -620,7 +654,7 @@ class berqUpload
         // $file_name = md5(self::clean_url($url)) . '.txt';
         $file_name = md5($url) . '.txt';
 
-        return is_file($path . $file_name) && (@filemtime($path . $file_name) + 60*5 > time());
+        return is_file($path . $file_name) && (@filemtime($path . $file_name) + 60 * 5 > time());
     }
 
     static function has_cache($url)

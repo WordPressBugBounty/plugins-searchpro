@@ -47,6 +47,7 @@ if (!class_exists('berqWP')) {
 			'debloat/debloat.php',
 			'perfmatters/perfmatters.php',
 			'phastpress/phastpress.php',
+			'wp-meteor/wp-meteor.php',
 		];
 
 		function __construct()
@@ -968,19 +969,29 @@ if (!class_exists('berqWP')) {
 				$berq_log->info('Making request 1');
 
 				$query_string = http_build_query($api_params);
-				$client = new HttpClient(BERQ_SERVER);
-				$client->setUserAgent('BerqWP');
-				$client->post('?' . $query_string, $api_params);
-				// $client->get('?'.$query_string);
-				// $client->setDebug(true);
-				$client->setTimeout(30);
+				// $client = new HttpClient(BERQ_SERVER);
+				// $client->setUserAgent('BerqWP');
+				// $client->post('?' . $query_string, $api_params);
+				// $client->setTimeout(30);
+
+				$client = new \BerqWP\GuzzleHttp\Client([
+					'timeout' => 60,
+					'http_errors' => false,
+					'verify' => false,
+				]);
+
+				$response = $client->post(BERQ_SERVER . '?' . $query_string, [
+					'form_params' => $api_params,
+				]);
+				$statusCode = $response->getStatusCode();
+				$response = $response->getBody()->getContents();
 
 				// var_dump($client->getContent(), $client->getError(), $api_params);
 
 				// $berq_log->info(print_r($client->getContent(), true).'---'.$client->ok());
 
-				if ($client->ok()) {
-					$response = $client->getContent();
+				if ($statusCode >= 200 && $statusCode < 300) {
+					// $response = $client->getContent();
 					$JSON = json_decode($response);
 
 					if ($action == 'slm_activate' && isset($JSON->error_code) && $JSON->message !== 'Invalid license key') {
@@ -996,15 +1007,20 @@ if (!class_exists('berqWP')) {
 						$berq_log->info('Making request 2');
 
 						$query_string = http_build_query($api_params);
-						$client = new HttpClient(BERQ_SERVER);
-						$client->setUserAgent('BerqWP');
-						$client->post('?' . $query_string, $api_params);
+						// $client = new HttpClient(BERQ_SERVER);
+						// $client->setUserAgent('BerqWP');
+						// $client->post('?' . $query_string, $api_params);
 
-						// $berq_log->info(print_r($client->getContent(), true));
 
-						if ($client->ok()) {
-							$response = $client->getContent();
-						}
+						// if ($client->ok()) {
+						// 	$response = $client->getContent();
+						// }
+
+						$response = $client->post(BERQ_SERVER . '?' . $query_string, [
+							'form_params' => $api_params,
+						]);
+
+						$response = $response->getBody()->getContents();
 					}
 				}
 
@@ -1021,15 +1037,20 @@ if (!class_exists('berqWP')) {
 					$berq_log->info('Making request 3');
 
 					$query_string = http_build_query($api_params);
-					$client = new HttpClient(BERQ_SERVER);
-					$client->setUserAgent('BerqWP');
-					$client->post('?' . $query_string, $api_params);
+					// $client = new HttpClient(BERQ_SERVER);
+					// $client->setUserAgent('BerqWP');
+					// $client->post('?' . $query_string, $api_params);
 
-					// $berq_log->info(print_r($client->getContent(), true));
 
-					if ($client->ok()) {
-						$response = $client->getContent();
-					}
+					// if ($client->ok()) {
+					// 	$response = $client->getContent();
+					// }
+
+					$response = $client->post(BERQ_SERVER . '?' . $query_string, [
+						'form_params' => $api_params,
+					]);
+
+					$response = $response->getBody()->getContents();
 				}
 
 				if (empty($response)) {
