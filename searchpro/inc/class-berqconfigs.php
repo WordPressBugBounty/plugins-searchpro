@@ -11,9 +11,11 @@ class berqConfigs {
         'page_compression'  => false,
     ];
 
+    private static $cached_config = null;
+
     function __construct() {
         $config_dir = dirname($this->config_file);
-        
+
         // Ensure the cache directory exists
         if (!is_dir($config_dir)) {
             wp_mkdir_p($config_dir);
@@ -22,14 +24,17 @@ class berqConfigs {
         if (!file_exists($this->config_file)) {
             // Create config file with current defaults if it doesn't exist
             $this->save_config($this->defaults);
-        } else {
-            // Update existing config with any new default values
+            self::$cached_config = $this->defaults;
+        } else if (self::$cached_config === null) {
+            // Only read from disk if not already cached this request
             $existing_config = $this->get_file_config();
             $merged_config = $this->merge_with_defaults($existing_config);
-            
+
             if ($merged_config !== $existing_config) {
                 $this->save_config($merged_config);
             }
+
+            self::$cached_config = $merged_config;
         }
     }
 
@@ -53,16 +58,22 @@ class berqConfigs {
 
     private function save_config($config) {
         file_put_contents($this->config_file, json_encode($config, JSON_PRETTY_PRINT));
+        self::$cached_config = null; // invalidate cache on write
     }
 
     public function get_configs() {
+        if (self::$cached_config !== null) {
+            return self::$cached_config;
+        }
+
         $file_config = $this->get_file_config();
 
         if ($file_config === false) {
             return false;
         }
 
-        return $this->merge_with_defaults($file_config);
+        self::$cached_config = $this->merge_with_defaults($file_config);
+        return self::$cached_config;
     }
 
     public function update_configs($new_config) {
@@ -72,12 +83,10 @@ class berqConfigs {
         if ($current_config === false) {
             return false;
         }
-        
+
         // Merge new values with existing config
         $updated_config = array_merge($current_config, $new_config);
 
-        // var_dump($updated_config);
-        
         // Save the complete configuration
         return $this->save_config($updated_config);
     }

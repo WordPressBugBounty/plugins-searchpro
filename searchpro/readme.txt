@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 3.1.12
+Stable tag: 3.1.13
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -234,6 +234,10 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 3.1.13 =
+* [Enhancement] Use static cache when reading the config file.
+* [Bug] Fixed cache warmup not working with non-ASCII asset file paths.
 
 = 3.1.12 =
 * [Enhancement] Auto refresh home cache when a scheduled post is published.

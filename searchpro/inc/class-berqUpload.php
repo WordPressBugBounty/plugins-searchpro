@@ -200,6 +200,10 @@ class berqUpload
                 ];
 
                 if ($is_last_chunk) {
+
+                    global $berq_log;
+                    $berq_log->info("Processing last chunk");
+
                     $body['html'] = base64_encode(gzencode($html));
                     $post_data = berqwp_get_page_params($url);
 
@@ -232,6 +236,8 @@ class berqUpload
         }
 
         if ($queue_failed === false) {
+            global $berq_log;
+            $berq_log->info("Upload failed, adding back to queue");
             return ["success" => false];
         }
 
@@ -254,52 +260,57 @@ class berqUpload
 
         $berq_log->info("Uploading chunk with " . count($chunk) . " assets using Guzzle");
 
+        if ($is_last) {
+            // $berq_log->info("Last chunk: " . print_r($chunk, true));
+        }
+
         // Use scoped Guzzle client
         $client = new \BerqWP\GuzzleHttp\Client([
             'timeout' => 60,
             'verify' => false, // Disable SSL verification
         ]);
 
-        // Build multipart array for Guzzle
-        $multipart = [];
-
-        // Add regular POST fields
-        foreach ($body as $key => $value) {
-            if ($value instanceof CURLFile) {
-                continue; // Skip files for now
-            }
-            $multipart[] = [
-                'name' => $key,
-                'contents' => $value,
-            ];
-        }
-
-        // Add file uploads
-        foreach ($body as $key => $value) {
-            if (!($value instanceof CURLFile)) {
-                continue; // Only process files
-            }
-
-            $file_path = $value->getFilename();
-            $file_name = $value->getPostFilename();
-            $mime_type = $value->getMimeType();
-
-            if (!is_file($file_path)) {
-                $berq_log->warning("File not found: {$file_path}");
-                continue;
-            }
-
-            $multipart[] = [
-                'name' => $key,
-                'contents' => fopen($file_path, 'r'),
-                'filename' => $file_name,
-                'headers' => [
-                    'Content-Type' => $mime_type,
-                ],
-            ];
-        }
-
+        
         try {
+            // Build multipart array for Guzzle
+            $multipart = [];
+    
+            // Add regular POST fields
+            foreach ($body as $key => $value) {
+                if ($value instanceof CURLFile) {
+                    continue; // Skip files for now
+                }
+                $multipart[] = [
+                    'name' => $key,
+                    'contents' => $value,
+                ];
+            }
+    
+            // Add file uploads
+            foreach ($body as $key => $value) {
+                if (!($value instanceof CURLFile)) {
+                    continue; // Only process files
+                }
+    
+                $file_path = $value->getFilename();
+                $file_name = $value->getPostFilename();
+                $mime_type = $value->getMimeType();
+    
+                if (!is_file($file_path)) {
+                    $berq_log->warning("File not found: {$file_path}");
+                    continue;
+                }
+    
+                $multipart[] = [
+                    'name' => $key,
+                    'contents' => fopen($file_path, 'r'),
+                    'filename' => $file_name,
+                    'headers' => [
+                        'Content-Type' => $mime_type,
+                    ],
+                ];
+            }
+
             $response = $client->request('POST', 'https://boost.berqwp.com/photon/', [
                 'multipart' => $multipart,
             ]);
@@ -379,6 +390,9 @@ class berqUpload
         } catch (\Exception $e) {
             $berq_log->error("Upload failed: " . $e->getMessage());
             throw $e;
+        } catch (\Throwable $e) {
+            $berq_log->error("Upload failed: " . $e->getMessage());
+            // throw $e;
         }
     }
 

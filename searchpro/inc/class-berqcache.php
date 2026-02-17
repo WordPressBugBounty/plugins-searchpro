@@ -618,7 +618,7 @@ if (!class_exists('berqCache')) {
             berqwp_clear_cache_queue();
 
             update_option('berqwp_server_queue', [], false);
-            // update_option('berqwp_uploaded_assets', [], false);
+            update_option('berqwp_uploaded_assets', [], false);
 
             $urls = array_unique($urls);
 
