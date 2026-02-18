@@ -69,11 +69,11 @@ class berqUpload
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process inline css $timeMs ms");
 
-        $start = microtime(true);
-        self::proccess_external();
-        $end = microtime(true);
-        $timeMs = ($end - $start) * 1000;
-        $berq_log->info("process external 1 $timeMs ms");
+        // $start = microtime(true);
+        // self::proccess_external();
+        // $end = microtime(true);
+        // $timeMs = ($end - $start) * 1000;
+        // $berq_log->info("process external 1 $timeMs ms");
 
         $start = microtime(true);
         self::proccess_css_ref();
@@ -87,11 +87,11 @@ class berqUpload
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process css import $timeMs ms");
 
-        $start = microtime(true);
-        self::proccess_external();
-        $end = microtime(true);
-        $timeMs = ($end - $start) * 1000;
-        $berq_log->info("process external 2 $timeMs ms");
+        // $start = microtime(true);
+        // self::proccess_external();
+        // $end = microtime(true);
+        // $timeMs = ($end - $start) * 1000;
+        // $berq_log->info("process external 2 $timeMs ms");
 
         // $compressed_assets = array_map(function ($asset) {
 
@@ -507,15 +507,6 @@ class berqUpload
                 //     ];
                 // }
 
-                // Download the HTML
-                $response = wp_remote_get($item['html'], $options);
-                $response_code = wp_remote_retrieve_response_code($response);
-
-                // Check for errors
-                if (is_wp_error($response) || $response_code !== 200) {
-                    continue;
-                }
-
                 if (berqwp_is_page_url_excluded($item['url'])) {
                     $server_queue = get_option('berqwp_server_queue', []);
 
@@ -529,23 +520,34 @@ class berqUpload
                     continue;
                 }
 
+                // Download the HTML
+                $response = wp_remote_get($item['html'], $options);
+                $response_code = wp_remote_retrieve_response_code($response);
+
+                // Check for errors
+                if (is_wp_error($response) || $response_code !== 200) {
+                    continue;
+                }
+
                 $html = wp_remote_retrieve_body($response);
 
                 $parsed = wp_parse_url($item['html']);
 
                 if (!empty($parsed['path']) && str_ends_with($parsed['path'], '.gz')) {
-                    $tmp = wp_tempnam('cache.gz');
-                    file_put_contents($tmp, $html);
+                    
+                    $html = gzdecode($html);
+                    // $tmp = wp_tempnam('cache.gz');
+                    // file_put_contents($tmp, $html);
 
-                    $gz = gzopen($tmp, 'rb');
-                    $html = '';
+                    // $gz = gzopen($tmp, 'rb');
+                    // $html = '';
 
-                    while (!gzeof($gz)) {
-                        $html .= gzread($gz, 8192);
-                    }
+                    // while (!gzeof($gz)) {
+                    //     $html .= gzread($gz, 8192);
+                    // }
 
-                    gzclose($gz);
-                    unlink($tmp);
+                    // gzclose($gz);
+                    // unlink($tmp);
                 }
 
                 // Allow other plugins to modify cache html
@@ -1094,14 +1096,14 @@ class berqUpload
                     continue;
                 }
 
-                $js = file_get_contents($js_path);
+                // $js = file_get_contents($js_path);
 
                 self::$resources[] = [
                     'url' => $src,
                     'path' => $js_path,
                     'type' => 'js',
                     'hosted' => true,
-                    'content' => $js,
+                    'content' => '',
                 ];
 
                 continue;
@@ -1166,14 +1168,14 @@ class berqUpload
                     continue;
                 }
 
-                $img = file_get_contents($img_path);
+                // $img = file_get_contents($img_path);
 
                 self::$resources[] = [
                     'url' => $src,
                     'path' => $img_path,
                     'type' => 'img',
                     'hosted' => true,
-                    'content' => $img,
+                    'content' => '',
                 ];
 
                 continue;
@@ -1256,14 +1258,14 @@ class berqUpload
                     continue;
                 }
 
-                $img = file_get_contents($img_path);
+                // $img = file_get_contents($img_path);
 
                 self::$resources[] = [
                     'url' => $srcset_img_url,
                     'path' => $img_path,
                     'type' => 'img',
                     'hosted' => true,
-                    'content' => $img,
+                    'content' => '',
                 ];
 
                 continue;

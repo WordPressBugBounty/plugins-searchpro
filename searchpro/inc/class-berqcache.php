@@ -147,6 +147,8 @@ if (!class_exists('berqCache')) {
 
         function warmup_html($html)
         {
+            set_time_limit(120);
+
             $current_page_url = bwp_get_request_url();
             $queue = get_option('berqwp_optimize_queue', []);
 
@@ -618,7 +620,7 @@ if (!class_exists('berqCache')) {
             berqwp_clear_cache_queue();
 
             update_option('berqwp_server_queue', [], false);
-            update_option('berqwp_uploaded_assets', [], false);
+            // update_option('berqwp_uploaded_assets', [], false);
 
             $urls = array_unique($urls);
 

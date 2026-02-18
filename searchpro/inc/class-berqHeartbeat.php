@@ -255,8 +255,9 @@ class berqHeartbeat
     {
         $queue = get_option($this->queue_key, []);
 
+        berqUpload::request_pending_cache();
+        
         if (empty($queue)) {
-            berqUpload::request_pending_cache();
             return;
         }
 
@@ -317,7 +318,6 @@ class berqHeartbeat
 
             $queue[$key]['status'] = 'pending';
             $queue[$key]['attempts']++;
-            $queue[$key]['priority'] += 2;
         }
 
         // Remove items with too many attempts
