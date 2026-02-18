@@ -43,10 +43,11 @@ if (!class_exists('berqCache')) {
             if (isset($_GET['bwp_preload'])) {
                 add_action('wp', [$this, 'preload_buffer'], 999);
             } else {
-                global $berqwp_is_dropin;
-                if (empty($berqwp_is_dropin)) {
-                    add_action('wp', [$this, 'html_cache'], 2);
-                }
+
+                add_action('wp', [$this, 'html_cache'], 2);
+                // global $berqwp_is_dropin;
+                // if (empty($berqwp_is_dropin)) {
+                // }
             }
 
             // Add clear cache link to admin bar
@@ -1346,7 +1347,7 @@ if (!class_exists('berqCache')) {
                 $queue[$key] = [
                     'url' => $page_url,
                     'added' => time(),
-                    'priority' => 5,
+                    'priority' => $page_url == home_url('/') ? 1 : 5,
                     'attempts' => 0
                 ];
 

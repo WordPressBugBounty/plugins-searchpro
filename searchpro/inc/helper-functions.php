@@ -282,9 +282,9 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
     $parsed_site_url = wp_parse_url(home_url());
     $parsed_page_url = wp_parse_url($page_url);
 
-    // if ($parsed_page_url['host'] !== $parsed_site_url['host']) {
-    //     return;
-    // }
+    if ($parsed_page_url['host'] !== $parsed_site_url['host']) {
+        return;
+    }
 
     // Avoid caching file URLs e.g .php
     // Allow .html
@@ -315,20 +315,18 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
     $queue = get_option('berqwp_optimize_queue', []);
     $key = md5($page_url);
 
-    if (!isset($queue[$key])) {
-        $queue[$key] = [
-            'url' => $page_url,
-            'added' => time(),
-            'priority' => $is_forced ? 1 : 5,
-            'attempts' => 0
-        ];
+    $queue[$key] = [
+        'url' => $page_url,
+        'added' => time(),
+        'priority' => $is_forced ? 1 : 5,
+        'attempts' => 0
+    ];
 
-        if ($is_forced) {
-            $queue[$key]['force'] = 1;
-        }
-
-        update_option('berqwp_optimize_queue', $queue, false);
+    if ($is_forced) {
+        $queue[$key]['force'] = 1;
     }
+
+    update_option('berqwp_optimize_queue', $queue, false);
 
     // $berqwp->request_cache($post_data, $timeout);
 }
