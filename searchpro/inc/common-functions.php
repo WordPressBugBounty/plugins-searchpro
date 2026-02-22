@@ -89,7 +89,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
             
                 } 
     
-                header('Cache-Control: public, max-age=0, s-maxage=3600', true);
+                header('Cache-Control: public, max-age=0, s-maxage=3600, must-revalidate', true);
 
                 // if ($compression_enabled && $supports_gzip) {
                 if ($compression_enabled) {

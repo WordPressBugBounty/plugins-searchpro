@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) exit;
 class Nginx extends berqIntegrations {
     function __construct() {
         add_action('berqwp_flush_all_cache', [$this, 'flush_cache']);
-        add_action('berqwp_stored_page_cache', [$this, 'flush_cache']);
+        add_action('berqwp_stored_page_cache', [$this, 'flush_page_cache']);
     }
     
     function flush_cache()
@@ -22,6 +22,21 @@ class Nginx extends berqIntegrations {
             }
 
         }
+    }
+
+    function flush_page_cache($slug)
+    {
+        $is_nginx = stripos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false;
+
+        if (!$is_nginx) {
+            return;
+        }
+
+        if (empty($slug)) {
+            $slug = '/';
+        }
+
+        berqReverseProxyCache::purge_cache(home_url($slug));
     }
 }
 

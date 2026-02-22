@@ -369,6 +369,9 @@ if (isset($_POST['berqwp_save_nonce'])) {
         });
 
         if (bwp_is_option_updated('berq_exclude_cdn')) {
+
+            // var_dump('test');
+            // exit;
             update_option('bwp_require_flush_cache', 1);
         }
 
@@ -455,9 +458,15 @@ if (isset($_POST['berqwp_save_nonce'])) {
         $urls = sanitize_textarea_field($_POST['berq_exclude_js_css']);
         $urls_array = explode("\n", $urls);
 
-        if (isset($urls_array)) {
-            update_option('berq_exclude_js_css', $urls_array);
-        }
+        $urls_array = array_map(function ($kw) {
+            return trim($kw);
+        }, $urls_array);
+
+        $urls_array = array_filter($urls_array, function ($kw) {
+            return !empty($kw);
+        });
+
+        update_option('berq_exclude_js_css', $urls_array);
 
     }
 

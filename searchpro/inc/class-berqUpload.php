@@ -40,6 +40,10 @@ class berqUpload
 
             $html = wp_remote_retrieve_body($response);
 
+            if (empty($html)) {
+                self::queue_remove_page($url);
+            }
+
             $html = preg_replace('/\?nocache=\d+&/', '?', $html);
             $html = preg_replace('/\?nocache=\d+/', '', $html);
             $html = preg_replace('/nocache%3D\d+(%26)?/', '', $html);
@@ -489,6 +493,13 @@ class berqUpload
         self::handle_download_cache($json['pending_download']);
     }
 
+    static function queue_remove_page($pag_url) {
+        $queue = get_option('berqwp_optimize_queue', []);
+        $key = md5($pag_url);
+        unset($queue[$key]);
+        update_option('berqwp_optimize_queue', $queue, false);
+    }
+
     static function handle_download_cache($pending_downloads)
     {
         global $berq_log;
@@ -561,10 +572,7 @@ class berqUpload
                 foreach ($server_queue as $index => $url) {
                     if ($url == $item['url']) {
 
-                        $queue = get_option('berqwp_optimize_queue', []);
-                        $key = md5($item['url']);
-                        unset($queue[$key]);
-                        update_option('berqwp_optimize_queue', $queue, false);
+                        self::queue_remove_page($item['url']);
 
                         unset($server_queue[$index]);
                     }

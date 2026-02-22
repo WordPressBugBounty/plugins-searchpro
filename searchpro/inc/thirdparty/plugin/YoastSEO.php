@@ -15,6 +15,7 @@ class berqYoastSEO extends berqIntegrations {
         $default_allowed_extravars[] = 'berqwp';
         $default_allowed_extravars[] = 'berqwp_sitemap';
         $default_allowed_extravars[] = 'PageSpeed';
+        $default_allowed_extravars[] = 'bwp_preload';
 
         return $default_allowed_extravars;
     }

@@ -1572,11 +1572,21 @@ function bwp_is_option_updated($option_name)
     }
 
     $option_val = get_option($option_name);
+    $array_options = ['berq_exclude_js_css', 'berq_exclude_cdn'];
 
-    if ($option_name == 'berq_exclude_js_css') {
+    if (in_array($option_name, $array_options)) {
         $urls = sanitize_textarea_field($value);
         $urls_array = explode("\n", $urls);
-        // var_dump($option_val, $urls_array);
+
+        $urls_array = array_map(function ($kw) {
+            return trim($kw);
+        }, $urls_array);
+
+        $urls_array = array_filter($urls_array, function ($kw) {
+            return !empty($kw);
+        });
+
+        // var_dump($option_val, $urls_array, array_diff($option_val, $urls_array));
         // exit;
 
         return !empty(array_diff($option_val, $urls_array));
