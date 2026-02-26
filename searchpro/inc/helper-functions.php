@@ -6,6 +6,82 @@ use function BerqWP\Vendor\SimpleHtmlDom\berqwp_str_get_html;
 if (!defined('ABSPATH'))
     exit;
 
+// ==========================================
+// Multisite Network Option Helpers
+// ==========================================
+
+function berqwp_get_license_key() {
+    if (function_exists('is_multisite') && is_multisite()) {
+        return get_site_option('berqwp_license_key', '');
+    }
+    return get_option('berqwp_license_key', '');
+}
+
+function berqwp_update_license_key($key) {
+    if (function_exists('is_multisite') && is_multisite()) {
+        return update_site_option('berqwp_license_key', $key);
+    }
+    return update_option('berqwp_license_key', $key);
+}
+
+function berqwp_delete_license_key() {
+    if (function_exists('is_multisite') && is_multisite()) {
+        return delete_site_option('berqwp_license_key');
+    }
+    return delete_option('berqwp_license_key');
+}
+
+function berqwp_get_network_option($key, $default = false) {
+    if (function_exists('is_multisite') && is_multisite()) {
+        return get_site_option($key, $default);
+    }
+    return get_option($key, $default);
+}
+
+function berqwp_update_network_option($key, $value) {
+    if (function_exists('is_multisite') && is_multisite()) {
+        return update_site_option($key, $value);
+    }
+    return update_option($key, $value);
+}
+
+function berqwp_delete_network_option($key) {
+    if (function_exists('is_multisite') && is_multisite()) {
+        return delete_site_option($key);
+    }
+    return delete_option($key);
+}
+
+function berqwp_is_network_activated() {
+    if (!function_exists('is_multisite') || !is_multisite()) {
+        return false;
+    }
+    if (function_exists('is_plugin_active_for_network')) {
+        return is_plugin_active_for_network('searchpro/berqwp.php');
+    }
+    return false;
+}
+
+function berqwp_is_multisite() {
+    return function_exists('is_multisite') && is_multisite();
+}
+
+function berqwp_is_license_managed_by_network() {
+    return berqwp_is_multisite() && berqwp_is_network_activated();
+}
+
+function berqwp_is_license_active() {
+    return !empty(berqwp_get_license_key());
+}
+
+function berqwp_activate_single_site() {
+    if (empty(berqwp_get_license_key())) {
+        set_transient('bqwp_hide_feedback_notice', true, 60 * 60);
+        set_transient('berqwp_redirect', true, 1);
+    }
+    update_option('berqwp_sync_addons', true);
+    do_action('berqwp_activate_plugin');
+}
 
 function berqwp_is_slug_excludable($slug)
 {
@@ -183,7 +259,7 @@ function berqwp_get_page_params($page_url, $is_forced = false)
     // Data to send as POST parameters
     $post_data = array(
         'site_id' => $berqwp_configs['site_id'],
-        'license_key' => get_option('berqwp_license_key'),
+        'license_key' => berqwp_get_license_key(),
         'page_url' => $page_url,
         'page_slug' => $page_slug,
         'site_url' => home_url(),
@@ -235,7 +311,7 @@ function bwp_pass_account_requirement()
 {
     global $berqWP, $berq_log;
 
-    $license_key = get_option('berqwp_license_key');
+    $license_key = berqwp_get_license_key();
 
     if (empty($license_key)) {
         return false;
@@ -273,7 +349,7 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
         return;
     }
 
-    if (empty(get_option('berqwp_license_key'))) {
+    if (empty(berqwp_get_license_key())) {
         return;
     }
 
@@ -305,7 +381,7 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
     global $berq_log;
     $berq_log->info('warming page: ' . $page_url);
 
-    $berqwp = new BerqWP(get_option('berqwp_license_key'), null, optifer_cache);
+    $berqwp = new BerqWP(berqwp_get_license_key(), null, optifer_cache);
     $timeout = 30;
 
     if ($async) {
@@ -760,9 +836,9 @@ function bwp_is_gzip_supported()
 
 function bwp_cached_pages_count()
 {
-    $cache_directory = optifer_cache . DIRECTORY_SEPARATOR . 'html';
-    $cache_files = glob($cache_directory . DIRECTORY_SEPARATOR . "*.gz");
-    return count($cache_files);
+    $cache_directory = bwp_get_cache_dir();
+    $cache_files = glob($cache_directory . "*.gz");
+    return is_array($cache_files) ? count($cache_files) : 0;
 }
 
 function bwp_wp_remote_get($url, $args = array())
@@ -883,7 +959,7 @@ function berq_rest_permission_callback(WP_REST_Request $request)
     $nonce = $request->get_header('X-WP-Nonce');
     $hash = $request->get_header('X-berqwp-key-hash');
 
-    if ($hash == md5(get_option('berqwp_license_key'))) {
+    if ($hash == md5(berqwp_get_license_key())) {
         return true;
     }
 
@@ -898,7 +974,7 @@ function berq_rest_permission_callback(WP_REST_Request $request)
 function berq_rest_verify_license_callback(WP_REST_Request $request)
 {
     $license_key_hash = sanitize_text_field($request->get_param('license_key_hash'));
-    $license_key = get_option('berqwp_license_key');
+    $license_key = berqwp_get_license_key();
 
     if (empty($license_key_hash) || empty($license_key) || $license_key_hash !== md5($license_key)) {
         global $berq_log;
@@ -1229,7 +1305,7 @@ function bwp_url_into_path($url)
 
 function bwp_get_cache_dir()
 {
-    $cache_directory = optifer_cache . '/html/';
+    $cache_directory = optifer_cache . 'html/';
 
     if (function_exists('is_multisite') && is_multisite()) {
         $site_id = get_current_blog_id();
@@ -1241,6 +1317,21 @@ function bwp_get_cache_dir()
     }
 
     return $cache_directory;
+}
+
+function bwp_get_static_cache_dir()
+{
+    $dir = optifer_cache . 'static/';
+
+    if (function_exists('is_multisite') && is_multisite()) {
+        $dir .= 'site-' . get_current_blog_id() . '/';
+    }
+
+    if (!is_dir($dir)) {
+        wp_mkdir_p($dir);
+    }
+
+    return $dir;
 }
 
 function bwp_store_cache_webhook()
@@ -1379,6 +1470,7 @@ function bwp_get_sitemap()
                 'total_pages' => $total_pages,
                 'total_posts' => $total_posts,
                 'urls' => $sitemap_urls,
+                'queue' => get_option('berqwp_optimize_queue', []),
             );
 
             echo json_encode($response);
@@ -1586,6 +1678,10 @@ function bwp_is_option_updated($option_name)
             return !empty($kw);
         });
 
+        if (!is_array($option_val)) {
+            $option_val = [];
+        }
+
         // var_dump($option_val, $urls_array, array_diff($option_val, $urls_array));
         // exit;
 
@@ -1600,7 +1696,7 @@ function bwp_is_option_updated($option_name)
 function bwp_request_purge_license_key_cache()
 {
 
-    $license_key = get_option('berqwp_license_key');
+    $license_key = berqwp_get_license_key();
     $parsed_url = parse_url(home_url());
     $domain = $parsed_url['host'];
 
@@ -1842,7 +1938,7 @@ function berqwp_clear_cache_queue()
 {
     $berqconfigs = new berqConfigs();
     $site_id = $berqconfigs->get_configs()['site_id'];
-    $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
+    $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
     $berqwp->clear_cache_queue(home_url(), $site_id);
 }
 

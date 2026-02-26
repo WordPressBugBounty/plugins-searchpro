@@ -28,7 +28,7 @@ if (!class_exists('berqCache')) {
                 // Flush critical css
                 $parsed_url = wp_parse_url(home_url());
                 $domain = $parsed_url['host'];
-                $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
+                $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
                 $berqwp->purge_critilclcss($domain);
 
                 // Flush page cache
@@ -219,6 +219,9 @@ if (!class_exists('berqCache')) {
                 $queue = get_option('berqwp_optimize_queue', []);
             }
 
+            // Sort by priority
+            uasort($queue, fn($a, $b) => $a['priority'] - $b['priority']);
+
             // remove active pages
             $pending_queue = array_filter($queue, function ($item) {
                 return empty($item['status']) || $item['status'] !== 'active';
@@ -235,6 +238,9 @@ if (!class_exists('berqCache')) {
 
                 $queue[$key]['status'] = 'active';
                 update_option('berqwp_optimize_queue', $queue, false);
+
+                global $berq_log;
+                $berq_log->info("Doing preload request");
 
                 // Preload URL
                 wp_remote_get($preload_url . '?bwp_preload=' . time(), [
@@ -417,7 +423,7 @@ if (!class_exists('berqCache')) {
         {
             $parsed_url = wp_parse_url(home_url());
             $domain = $parsed_url['host'];
-            $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
+            $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
             $berqwp->purge_critilclcss($domain);
         }
 
@@ -442,6 +448,10 @@ if (!class_exists('berqCache')) {
             if ($new_status == 'auto-draft') {
                 return;
             }
+
+            // if ($old_status == 'new' && $new_status == 'draft') {
+            //     return;
+            // }
 
             // if statement skips when scheduled post publishes 
             // with admin wp cron request
@@ -648,11 +658,11 @@ if (!class_exists('berqCache')) {
         {
             return;
             $post_data = [
-                'license_key' => get_option('berqwp_license_key'),
+                'license_key' => berqwp_get_license_key(),
                 'site_url' => home_url(),
                 'cache_warmup' => true,
             ];
-            $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
+            $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
             $berqwp->request_cache_warmup($post_data, $async);
         }
 
@@ -684,7 +694,7 @@ if (!class_exists('berqCache')) {
             do_action('berqwp_flush_page_cache', $slug);
 
             if ($flush_criticalcss) {
-                $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
+                $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
                 $berqwp->purge_criticlecss_url($page_url);
             }
 
@@ -879,7 +889,7 @@ if (!class_exists('berqCache')) {
             $args = [
                 'timeout' => 30,
                 'sslverify' => false,
-                'body' => ['flush_cdn' => $domain, 'license_key' => get_option('berqwp_license_key')]
+                'body' => ['flush_cdn' => $domain, 'license_key' => berqwp_get_license_key()]
             ];
 
             wp_remote_post('https://boost.berqwp.com/photon/', $args);
@@ -955,7 +965,7 @@ if (!class_exists('berqCache')) {
                 $parsed_url = wp_parse_url(home_url());
                 $domain = $parsed_url['host'];
 
-                $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
+                $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
                 $berqwp->purge_critilclcss($domain);
 
                 do_action('berqwp_purge_criticalcss');
@@ -1029,7 +1039,7 @@ if (!class_exists('berqCache')) {
 
         function add_admin_bar_menu()
         {
-            if (empty(get_option('berqwp_license_key'))) {
+            if (empty(berqwp_get_license_key())) {
                 return;
             }
 
@@ -1221,7 +1231,7 @@ if (!class_exists('berqCache')) {
                 return false;
             }
 
-            if (empty(get_option('berqwp_license_key'))) {
+            if (empty(berqwp_get_license_key())) {
                 return false;
             }
 
@@ -1358,7 +1368,7 @@ if (!class_exists('berqCache')) {
             $berqconfigs = new berqConfigs();
             $configs = $berqconfigs->get_configs();
             $cache_key = md5($page_url);
-            $cache_directory = WP_CONTENT_DIR . '/cache/berqwp/html/';
+            $cache_directory = bwp_get_cache_dir();
             $cache_file = $cache_directory . $cache_key . '.gz';
             $cache_max_life = file_exists($cache_file) ? @filemtime($cache_file) + $configs['cache_lifespan'] : null;
 
@@ -1390,6 +1400,11 @@ if (!class_exists('berqCache')) {
                 readfile($cache_file);
                 exit();
             }
+
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('CDN-Cache-Control: no-store');     // Cloudflare
+            header('Surrogate-Control: no-store');      // Varnish
+            header('X-Accel-Expires: 0');               // Nginx FastCGI
 
             return;
         }

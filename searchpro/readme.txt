@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 3.1.17
+Stable tag: 3.1.18
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -234,6 +234,11 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 3.1.18 =
+* [Enhancement] Added compatiblity with multisite network.
+* [Bug] Fixed critical error on save settings.
+* [Bug] Now uses file based locking for heartbeat.
 
 = 3.1.17 =
 * [Bug] Fixed pages not being added to the queue when the YoastSEO "Disable Query Parameters" feature is enabled.

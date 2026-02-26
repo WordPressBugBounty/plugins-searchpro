@@ -15,6 +15,16 @@ do_action('berqwp_notices');
     <div id="berqwp-intro">
         <h2 class="title">Automate PageSpeed optimization with just a few clicks</h2>
 
+        <?php if (berqwp_is_license_managed_by_network()): ?>
+            <div style="text-align: center; padding: 20px;">
+                <p style="font-size: 16px;">The license key for this plugin is managed at the <strong>Network Admin</strong> level.</p>
+                <?php if (current_user_can('manage_network_options')): ?>
+                    <p><a href="<?php echo esc_url(network_admin_url('admin.php?page=berqwp-network')); ?>" class="button button-primary" style="font-size: 14px; padding: 8px 20px;">Go to Network Settings</a></p>
+                <?php else: ?>
+                    <p>Please contact your network administrator to activate the license.</p>
+                <?php endif; ?>
+            </div>
+        <?php else: ?>
         <form class="license-verification" action="" method="post" autocomplete="off">
             <?php wp_nonce_field('berqwp_save_settings', 'berqwp_save_nonce'); ?>
             <input type="password" name="berqwp_license_key" placeholder="Enter your license key" required autocomplete="off">
@@ -26,6 +36,7 @@ do_action('berqwp_notices');
         }
         ?>
         <p class="license-msg">Create an account to obtain a BerqWP license key.</p>
+        <?php endif; ?>
         <div class="cta-btns">
             <a href="https://berqwp.com/pricing/" class="btn" target="_blank">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

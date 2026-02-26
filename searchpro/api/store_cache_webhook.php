@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET['berqwp_webhook']) && 
     $page_slug = strtolower($data['page_slug']);
     $license_key_hash = sanitize_text_field($data['license_key_hash']);
     $page_url = strtolower($data['page_url']);
-    $license_key = get_option('berqwp_license_key');
+    $license_key = berqwp_get_license_key();
     global $berq_log;
 
     if ($status == 'success' && !empty($html_url)) {

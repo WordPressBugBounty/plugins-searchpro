@@ -127,7 +127,7 @@ if ($cached_percentage < 0) {
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Cached Pages', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <div class="cache-percentage"><p><b><?php echo $cached_percentage; ?>%</b> (<?php echo $cached_pages; ?>) of your pages are currently cached. <span class="bwp-cache-count"></span><span class="bwp-pending-optimization"></span></p></div>
+            <div class="cache-percentage"><p><b><?php echo $cached_percentage; ?>%</b> (<?php echo $optimized_pages; ?>) of your pages are currently cached. <span class="bwp-cache-count"></span><span class="bwp-pending-optimization"></span></p></div>
             <div class="cached-pages-bar">
                 <div class="progress-bar" style="width:<?php echo $cached_percentage; ?>%"></div>
             </div>

@@ -9,10 +9,11 @@ class berqHeartbeat
 
     private string $queue_key = 'berqwp_optimize_queue';
     private string $stats_key = 'berqwp_optimize_stats';
-    private string $lock_key = 'berqwp_optimize_lock';
+    private string $lock_file;
 
     public function __construct()
     {
+        $this->lock_file = WP_CONTENT_DIR . '/cache/berqwp/.lock';
         add_action('wp_footer', [$this, 'inject_heartbeat'], 999);
         add_action('admin_footer', [$this, 'inject_heartbeat'], 999);
         add_action('wp_ajax_berqwp_heartbeat', [$this, 'handle_heartbeat']);
@@ -67,7 +68,7 @@ class berqHeartbeat
                 if (document.readyState === 'complete') {
                     init();
                 } else {
-                    window.addEventListener('load', init);
+                    document.addEventListener('DOMContentLoaded', init);
                 }
 
                 function init() {
@@ -195,21 +196,16 @@ class berqHeartbeat
             return;
         }
 
-        // Check if this page is now cached
-        if (!$is_cached && $url) {
-            $cache_key = 'bwph_' . md5($url);
-            if (get_transient($cache_key)) {
-                $response['cached'] = true;
-            }
-        }
-
         // Try to process queue if not locked
         if ($this->acquire_lock()) {
 
-            // Process in background
-            $this->process_queue();
+            $response['lock_acquired'] = true;
 
-            $this->release_lock();
+            try {
+                $this->process_queue();
+            } finally {
+                $this->release_lock();
+            }
 
             // Send response first
             wp_send_json_success($response);
@@ -217,6 +213,8 @@ class berqHeartbeat
             // Close connection
             $this->close_connection();
         } else {
+
+            $response['lock_acquired'] = false;
             wp_send_json_success($response);
         }
     }
@@ -263,10 +261,10 @@ class berqHeartbeat
 
         $queue = array_filter($queue, fn($item) => strpos($item['url'], '?') === false);
 
-        // Check load
-        if ($this->get_current_load() > 90) {
-            return;
-        }
+        // // Check load
+        // if ($this->get_current_load() > 90) {
+        //     return;
+        // }
 
         set_time_limit(120);
 
@@ -298,10 +296,13 @@ class berqHeartbeat
 
             if (!empty($item)) {
 
+                global $berq_log;
+                $berq_log->info("Doing heartbeat request");
+
                 // Delegate to optimize.php for processing and upload
                 $result = berqUpload::process_page($item['url']);
 
-                if (!$result['success']) {
+                if (!isset($result['success'])) {
                     throw new Exception($result['error'] ?? 'Processing failed');
                 }
 
@@ -415,20 +416,23 @@ class berqHeartbeat
     }
 
     /**
-     * Acquire processing lock
+     * Acquire processing lock (file-based)
      */
     private function acquire_lock(): bool
     {
-        $lock = get_transient($this->lock_key);
-
-        if ($lock) {
-            return false;
+        if (file_exists($this->lock_file)) {
+            if (filemtime($this->lock_file) > (time() - 120)) {
+                return false;
+            }
+            @unlink($this->lock_file);
         }
 
-        // Set lock for 60 seconds
-        set_transient($this->lock_key, time(), 60);
+        $dir = dirname($this->lock_file);
+        if (!is_dir($dir)) {
+            wp_mkdir_p($dir);
+        }
 
-        return true;
+        return (bool) @file_put_contents($this->lock_file, time());
     }
 
     /**
@@ -436,7 +440,7 @@ class berqHeartbeat
      */
     private function release_lock(): void
     {
-        delete_transient($this->lock_key);
+        @unlink($this->lock_file);
     }
 
     /**

@@ -10,16 +10,16 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
     $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
-    if (!empty($_POST['berqwp_license_key'])) {
+    if (!empty($_POST['berqwp_license_key']) && !berqwp_is_license_managed_by_network()) {
         // if (berq_is_localhost() && get_site_url() !== 'http://berq-test.local') {
         //     return;
         // }
-        
+
         $key = sanitize_text_field($_POST['berqwp_license_key']);
         $key_response = $this->verify_license_key($key, 'slm_activate');
 
         if (!empty($key_response) && $key_response->result == 'success' && ($key_response->message == 'License key activated' || $key_response->status == 'active')) {
-            update_option('berqwp_license_key', $key);
+            berqwp_update_license_key($key);
             
             if ($key_response->product_ref == 'AppSumo Deal') {
                 update_option('berqwp_can_use_fluid_images', 0, false);
@@ -81,12 +81,12 @@ if (isset($_POST['berqwp_save_nonce'])) {
         exit();
     }
 
-    if (!empty($_POST['berq_deactivate_key'])) {
-        $license_key = get_option('berqwp_license_key');
+    if (!empty($_POST['berq_deactivate_key']) && !berqwp_is_license_managed_by_network()) {
+        $license_key = berqwp_get_license_key();
         $key_response = $this->verify_license_key($license_key, 'slm_deactivate');
         
         delete_transient('berq_lic_response_cache');
-        delete_option('berqwp_license_key');
+        berqwp_delete_license_key();
         berqwp_clear_cache_queue();
 
         global $berqNotifications;

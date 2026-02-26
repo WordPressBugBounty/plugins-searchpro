@@ -39,7 +39,7 @@ class berqWooCommerce extends berqIntegrations {
 
         // Get the full URL of the product
         $product_url = get_permalink( $post_id );
-        $berqwp = new BerqWP(get_option('berqwp_license_key'), null, null);
+        $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
         $berqwp->purge_criticlecss_url($product_url);
         
     }

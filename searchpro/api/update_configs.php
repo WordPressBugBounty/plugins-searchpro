@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET['berqwp_webhook']) && 
 
     $settings = (array) $data['settings'];
     $license_key_hash = sanitize_text_field($data['license_key_hash']);
-    $license_key = get_option('berqwp_license_key');
+    $license_key = berqwp_get_license_key();
 
     if (empty($license_key_hash) || empty($license_key) || $license_key_hash !== md5($license_key)) {
         echo json_encode(['status' => 'error']);

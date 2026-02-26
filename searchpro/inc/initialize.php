@@ -83,6 +83,10 @@ if (get_option('berq_exclude_js_css') === false) {
     update_option('berq_exclude_js_css', [], false);
 }
 
+if (get_option('berq_exclude_cdn') === false) {
+    update_option('berq_exclude_cdn', [], false);
+}
+
 if (get_option('berqwp_optimize_taxonomies') === false) {
     update_option('berqwp_optimize_taxonomies', ['category', 'product_cat'], false);
 }

@@ -40,6 +40,10 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
         $url = @dropin_remove_ignore_params($url);
         $cache_key = md5($url);
         $cache_directory = WP_CONTENT_DIR . '/cache/berqwp/html/';
+        if (defined('MULTISITE') && MULTISITE) {
+            $blog_id = berqConfigs::detect_blog_id_from_request();
+            $cache_directory .= 'site-' . $blog_id . '/';
+        }
         $cache_file = $cache_directory . $cache_key . '.html';
         $cache_file_gz = $cache_directory . $cache_key . '.gz';
         $cache_file = $cache_file_gz;

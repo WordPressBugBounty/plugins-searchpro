@@ -10,6 +10,8 @@ class berqUpload
     {
         global $berq_log;
 
+        self::$resources = [];
+
         $berq_log->info("Processing $url");
 
         if (empty($html)) {
@@ -42,6 +44,10 @@ class berqUpload
 
             if (empty($html)) {
                 self::queue_remove_page($url);
+
+                return [
+                    "success" => true
+                ];
             }
 
             $html = preg_replace('/\?nocache=\d+&/', '?', $html);
@@ -49,26 +55,32 @@ class berqUpload
             $html = preg_replace('/nocache%3D\d+(%26)?/', '', $html);
         }
 
+        // Parse HTML once and reuse the DOM across all asset extraction methods
+        libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        $dom->loadHTML($html);
+        libxml_clear_errors();
+
         $start = microtime(true);
-        self::process_css($html);
+        self::process_css($html, $dom);
         $end = microtime(true);
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process css $timeMs ms");
 
         $start = microtime(true);
-        self::process_js($html);
+        self::process_js($html, $dom);
         $end = microtime(true);
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process js $timeMs ms");
 
         $start = microtime(true);
-        self::process_images($html);
+        self::process_images($html, $dom);
         $end = microtime(true);
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process images $timeMs ms");
 
         $start = microtime(true);
-        self::proccess_inline_css($html);
+        self::proccess_inline_css($html, $dom);
         $end = microtime(true);
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process inline css $timeMs ms");
@@ -133,11 +145,19 @@ class berqUpload
             return !empty($asset['path']) && is_file($asset['path']);
         });
 
-        self::$resources = array_filter(self::$resources, function ($asset) {
+        // Pre-compute SHA-256 hashes so we don't hash the same file multiple times
+        self::$resources = array_map(function ($asset) {
+            if (!empty($asset['path']) && is_file($asset['path'])) {
+                $asset['hash'] = hash_file('sha256', $asset['path']);
+            }
+            return $asset;
+        }, self::$resources);
 
-            $uploaded_assets = get_option('berqwp_uploaded_assets', []);
+        // Filter out already-uploaded assets (hoist get_option outside the loop)
+        $uploaded_assets = get_option('berqwp_uploaded_assets', []);
+        self::$resources = array_filter(self::$resources, function ($asset) use ($uploaded_assets) {
             $is_valid = array_filter($uploaded_assets, function ($uploaded_file) use ($asset) {
-                return $uploaded_file['url'] === $asset['url'] && $uploaded_file['hash'] === hash_file('sha256', $asset['path']) && $uploaded_file['verified'] === true;
+                return $uploaded_file['url'] === $asset['url'] && $uploaded_file['hash'] === $asset['hash'] && isset($uploaded_file['verified']) && $uploaded_file['verified'] === true;
             });
 
             return !$is_valid;
@@ -183,7 +203,6 @@ class berqUpload
             $end = microtime(true);
             $timeMs = ($end - $start) * 1000;
             $berq_log->info("page queue 1 $timeMs ms");
-            
         } else {
 
             $start = microtime(true);
@@ -192,7 +211,7 @@ class berqUpload
             foreach ($chunks as $index => $chunk) {
 
                 $meta = [
-                    'assets' => array_map(fn($a) => ['url' => $a['url'], 'hash' => hash_file('sha256', $a['path'])], $chunk),
+                    'assets' => array_map(fn($a) => ['url' => $a['url'], 'hash' => $a['hash']], $chunk),
                 ];
 
                 $is_last_chunk = $index === count($chunks) - 1;
@@ -274,11 +293,11 @@ class berqUpload
             'verify' => false, // Disable SSL verification
         ]);
 
-        
+
         try {
             // Build multipart array for Guzzle
             $multipart = [];
-    
+
             // Add regular POST fields
             foreach ($body as $key => $value) {
                 if ($value instanceof CURLFile) {
@@ -289,22 +308,22 @@ class berqUpload
                     'contents' => $value,
                 ];
             }
-    
+
             // Add file uploads
             foreach ($body as $key => $value) {
                 if (!($value instanceof CURLFile)) {
                     continue; // Only process files
                 }
-    
+
                 $file_path = $value->getFilename();
                 $file_name = $value->getPostFilename();
                 $mime_type = $value->getMimeType();
-    
+
                 if (!is_file($file_path)) {
                     $berq_log->warning("File not found: {$file_path}");
                     continue;
                 }
-    
+
                 $multipart[] = [
                     'name' => $key,
                     'contents' => fopen($file_path, 'r'),
@@ -323,7 +342,7 @@ class berqUpload
             $response_body = $response->getBody()->getContents();
             $json = json_decode($response_body, true);
 
-            if ($json === false) {
+            if ($json === null) {
                 $berq_log->info("Response body JSON failed: " . $response_body);
             }
 
@@ -346,10 +365,10 @@ class berqUpload
 
                 // Add/update new assets (newer entries overwrite older ones)
                 foreach ($chunk as $asset) {
-                    if (!empty($asset['url']) && !empty($asset['path']) && is_file($asset['path']) && in_array($asset['url'], $received_files)) {
+                    if (!empty($asset['url']) && !empty($asset['hash']) && in_array($asset['url'], $received_files)) {
                         $assets_by_url[$asset['url']] = [
                             'url' => $asset['url'],
-                            'hash' => hash_file('sha256', $asset['path']),
+                            'hash' => $asset['hash'],
                             'verified' => true,
                         ];
                     }
@@ -388,6 +407,8 @@ class berqUpload
                 $berq_log->error('Upload failed with HTTP code: ' . $http_code);
                 throw new \Exception('Could not upload page to BerqWP server');
             }
+
+            return true;
         } catch (\BerqWP\GuzzleHttp\Exception\RequestException $e) {
             $berq_log->error("Guzzle request failed: " . $e->getMessage());
             throw new \Exception('Could not upload page to BerqWP server: ' . $e->getMessage());
@@ -493,7 +514,8 @@ class berqUpload
         self::handle_download_cache($json['pending_download']);
     }
 
-    static function queue_remove_page($pag_url) {
+    static function queue_remove_page($pag_url)
+    {
         $queue = get_option('berqwp_optimize_queue', []);
         $key = md5($pag_url);
         unset($queue[$key]);
@@ -545,7 +567,7 @@ class berqUpload
                 $parsed = wp_parse_url($item['html']);
 
                 if (!empty($parsed['path']) && str_ends_with($parsed['path'], '.gz')) {
-                    
+
                     $html = gzdecode($html);
                     // $tmp = wp_tempnam('cache.gz');
                     // file_put_contents($tmp, $html);
@@ -651,13 +673,7 @@ class berqUpload
             return false;
         }
 
-        $path = optifer_cache . 'static/';
-
-        if (!is_dir($path)) {
-            if (!wp_mkdir_p($path)) {
-                return false;
-            }
-        }
+        $path = bwp_get_static_cache_dir();
 
         // $file_name = md5(self::clean_url($url)) . '.txt';
         $file_name = md5($url) . '.txt';
@@ -667,13 +683,7 @@ class berqUpload
 
     static function is_valid_cache($url)
     {
-        $path = optifer_cache . 'static/';
-
-        if (!is_dir($path)) {
-            if (!wp_mkdir_p($path)) {
-                return false;
-            }
-        }
+        $path = bwp_get_static_cache_dir();
 
         // $file_name = md5(self::clean_url($url)) . '.txt';
         $file_name = md5($url) . '.txt';
@@ -683,13 +693,7 @@ class berqUpload
 
     static function has_cache($url)
     {
-        $path = optifer_cache . 'static/';
-
-        if (!is_dir($path)) {
-            if (!wp_mkdir_p($path)) {
-                return false;
-            }
-        }
+        $path = bwp_get_static_cache_dir();
 
         // $file_name = md5(self::clean_url($url)) . '.txt';
         $file_name = md5($url) . '.txt';
@@ -699,13 +703,7 @@ class berqUpload
 
     static function get_cache($url)
     {
-        $path = optifer_cache . 'static/';
-
-        if (!is_dir($path)) {
-            if (!wp_mkdir_p($path)) {
-                return false;
-            }
-        }
+        $path = bwp_get_static_cache_dir();
 
         // $file_name = md5(self::clean_url($url)) . '.txt';
         $file_name = md5($url) . '.txt';
@@ -715,13 +713,7 @@ class berqUpload
 
     static function cache_external_asset($url, $content)
     {
-        $path = optifer_cache . 'static/';
-
-        if (!is_dir($path)) {
-            if (!wp_mkdir_p($path)) {
-                return false;
-            }
-        }
+        $path = bwp_get_static_cache_dir();
 
         // $file_name = md5(self::clean_url($url)) . '.txt';
         $file_name = md5($url) . '.txt';
@@ -809,6 +801,11 @@ class berqUpload
         });
 
         foreach ($css_assets as $content) {
+
+            if (empty($content['content'])) {
+                continue;
+            }
+
             preg_match_all('/@import\s*[\'"]([^\'"]+)/', $content['content'], $match);
             $urls = $match[1];
             $asset_url = $content['url'];
@@ -918,12 +915,14 @@ class berqUpload
         }
     }
 
-    static function process_css($html)
+    static function process_css($html, $dom = null)
     {
-        libxml_use_internal_errors(true);
-        $dom = new DOMDocument();
-        $dom->loadHTML($html);
-        libxml_clear_errors();
+        if ($dom === null) {
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+            $dom->loadHTML($html);
+            libxml_clear_errors();
+        }
 
         foreach ($dom->getElementsByTagName('link') as $link) {
 
@@ -986,12 +985,14 @@ class berqUpload
         }
     }
 
-    static function proccess_inline_css($html)
+    static function proccess_inline_css($html, $dom = null)
     {
-        libxml_use_internal_errors(true);
-        $dom = new DOMDocument();
-        $dom->loadHTML($html);
-        libxml_clear_errors();
+        if ($dom === null) {
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+            $dom->loadHTML($html);
+            libxml_clear_errors();
+        }
 
         foreach ($dom->getElementsByTagName('style') as $style) {
 
@@ -1058,12 +1059,14 @@ class berqUpload
         }
     }
 
-    static function process_js($html)
+    static function process_js($html, $dom = null)
     {
-        libxml_use_internal_errors(true);
-        $dom = new DOMDocument();
-        $dom->loadHTML($html);
-        libxml_clear_errors();
+        if ($dom === null) {
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+            $dom->loadHTML($html);
+            libxml_clear_errors();
+        }
 
         foreach ($dom->getElementsByTagName('script') as $script) {
 
@@ -1126,12 +1129,14 @@ class berqUpload
         }
     }
 
-    static function process_images($html)
+    static function process_images($html, $dom = null)
     {
-        libxml_use_internal_errors(true);
-        $dom = new DOMDocument();
-        $dom->loadHTML($html);
-        libxml_clear_errors();
+        if ($dom === null) {
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+            $dom->loadHTML($html);
+            libxml_clear_errors();
+        }
 
         foreach ($dom->getElementsByTagName('img') as $image) {
 
@@ -1401,6 +1406,10 @@ class berqUpload
     {
         $urls = [];
         $pattern = '/url\((.*?)\)/i';
+
+        if (empty($cssContent)) {
+            return [];
+        }
 
         preg_match_all($pattern, $cssContent, $matches);
 
