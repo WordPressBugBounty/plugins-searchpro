@@ -3,7 +3,7 @@
  * Plugin Name:       BerqWP
  * Plugin URI:        https://berqwp.com
  * Description:       Automatically pass Core Web Vitals for WordPress and boost your speed score to 90+ for both mobile and desktop without any technical skills.
- * Version:           3.1.18
+ * Version:           3.1.19
  * Requires at least: 5.3
  * Requires PHP:      7.4
  * Author:            BerqWP
@@ -16,7 +16,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BERQWP_VERSION')) {
-	define('BERQWP_VERSION', '3.1.18');
+	define('BERQWP_VERSION', '3.1.19');
 }
 
 if (!defined('optifer_PATH')) {
@@ -58,25 +58,31 @@ require_once optifer_PATH . '/BerqWP/src/Vendor/SimpleHtmlDom/simple_html_dom.ph
 
 require_once optifer_PATH . '/inc/crawler/berqDetectCrawler.php';
 require_once optifer_PATH . '/inc/class-berqconfigs.php';
-require_once optifer_PATH . '/inc/class-berqreverseproxy.php';
-require_once optifer_PATH . '/inc/class-ignoreparams.php';
 require_once optifer_PATH . '/vendor/autoload.php';
 require_once optifer_PATH . '/vendor/woocommerce/action-scheduler/action-scheduler.php';
 require_once optifer_PATH . '/inc/class-berqlogs.php';
 require_once optifer_PATH . '/inc/helper-functions.php';
 require_once optifer_PATH . '/inc/common-functions.php';
 require_once optifer_PATH . '/inc/dropin-functions.php';
-require_once optifer_PATH . '/inc/classs-http.php';
 require_once optifer_PATH . '/inc/photon/class-berqPageOptimizer.php';
 require_once optifer_PATH . '/inc/class-berqintegrations.php';
-require_once optifer_PATH . '/inc/class-berqcache.php';
 require_once optifer_PATH . '/inc/class-berqwp.php';
 require_once optifer_PATH . '/inc/class-berqnotifications.php';
-require_once optifer_PATH . '/inc/httpclient.php';
-require_once optifer_PATH . '/inc/class-berqCloudflareAPIHandler.php';
-require_once optifer_PATH . '/inc/class-berqUpload.php';
-require_once optifer_PATH . '/inc/class-berqHeartbeat.php';
+
+// cache
+require_once optifer_PATH . '/inc/cache/class-berqcache.php';
+require_once optifer_PATH . '/inc/cache/class-berqwarmup.php';
+require_once optifer_PATH . '/inc/cache/class-berqCloudflareAPIHandler.php';
+require_once optifer_PATH . '/inc/cache/class-berqreverseproxy.php';
+require_once optifer_PATH . '/inc/cache/class-ignoreparams.php';
+
+// queue
+require_once optifer_PATH . '/inc/queue/class-berqUpload.php';
+require_once optifer_PATH . '/inc/queue/class-berqHeartbeat.php';
+
+// admin
 require_once optifer_PATH . '/admin/class-berqPageRules.php';
+require_once optifer_PATH . '/admin/admin-bar.php';
 
 if (get_option('berqwp_enable_sandbox') == 0) {
 	bwp_serve_advanced_cache();

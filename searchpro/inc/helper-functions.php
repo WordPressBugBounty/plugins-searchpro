@@ -353,6 +353,14 @@ function warmup_cache_by_url($page_url, $is_forced = false, $async = false)
         return;
     }
 
+    if (berq_is_localhost() && !defined('BERQWP_ALLOW_LOCALHOST')) {
+        return;
+    }
+
+    if (berq_is_localhost() && defined('BERQWP_ALLOW_LOCALHOST') && BERQWP_ALLOW_LOCALHOST === false) {
+        return;
+    }
+
     $page_url = strtolower($page_url);
 
     $parsed_site_url = wp_parse_url(home_url());

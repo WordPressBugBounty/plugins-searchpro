@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 3.1.18
+Stable tag: 3.1.19
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -234,6 +234,12 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 3.1.19 =
+* [Enhancement] Added retry timeout for pages in the cache queue.
+* [Bug] Fixed an issue where pages in the queue could get stuck.
+* [Bug] Fixed missing array key warnings in PHP error logs.
+* Code refactoring.
 
 = 3.1.18 =
 * [Enhancement] Added compatiblity with multisite network.

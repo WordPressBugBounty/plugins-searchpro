@@ -97,7 +97,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
 
                 // if ($compression_enabled && $supports_gzip) {
                 if ($compression_enabled) {
-                    header('Vary: Accept-Encoding');
+					header('Vary: Accept-Encoding, Cookie');
                     header('Content-Encoding: gzip', true);
                     header('Content-Length: ' . filesize($cache_file), true);
                     // readgzfile($cache_file);

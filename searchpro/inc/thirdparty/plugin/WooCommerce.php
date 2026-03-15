@@ -59,6 +59,11 @@ class berqWooCommerce extends berqIntegrations {
     }
 
     function product_sale_end_actions() {
+
+		if (!function_exists('wc_get_products')) {
+			return;
+		}
+
         global $berq_log;
         $berq_log->info("Starting product_sale_end_actions");
 

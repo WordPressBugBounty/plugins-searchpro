@@ -829,6 +829,9 @@ if (!class_exists('berqWP')) {
 				]);
 			}
 
+			if (berq_is_localhost()) {
+				bwp_notice('warning', 'Localhost environment detected:', "<p>$plugin_name requires a live, publicly accessible website to function.</p>", []);
+			}
 
 			$plugins_to_deactivate = '';
 
@@ -851,7 +854,7 @@ if (!class_exists('berqWP')) {
 				}</style>";
 				echo '<div class="bwp-notice notice notice-error berqwp-plugin-conflict">';
 				echo wp_kses_post(__('<p><strong>BerqWP Plugin Conflict:</strong> The following plugins have a same nature as BerqWP plugin. Having multiple plugins of the same type can cause unexpected results.</p>', 'searchpro'));
-				?>
+			?>
 				<form action="<?php echo esc_url(get_site_url() . add_query_arg($_GET)); ?>" method="post">
 
 					<?php
