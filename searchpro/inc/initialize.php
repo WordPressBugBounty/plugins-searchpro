@@ -12,7 +12,7 @@ if (get_option('berqwp_webp_max_width') === false) {
 }
 
 if (get_option('berqwp_webp_quality') === false) {
-    update_option('berqwp_webp_quality', 80, false);
+    update_option('berqwp_webp_quality', 70, false);
 }
 
 if (get_option('berqwp_image_lazyloading') === false) {

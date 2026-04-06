@@ -309,7 +309,8 @@ function berqwp_get_page_params($page_url, $is_forced = false)
 
 function bwp_pass_account_requirement()
 {
-    global $berqWP, $berq_log;
+    global $berq_log;
+    $berqWP = \berqWP::getInstance();
 
     $license_key = berqwp_get_license_key();
 
@@ -643,7 +644,7 @@ function berqwp_get_LCP_details($url, $device = 'mobile')
     $body = wp_remote_retrieve_body($response);
     $output = json_decode($body, true);
 
-    // Get the LCP data        
+    // Get the LCP data
     return $output['lighthouseResult']['audits']['largest-contentful-paint-element']['details']['items'][0]['items'][0]['node'];
 }
 

@@ -80,23 +80,55 @@ if (!class_exists('berqWarmup')) {
             // Fetch post type URLs
             // $post_types = get_post_types(['public' => true, 'exclude_from_search' => false]);
             $post_types = get_option('berqwp_optimize_post_types', []);
-            foreach ($post_types as $post_type) {
-                $post_ids = get_posts([
-                    'post_status' => 'publish',
-                    'has_password' => false,
-                    'ignore_sticky_posts' => true,
-                    'no_found_rows' => true,
-                    'update_post_meta_cache' => false,
-                    'update_post_term_cache' => false,
-                    'order' => 'DESC',
-                    'orderby' => 'date',
-                    'post_type' => $post_type,
-                    'numberposts' => -1, // get all posts
-                    'fields' => 'ids', // only get post IDs
-                ]);
+            // foreach ($post_types as $post_type) {
+            //     $post_ids = get_posts([
+            //         'post_status' => 'publish',
+            //         'has_password' => false,
+            //         'ignore_sticky_posts' => true,
+            //         'no_found_rows' => true,
+            //         'update_post_meta_cache' => false,
+            //         'update_post_term_cache' => false,
+            //         'order' => 'DESC',
+            //         'orderby' => 'date',
+            //         'post_type' => $post_type,
+            //         'numberposts' => -1, // get all posts
+            //         'fields' => 'ids', // only get post IDs
+            //     ]);
 
-                foreach ($post_ids as $post_id) {
-                    $urls[] = get_permalink($post_id);
+            //     foreach ($post_ids as $post_id) {
+            //         $urls[] = get_permalink($post_id);
+            //     }
+            // }
+
+            $args = array(
+                'post_type' => $post_types,
+                'post_status' => array('publish'), // Only published posts
+                'posts_per_page' => -1,
+                'fields' => 'ids', // Only retrieve IDs to save memory
+            );
+
+            // Run the query
+            $query = new WP_Query($args);
+            $total_posts = $query->found_posts;
+
+            if ($query->have_posts()) {
+                while ($query->have_posts()) {
+                    $query->the_post();
+                    $url = get_permalink();
+
+                    $urls[] = $url;
+
+                    $translation_urls = apply_filters('berqwp_page_translation_urls', [], $url);
+
+                    if (!empty($translation_urls)) {
+                        foreach ($translation_urls as $page_url) {
+                            if (!bwp_can_optimize_page_url($page_url)) {
+                                continue;
+                            }
+
+                            $urls[] = $page_url;
+                        }
+                    }
                 }
             }
 
@@ -106,6 +138,7 @@ if (!class_exists('berqWarmup')) {
                 'count_total' => false,
                 'fields' => 'ID',
             ]);
+
             foreach ($user_ids as $user_id) {
                 $urls[] = get_author_posts_url($user_id);
             }
@@ -174,7 +207,7 @@ if (!class_exists('berqWarmup')) {
 
             $queue_values = array_values($pending_queue);
 
-            if (!empty($queue_values[0])) {
+            if (!empty($queue_values[0]) && !empty($queue_values[0]['url'])) {
                 $preload_url = $queue_values[0]['url'];
 
                 // Remove from original queue using the MD5 key
@@ -186,6 +219,11 @@ if (!class_exists('berqWarmup')) {
 
                 global $berq_log;
                 $berq_log->info("Doing preload request");
+
+
+                if (defined('BERQWP_DEV_MOCKS') && BERQWP_DEV_MOCKS) {
+                    $preload_url = str_replace("localhost:9000", "host.docker.internal:9000", $preload_url);
+                }
 
                 // Preload URL
                 wp_remote_get($preload_url . '?bwp_preload=' . time(), [
@@ -211,6 +249,10 @@ if (!class_exists('berqWarmup')) {
 
             $current_page_url = bwp_get_request_url();
             $queue = get_option('berqwp_optimize_queue', []);
+
+            if (defined('BERQWP_DEV_MOCKS') && BERQWP_DEV_MOCKS) {
+                $current_page_url = str_replace("host.docker.internal:9000", "localhost:9000", $current_page_url);
+            }
 
             if (empty($html)) {
                 global $berq_log;
@@ -245,11 +287,21 @@ if (!class_exists('berqWarmup')) {
                 }
 
                 unset($queue[$key]);
+
             } catch (Exception $e) {
 
                 global $berq_log;
-                $berq_log->info("Page $page_url failed, adding back into queue");
+                $berq_log->info("Page $page_url failed, adding back into queue. {$e->getMessage()}");
 
+                $queue[$key]['url'] = $page_url;
+                $queue[$key]['status'] = 'pending';                $queue[$key]['attempts']++;
+
+            } catch (Throwable $e) {
+
+                global $berq_log;
+                $berq_log->info("Page $page_url failed, adding back into queue. {$e}");
+
+                $queue[$key]['url'] = $page_url;
                 $queue[$key]['status'] = 'pending';
                 $queue[$key]['attempts']++;
             }

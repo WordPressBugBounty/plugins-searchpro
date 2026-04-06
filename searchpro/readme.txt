@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 3.1.19
+Stable tag: 3.1.21
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -29,7 +29,7 @@ Since all popular page speed testing tools use similar methods, you'll get the s
 - **90+ speed score for mobile & desktop**
 - **Comes with CDN integrated**
 - **Monitor Core Web Vitals in real-time with Web Vitals Analytics**
-- **Works with all popular WordPress themes and plugins** 
+- **Works with all popular WordPress themes and plugins**
 - **Doesn’t break your website**
 - **Built for non-techies**
 - **Get instant support with BerqWP's AI assistant**
@@ -99,7 +99,7 @@ BerqWP utilizes the WordPress **advanced-cache.php** file to deliver cached page
 ## ✅ Core Web Vitals Optimizations
 BerqWP is designed to help websites achieve high scores on **Google’s Core Web Vitals**, improving user experience and SEO rankings.
 
-**Largest Contentful Paint (LCP) Optimization** 
+**Largest Contentful Paint (LCP) Optimization**
 
 * **Image Preloading:** BerqWP detects the LCP element (usually an image or banner) and preloads it to ensure it loads as quickly as possible.
 * **WebP Conversion:** All images are converted into **WebP format**, reducing file size by **70% – 85%** while maintaining quality.
@@ -234,6 +234,10 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 3.1.21 =
+* [Enhancement] Reduced file reads.
+* [Enhancement] Better error handling & error logging.
 
 = 3.1.19 =
 * [Enhancement] Added retry timeout for pages in the cache queue.
@@ -416,7 +420,7 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 = 2.2.29 =
 * [Enhancement] Purge the homepage cache when a new WooCommerce product is published.
 
-= 2.2.28 = 
+= 2.2.28 =
 * [Enhancement] Increase nonce lifespan on for BerqWP cache requests.
 * [Enhancement] Better image handling for webp images.
 

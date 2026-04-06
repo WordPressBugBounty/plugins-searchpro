@@ -1,9 +1,5 @@
 <?php
 
-/**
- * WPO Heartbeat - Browser-driven background optimization with traffic management
- */
-
 class berqHeartbeat
 {
 
@@ -288,7 +284,7 @@ class berqHeartbeat
             return;
         }
 
-        $queue = array_filter($queue, fn($item) => strpos($item['url'], '?') === false);
+        $queue = array_filter($queue, fn($item) => !empty($item['url']) && strpos($item['url'], '?') === false);
 
         // // Check load
         // if ($this->get_current_load() > 90) {
@@ -316,9 +312,8 @@ class berqHeartbeat
             $key = array_key_first($pending_queue);
             $item = $queue[$key];
 
-            try {
-
-                if (!empty($item)) {
+            if (!empty($item)) {
+                try {
 
                     global $berq_log;
                     $berq_log->info("Doing heartbeat request");
@@ -332,15 +327,25 @@ class berqHeartbeat
 
                     // Success - remove from queue
                     unset($queue[$key]);
+
+                } catch (Exception $e) {
+
+                    global $berq_log;
+                    $berq_log->info("Heartbeat page {$item['url']} failed: {$e->getMessage()}");
+
+                    $queue[$key]['url'] = $item['url'];
+                    $queue[$key]['status'] = 'pending';
+                    $queue[$key]['attempts']++;
+
+                } catch (Throwable $e) {
+
+                    global $berq_log;
+                    $berq_log->info("Heartbeat page {$item['url']} failed: {$e->getMessage()}");
+
+                    $queue[$key]['url'] = $item['url'];
+                    $queue[$key]['status'] = 'pending';
+                    $queue[$key]['attempts']++;
                 }
-            } catch (Exception $e) {
-                // error_log('BWP2 Error: ' . $e->getMessage());
-
-                global $berq_log;
-                $berq_log->info("Heartbeat page {$item['url']} failed");
-
-                $queue[$key]['status'] = 'pending';
-                $queue[$key]['attempts']++;
             }
         }
 
@@ -435,7 +440,7 @@ class berqHeartbeat
     private function acquire_lock(): bool
     {
         if (file_exists($this->lock_file)) {
-            if (filemtime($this->lock_file) > (time() - 120)) {
+            if (filemtime($this->lock_file) > (time() - $this->timeout_limit)) {
                 return false;
             }
             @unlink($this->lock_file);

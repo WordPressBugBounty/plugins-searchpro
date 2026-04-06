@@ -1,7 +1,6 @@
 <?php
 
 use BerqWP\Cache;
-use function BerqWP\Vendor\SimpleHtmlDom\berqwp_str_get_html;
 
 class berqUpload
 {
@@ -19,6 +18,9 @@ class berqUpload
             $start = microtime(true);
             $response = wp_remote_get($url . '?nocache=' . time(), [
                 'cookies' => [],
+                // 'headers'   => [
+                //     'User-Agent' => 'WordPress/' . get_bloginfo('version') . '; ' . home_url(),
+                // ],
                 'headers' => [
                     'User-Agent'      => 'Mozilla/5.0 (BerqWP)',
                     'Cache-Control'   => 'no-cache, no-store, must-revalidate',
@@ -28,13 +30,11 @@ class berqUpload
                 'httpversion' => '2.0',
                 'timeout' => 30
             ]);
-
             $end = microtime(true);
             $timeMs = ($end - $start) * 1000;
-            $statusCode = wp_remote_retrieve_response_code($response);
 
-            if (is_wp_error($response) || $statusCode !== 200) {
-                $berq_log->info("failed to download page html, status code: $statusCode");
+            if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) {
+                $berq_log->info("failed to download page html");
                 return;
             }
 
@@ -56,28 +56,31 @@ class berqUpload
         }
 
         // Parse HTML once and reuse the DOM across all asset extraction methods
-        $dom = berqwp_str_get_html($html);
+        libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        $dom->loadHTML($html);
+        libxml_clear_errors();
 
         $start = microtime(true);
-        self::process_css($dom);
+        self::process_css($html, $dom);
         $end = microtime(true);
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process css $timeMs ms");
 
         $start = microtime(true);
-        self::process_js($dom);
+        self::process_js($html, $dom);
         $end = microtime(true);
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process js $timeMs ms");
 
         $start = microtime(true);
-        self::process_images($dom);
+        self::process_images($html, $dom);
         $end = microtime(true);
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process images $timeMs ms");
 
         $start = microtime(true);
-        self::proccess_inline_css($dom);
+        self::proccess_inline_css($html, $dom);
         $end = microtime(true);
         $timeMs = ($end - $start) * 1000;
         $berq_log->info("process inline css $timeMs ms");
@@ -115,11 +118,6 @@ class berqUpload
         //     return $asset;
         // }, self::$resources);
 
-        // free memory
-        $dom->clear();
-        unset($dom);
-
-        // add mime type in resources
         self::$resources = array_map(function ($asset) {
 
             if ($asset['content'] !== null) {
@@ -143,25 +141,26 @@ class berqUpload
             return $asset;
         }, self::$resources);
 
-        // remove assets that doesn't exist or has invalid file path
         self::$resources = array_filter(self::$resources, function ($asset) {
-            return !empty($asset['path']) && is_file($asset['path']) && is_readable($asset['path']);
+            return !empty($asset['path']) && is_file($asset['path']);
         });
 
         // Pre-compute SHA-256 hashes so we don't hash the same file multiple times
         self::$resources = array_map(function ($asset) {
-            $asset['hash'] = hash_file('sha256', $asset['path']);
+            if (!empty($asset['path']) && is_file($asset['path'])) {
+                $asset['hash'] = hash_file('sha256', $asset['path']);
+            }
             return $asset;
         }, self::$resources);
 
-        // Filter out already-uploaded assets
+        // Filter out already-uploaded assets (hoist get_option outside the loop)
         $uploaded_assets = get_option('berqwp_uploaded_assets', []);
-
         self::$resources = array_filter(self::$resources, function ($asset) use ($uploaded_assets) {
+            $is_valid = array_filter($uploaded_assets, function ($uploaded_file) use ($asset) {
+                return $uploaded_file['url'] === $asset['url'] && $uploaded_file['hash'] === $asset['hash'] && isset($uploaded_file['verified']) && $uploaded_file['verified'] === true;
+            });
 
-            // return new/outdated assets for the upload
-            return !self::asset_upload_verified( $asset, $uploaded_assets );
-
+            return !$is_valid;
         });
 
         // Prepare metadata
@@ -190,13 +189,7 @@ class berqUpload
                 'domain' => $domain,
             ];
 
-            $gzip_html = gzencode($html);
-
-            if ($gzip_html === false) {
-                throw new Error("GZip encoding failed");
-            }
-
-            $body['html'] = base64_encode($gzip_html);
+            $body['html'] = base64_encode(gzencode($html));
             $post_data = berqwp_get_page_params($url);
 
             if (self::is_forced($url)) {
@@ -210,7 +203,6 @@ class berqUpload
             $end = microtime(true);
             $timeMs = ($end - $start) * 1000;
             $berq_log->info("page queue 1 $timeMs ms");
-
         } else {
 
             $start = microtime(true);
@@ -230,52 +222,24 @@ class berqUpload
                     'domain' => $domain,
                 ];
 
-                try {
+                if ($is_last_chunk) {
 
-                    if ($is_last_chunk) {
+                    global $berq_log;
+                    $berq_log->info("Processing last chunk");
 
-                        global $berq_log;
-                        $berq_log->info("Processing last chunk");
+                    $body['html'] = base64_encode(gzencode($html));
+                    $post_data = berqwp_get_page_params($url);
 
-                        $gzip_html = gzencode($html);
-
-                        if ($gzip_html === false) {
-                            throw new Error("GZip encoding failed");
-                        }
-
-                        $body['html'] = base64_encode($gzip_html);
-                        $post_data = berqwp_get_page_params($url);
-
-                        if (self::is_forced($url)) {
-                            $post_data['force'] = 1;
-                        }
-
-                        $body['params'] = json_encode($post_data);
+                    if (self::is_forced($url)) {
+                        $post_data['force'] = 1;
                     }
 
-                    // Attach files
-                    foreach ($chunk as $i => $asset) {
-                        try {
-                            $body["asset_$i"] = curl_file_create($asset['path'], $asset['type'], basename($asset['path']));
-                            $berq_log->info("Successfully created curl file: " . $asset['url']);
+                    $body['params'] = json_encode($post_data);
+                }
 
-                        } catch (Exception $e) {
-
-                            $berq_log->info("Curl file create failed: " . $asset['url'] . $e);
-
-                        } catch (Throwable $e) {
-
-                            $berq_log->info("Curl file create failed: " . $asset['url'] . $e);
-
-                        }
-                    }
-
-                } catch (Exception $e) {
-
-                    $berq_log->info("Chunk processing failed, continuing");
-
-                } catch (Throwable $e) {
-                    $berq_log->info("Chunk processing failed, continuing");
+                // Attach files
+                foreach ($chunk as $i => $asset) {
+                    $body["asset_$i"] = curl_file_create($asset['path'], $asset['type'], basename($asset['path']));
                 }
 
                 $upload_result = self::handle_upload($body, $chunk, $is_last_chunk);
@@ -303,15 +267,6 @@ class berqUpload
         return [
             "success" => true
         ];
-    }
-
-    static function asset_upload_verified($asset, $uploaded_assets) {
-
-        $is_valid = array_filter($uploaded_assets, function ($uploaded_file) use ($asset) {
-            return $uploaded_file['url'] === $asset['url'] && $uploaded_file['hash'] === $asset['hash'] && isset($uploaded_file['verified']) && $uploaded_file['verified'] === true;
-        });
-
-        return !empty($is_valid);
     }
 
     public static function is_forced($page_url)
@@ -353,7 +308,6 @@ class berqUpload
                 if ($value instanceof CURLFile) {
                     continue; // Skip files for now
                 }
-
                 $multipart[] = [
                     'name' => $key,
                     'contents' => $value,
@@ -380,15 +334,9 @@ class berqUpload
                     continue;
                 }
 
-                $fp = fopen($file_path, 'r');
-                if ($fp === false) {
-                    $berq_log->warning("Failed to open file: {$file_path}");
-                    continue;
-                }
-
                 $multipart[] = [
                     'name' => $key,
-                    'contents' => $fp,
+                    'contents' => fopen($file_path, 'r'),
                     'filename' => $file_name,
                     'headers' => [
                         'Content-Type' => $mime_type,
@@ -408,7 +356,7 @@ class berqUpload
                 $file_url = WP_CONTENT_URL . "/mocks/" . md5($page_url) . ".gz";
 
                 $file_url = str_replace("localhost:9000", "host.docker.internal:9000", $file_url);
-
+                
                 wp_mkdir_p($mocks_dir);
 
                 $download_queue[md5($page_url)] = [
@@ -468,8 +416,10 @@ class berqUpload
             }
 
             // Handle last chunk response
-            if ($is_last && isset($json['pending_download'])) {
-                self::handle_download_cache($json['pending_download']);
+            if ($is_last) {
+                if (isset($json['pending_download'])) {
+                    self::handle_download_cache($json['pending_download']);
+                }
             }
 
             // Add to server queue if last chunk
@@ -504,7 +454,7 @@ class berqUpload
             throw $e;
         } catch (\Throwable $e) {
             $berq_log->error("Upload failed: " . $e->getMessage());
-            throw $e;
+            // throw $e;
         }
     }
 
@@ -575,11 +525,11 @@ class berqUpload
             $download_queue_option = "berqwp_mock_photon_download_queue";
             $download_queue = get_option($download_queue_option, []);
 
-
+            
             // $download_queue = array_map(function ($item) {
                 //     return $item[0];
                 // }, $download_queue);
-
+                
             $download_queue = array_values($download_queue);
 
             self::handle_download_cache($download_queue);
@@ -628,7 +578,7 @@ class berqUpload
             $download_queue = get_option($download_queue_option, []);
             unset($download_queue[$key]);
             update_option($download_queue_option, $download_queue, false);
-
+    
             $file_url = WP_CONTENT_DIR . "/mocks/" . $key . ".gz";
             unlink($file_url);
         }
@@ -809,7 +759,7 @@ class berqUpload
         // $file_name = md5(self::clean_url($url)) . '.txt';
         $file_name = md5($url) . '.txt';
 
-        return is_file($path . $file_name) && (@filemtime($path . $file_name) + 60 * 60 > time());
+        return is_file($path . $file_name) && (@filemtime($path . $file_name) + 60 * 5 > time());
     }
 
     static function has_cache($url)
@@ -834,16 +784,7 @@ class berqUpload
 
     static function cache_external_asset($url, $content)
     {
-        if (self::is_valid_cache($url)) {
-            return $content;
-        }
-
         $path = bwp_get_static_cache_dir();
-
-        // if (empty($content)) {
-        //     global $berq_log;
-        //     $berq_log->info("Empty file content, possibly file doesn't exist: $url");
-        // }
 
         // $file_name = md5(self::clean_url($url)) . '.txt';
         $file_name = md5($url) . '.txt';
@@ -1045,13 +986,20 @@ class berqUpload
         }
     }
 
-    static function process_css($dom = null)
+    static function process_css($html, $dom = null)
     {
-        if (empty($dom)) {
-            return;
+        if ($dom === null) {
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+            $dom->loadHTML($html);
+            libxml_clear_errors();
         }
 
-        foreach ($dom->find('link[rel=stylesheet], link[as=style]') as $link) {
+        foreach ($dom->getElementsByTagName('link') as $link) {
+
+            if (strtolower($link->getAttribute('rel')) !== 'stylesheet' && strtolower($link->getAttribute('as')) !== 'style') {
+                continue;
+            }
 
             $href = $link->getAttribute('href');
 
@@ -1108,15 +1056,18 @@ class berqUpload
         }
     }
 
-    static function proccess_inline_css($dom = null)
+    static function proccess_inline_css($html, $dom = null)
     {
-        if (empty($dom)) {
-            return;
+        if ($dom === null) {
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+            $dom->loadHTML($html);
+            libxml_clear_errors();
         }
 
-        foreach ($dom->find('style') as $style) {
+        foreach ($dom->getElementsByTagName('style') as $style) {
 
-            $urls = self::extractUrlsFromCss($style->innertext);
+            $urls = self::extractUrlsFromCss($style->nodeValue);
 
             foreach ($urls as $url) {
                 $url = trim($url);
@@ -1179,13 +1130,16 @@ class berqUpload
         }
     }
 
-    static function process_js($dom = null)
+    static function process_js($html, $dom = null)
     {
-        if (empty($dom)) {
-            return;
+        if ($dom === null) {
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+            $dom->loadHTML($html);
+            libxml_clear_errors();
         }
 
-        foreach ($dom->find('script') as $script) {
+        foreach ($dom->getElementsByTagName('script') as $script) {
 
             if (empty($script->getAttribute('src'))) {
                 continue;
@@ -1246,13 +1200,16 @@ class berqUpload
         }
     }
 
-    static function process_images($dom = null)
+    static function process_images($html, $dom = null)
     {
-        if (empty($dom)) {
-            return;
+        if ($dom === null) {
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+            $dom->loadHTML($html);
+            libxml_clear_errors();
         }
 
-        foreach ($dom->find('img') as $image) {
+        foreach ($dom->getElementsByTagName('img') as $image) {
 
             if (empty($image->getAttribute('src'))) {
                 continue;

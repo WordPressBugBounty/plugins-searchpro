@@ -10,6 +10,7 @@ if (!class_exists('berqWP')) {
 
 		public $is_key_verified = false;
 		public $key_response = false;
+		public static $instance = null;
 
 		public $conflicting_plugins = [
 			'autoptimize/autoptimize.php', // Autoptimize
@@ -133,6 +134,17 @@ if (!class_exists('berqWP')) {
 				add_action('berqwp_activate_plugin', [$this, 'regenerate_blog_map']);
 			}
 		}
+
+		static function getInstance() {
+
+            if (self::$instance === null) {
+                $instance = new berqWP();
+                self::$instance = $instance;
+                return $instance;
+            }
+
+            return self::$instance;
+        }
 
 		function sync_addons()
 		{
@@ -1109,7 +1121,7 @@ if (!class_exists('berqWP')) {
 				// }
 
 				// if ($action == 'slm_check' && !empty($cached_response) && $cached_response->result == 'error') {
-				// 	// Key verification failed, cache the response for 14 hours 
+				// 	// Key verification failed, cache the response for 14 hours
 				// 	// preventing unnecessary verification requests
 				// 	set_transient($transient_key, $cached_response, 14 * HOUR_IN_SECONDS);
 				// }
@@ -1303,6 +1315,7 @@ if (!class_exists('berqWP')) {
 		}
 	}
 
-	global $berqWP;
-	$berqWP = new berqWP();
+	berqWP::getInstance();
+	// global $berqWP;
+	// $berqWP = new berqWP();
 }
