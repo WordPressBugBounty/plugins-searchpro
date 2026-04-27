@@ -3,7 +3,7 @@
  * BerqWP Advanced Cache Drop-in
 */
 
-if (!defined('ABSPATH')) exit;
+// ABSPATH is not yet defined when this dropin runs — do not exit here
 
 if (!defined('optifer_PATH')) {
     define('optifer_PATH', WP_CONTENT_DIR . '/plugins/searchpro/');

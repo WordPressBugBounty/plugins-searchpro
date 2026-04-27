@@ -2,9 +2,9 @@
 
 namespace BerqWP;
 use BerqWP\RateLimiter;
-use BerqWP\GuzzleHttp\Pool;
-use BerqWP\GuzzleHttp\Psr7\Request;
-use BerqWP\GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Pool;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Exception\RequestException;
 
 class Cache
 {
@@ -30,15 +30,38 @@ class Cache
         }
 
         try {
-            $response = $this->client->post('', [
+            $response = $this->client->post('cache/request', [
                 'timeout' => $timeout,
                 'form_params' => $post_data
             ]);
-    
+
             if ($response->getStatusCode() === 200) {
                 return true;
             }
-            
+
+        } catch (RequestException $e) {} catch (\Throwable $e) {}
+
+
+        return false;
+    }
+
+    function queue_count($site_id, $timeout = 30)
+    {
+
+        try {
+
+            $response = $this->client->post('status/queue-count', [
+                'timeout' => $timeout,
+                'form_params' => ['site_id' => $site_id]
+            ]);
+
+            $body = $response->getBody();
+            $json = json_decode($body, true);
+
+            if (!empty($json) && $json['status'] == 'success') {
+                return (int) $json['count'];
+            }
+
         } catch (RequestException $e) {} catch (\Throwable $e) {}
 
 
@@ -71,10 +94,10 @@ class Cache
                     );
                 }
             };
-    
+
             $results = [];
             $errors = [];
-    
+
             $pool = new Pool($this->client, $requests($post_data_arr), [
                 'concurrency' => 5, // Adjust as needed
                 'fulfilled' => function ($response, $index) use (&$results, $post_data_arr) {
@@ -84,7 +107,7 @@ class Cache
                     $errors[$index] = $reason;
                 },
             ]);
-    
+
             $promise = $pool->promise();
             $promise->wait();
 
@@ -104,7 +127,13 @@ class Cache
 
         // file_put_contents($cache_file, $html);
 
-        $cache_file = $this->cache_directory . md5($page_url) . '.gz';
+        $cache_path = $this->cache_directory . bwp_build_cache_path($page_url);
+
+        if (!is_dir($cache_path)) {
+            wp_mkdir_p($cache_path);
+        }
+
+        $cache_file = $cache_path . '/index.html.gz';
         $html = gzencode($html, 9);
         file_put_contents($cache_file, $html);
 
@@ -114,13 +143,13 @@ class Cache
     {
 
         try {
-            $response = $this->client->post('', [
-                'timeout' => $async ? 1 : 30,
+            $response = $this->client->post('cache/warmup', [
+                'timeout' => $async ? 5 : 30,
                 'form_params' => $post_data
             ]);
-    
+
             return $response;
-            
+
         } catch (RequestException $e) {} catch (\Throwable $e) {}
 
     }
@@ -133,10 +162,10 @@ class Cache
                 'clear_queue'       => true,
                 'license_key'       => $license_key,
             ];
-            $response = $this->client->post('', [
+            $response = $this->client->post('cache/discard-queue', [
                 'form_params' => $post_data
             ]);
-    
+
             return $response;
 
         } catch (RequestException $e) {} catch (\Throwable $e) {}

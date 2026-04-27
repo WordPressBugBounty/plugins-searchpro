@@ -1,7 +1,7 @@
 <?php
 
 function bwp_is_ajax() {
-    return 
+    return
         (function_exists("wp_doing_ajax") && wp_doing_ajax()) ||
         (defined('DOING_AJAX') && DOING_AJAX) ||
         (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && $_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest") ||
@@ -11,7 +11,7 @@ function bwp_is_ajax() {
 
 function bwp_is_user_logged_in() {
     foreach ($_COOKIE as $key => $value) {
-        if (strpos($key, 'wordpress_logged_in_') === 0) {
+        if (strpos($key, 'wordpress_logged_in') === 0) {
             return true;
         }
     }
@@ -24,13 +24,13 @@ function dropin_remove_ignore_params($slug)
 
     // Parse the provided slug
     $url_parts = parse_url($slug);
-    
+
     // Get the current URL parameters
     $url_params = array();
     if (isset($url_parts['query'])) {
         parse_str($url_parts['query'], $url_params);
     }
-    
+
     // Remove specified tracking parameters from the URL
     foreach ($tracking_params as $param) {
         $param = trim($param);
@@ -71,7 +71,7 @@ function berqwp_dropin_is_page_url_excluded($page_url) {
         return false;
     }
 
-    $berqconfigs = new berqConfigs();
+    $berqconfigs = berqConfigs::getInstance();
     $configs = $berqconfigs->get_configs();
     $pages_to_exclude = $configs['exclude_urls'];
 

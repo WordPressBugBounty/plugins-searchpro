@@ -1,11 +1,18 @@
 body {
-  background-color: #F7FAFF !important;
+  background-color: #f7faff !important;
 }
 
 .berqwp-dashbaord {
-  font-family: "Source Sans 3", sans-serif !important;
-  background-color: #F7FAFF;
+  font-family: "Lato", sans-serif !important;
+  background-color: #f7faff;
   transition: all 0.3s ease;
+}
+.berqwp-dashbaord ul {
+  font-size: 15px;
+}
+.berqwp-dashbaord .bwp-notice {
+  margin-right: 0px !important;
+  box-shadow: none !important;
 }
 .berqwp-dashbaord.sticky {
   position: fixed;
@@ -16,6 +23,10 @@ body {
   margin-bottom: 100vh;
   border-radius: 0;
   z-index: 99;
+}
+
+.berqwp-dashbaord * {
+  box-sizing: border-box;
 }
 
 .berqwp-header {
@@ -49,15 +60,50 @@ a.berqwp-support {
 .berqwp-header-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
+}
+.berqwp-header-right .optimization-methods-switch {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #d4dff2;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.berqwp-header-right .optimization-methods-switch.local .method-local {
+  color: #1f71ff;
+  border-bottom: 3px solid #1f71ff;
+}
+.berqwp-header-right .optimization-methods-switch.cloud .method-cloud {
+  color: #1f71ff;
+  border-bottom: 3px solid #1f71ff;
+}
+.berqwp-header-right .optimization-methods-switch a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  color: #0c2d66;
+  padding: 8px 13px;
+  gap: 6px;
+  cursor: pointer;
+}
+.berqwp-header-right .optimization-methods-switch a:first-child {
+  border-right: 1px solid #d4dff2;
+}
+.berqwp-header-right .optimization-methods-switch svg {
+  width: 16px;
+  height: auto;
+  display: flex;
 }
 
 .berqwp-upgrade {
-  color: #FFF;
+  color: #fff;
   font-size: 16px;
   font-style: normal;
   font-weight: 600;
-  background: #1F71FF;
+  background: #1f71ff;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -100,9 +146,9 @@ a.berqwp-support {
 
 .berqwp-tab-content {
   width: calc(100% - 280px);
-  padding: 0 25px;
+  padding: 0 55px;
   padding-top: 25px;
-  background: #F7FAFF;
+  background: #f7faff;
   border-bottom-right-radius: 10px;
 }
 
@@ -118,22 +164,22 @@ h2.berq-tab-title {
   line-height: normal;
   margin: 0;
   padding-bottom: 15px;
-  border-bottom: 1px solid #E8F0FF;
+  border-bottom: 1px solid #e8f0ff;
   margin-bottom: 20px;
 }
 
 .berq-info-box {
-  border: 1px solid rgb(228, 237, 251);
-  background: #FFF;
+  border: 1px solid rgb(220, 230, 244);
+  background: #fff;
   box-shadow: 0px 3px 5px 0px rgba(83, 113, 167, 0.05);
-  padding: 16px;
+  padding: 20px;
   margin-bottom: 20px;
-  border-radius: 8px;
+  border-radius: 13px;
 }
 
 h3.berq-box-title {
-  color: #0C2D66;
-  font-size: 18px;
+  color: #002159;
+  font-size: 16px;
   font-style: normal;
   font-weight: 600;
   line-height: normal;
@@ -144,7 +190,7 @@ h3.berq-box-title {
 .berq-box-content p {
   margin: 0;
   font-size: 16px;
-  color: #465774;
+  color: #6071a4;
 }
 
 .berq-dual-box > div {
@@ -211,8 +257,8 @@ button.berqwp-save {
   padding: 12px 20px;
   text-transform: uppercase;
   color: #fff;
-  background: #5057FF;
-  border-radius: 6px;
+  background: #1f71ff;
+  border-radius: 10px;
   margin-bottom: 20px;
   cursor: pointer;
 }
@@ -224,7 +270,7 @@ button.berqwp-save:hover {
 button.berqwp-save.cf {
   margin-top: 10px;
   text-transform: inherit;
-  background-color: #F6821F;
+  background-color: #f6821f;
 }
 button.berqwp-save.cf:hover {
   background-color: #e29230;
@@ -415,7 +461,7 @@ table.berq-image-settings {
 
 .berq-img-action > div {
   padding: 10px 20px;
-  background: #1F71FF;
+  background: #1f71ff;
   font-size: 15px;
   color: #fff;
   cursor: pointer;
@@ -423,7 +469,7 @@ table.berq-image-settings {
 
 .berq-img-action > .berq-delete-webp {
   background: rgba(255, 64, 64, 0.12);
-  color: #FF4040;
+  color: #ff4040;
 }
 
 .lds-ring {
@@ -476,7 +522,7 @@ table.berq-image-settings {
 
 .berq-optimization-guide {
   background: #10326b;
-  font-family: "Source Sans 3", sans-serif !important;
+  font-family: "Lato", sans-serif !important;
   padding: 25px;
   border-radius: 10px;
   box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.2);
@@ -567,6 +613,9 @@ table.berq-image-settings {
   color: #465774;
   font-size: 15px;
   width: 100%;
+  background-color: #f7faff;
+  border-radius: 10px;
+  border: 1px solid #d4dff2;
 }
 
 .berq-info-box select {
@@ -614,7 +663,7 @@ table.berq-image-settings {
 }
 
 .optimzation-slider .slider-tick.round {
-  background-color: #D2E3FF;
+  background-color: #d2e3ff;
   background-image: none;
   box-shadow: none;
   opacity: 1;
@@ -631,12 +680,12 @@ table.berq-image-settings {
 }
 
 .optimzation-slider .slider-selection.tick-slider-selection {
-  background-color: #1F71FF !important;
+  background-color: #1f71ff !important;
   background-image: none;
 }
 
 .optimzation-slider .slider-handle.min-slider-handle.round {
-  background: #1F71FF !important;
+  background: #1f71ff !important;
   z-index: 9;
 }
 
@@ -704,26 +753,105 @@ table.berq-image-settings {
 }
 
 #berqwp-intro {
-  background-color: #F7FAFF;
+  background-color: #f7faff;
   border-radius: 20px;
-  border: 1px solid #E6E6E6;
+  border: 1px solid #e6e6e6;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   -webkit-font-smoothing: antialiased;
   padding: 70px 20px;
+  padding-bottom: 100px;
+  max-width: 800px;
+  margin: 0 auto;
+  box-shadow: 0px 3px 5px 0px rgba(83, 113, 167, 0.05);
 }
 #berqwp-intro h2.title {
-  font-size: 47px;
+  font-size: 35px;
   text-align: center;
   color: #222222;
   line-height: normal;
-  max-width: 730px;
+  max-width: 570px;
   font-weight: 500;
   text-transform: capitalize;
   margin: 0;
-  margin-bottom: 75px;
+  margin-bottom: 40px;
+}
+#berqwp-intro .inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+#berqwp-intro .inner input[type=email],
+#berqwp-intro .inner input[type=password] {
+  background-color: #fff;
+  padding: 10px 13px;
+  border: 1px solid #dad2ff;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1;
+}
+#berqwp-intro .inner button[type=submit] {
+  background-color: #1f71ff;
+  padding: 10px 13px;
+  border: 1px solid #1f71ff;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  color: #fff;
+  line-height: 1;
+}
+#berqwp-intro .inner button[type=submit][disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+#berqwp-intro .optimization-method-block {
+  margin-bottom: 50px;
+}
+#berqwp-intro .optimization-method-block h3 {
+  text-align: center;
+  font-size: 18px;
+}
+#berqwp-intro .optimization-method-block p {
+  text-align: center;
+  font-size: 14px;
+  max-width: 400px;
+  margin-bottom: 30px;
+}
+#berqwp-intro .optimization-method-block .optimization-method-options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+#berqwp-intro .optimization-method-block .optimization-method-options input[type=radio] {
+  display: none;
+}
+#berqwp-intro .optimization-method-block .optimization-method-options input[type=radio]:checked + .optimization-method {
+  border-color: #1f71ff;
+  background-color: #1f71ff;
+  color: #fff;
+}
+#berqwp-intro .optimization-method-block .optimization-method-options .optimization-method {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  padding: 10px 13px;
+  border: 1px solid #dad2ff;
+  border-radius: 8px;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+#berqwp-intro .optimization-method-block .optimization-method-options .optimization-method .icon svg {
+  width: 16px;
+  height: auto;
+  display: flex;
 }
 #berqwp-intro form.license-verification {
   display: flex;
@@ -737,19 +865,19 @@ table.berq-image-settings {
   padding: 16px 24px;
   line-height: 1;
   background: #fff;
-  border: 1px solid #D7D7D7;
+  border: 1px solid #d7d7d7;
   width: 280px;
 }
 #berqwp-intro form.license-verification input[type=password]::-moz-placeholder {
-  color: #928E8E;
+  color: #928e8e;
 }
 #berqwp-intro form.license-verification input[type=password]::placeholder {
-  color: #928E8E;
+  color: #928e8e;
 }
 #berqwp-intro form.license-verification input[type=submit] {
   border: none;
   color: #fff;
-  background: #5057FF;
+  background: #1f71ff;
   align-self: stretch;
   padding: 20px 40px;
   font-size: 18px;
@@ -775,7 +903,7 @@ table.berq-image-settings {
   margin-top: 60px;
 }
 #berqwp-intro .cta-btns a.btn {
-  background: #1F71FF;
+  background: #1f71ff;
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -851,7 +979,7 @@ table.dataTable > thead > tr > td {
 
 div.dt-container .dt-paging .dt-paging-button.current,
 div.dt-container .dt-paging .dt-paging-button.current:hover {
-  background: #5057ff !important;
+  background: #1f71ff !important;
   border: none;
   font-size: 15px;
   padding: 6px 13px;
@@ -975,29 +1103,35 @@ input.bwp-disable-cf {
   display: block;
 }
 
-.berqwp-lifespan-options {
+.berqwp-lifespan-options,
+.berqwp-inline-radio-select {
   margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 15px;
 }
-.berqwp-lifespan-options label {
+.berqwp-lifespan-options label,
+.berqwp-inline-radio-select label {
   flex-grow: 2;
   max-width: 200px;
   padding: 10px 15px;
   margin: 0;
   border: 1px solid #e0e9fa;
   border-radius: 5px;
-  color: #0C2D66;
+  color: #0c2d66;
   cursor: pointer;
+  font-size: 14px;
 }
-.berqwp-lifespan-options label:focus-within, .berqwp-lifespan-options label.selected {
-  background-color: #5057ff;
-  border-color: #5057ff;
+.berqwp-lifespan-options label:focus-within, .berqwp-lifespan-options label.selected,
+.berqwp-inline-radio-select label:focus-within,
+.berqwp-inline-radio-select label.selected {
+  background-color: #1f71ff;
+  border-color: #1f71ff;
   color: #fff;
 }
-.berqwp-lifespan-options label.selected input {
+.berqwp-lifespan-options label.selected input,
+.berqwp-inline-radio-select label.selected input {
   border-color: #fff;
 }
 
@@ -1033,24 +1167,24 @@ input.bwp-disable-cf {
   margin: 20px 0;
 }
 .berq-info-box .feature-blocks .single-feature {
-  background-color: #F3F3FF;
+  background-color: #f3f3ff;
   padding: 13px;
-  border: 1px solid #B5B8FF;
+  border: 1px solid #b5b8ff;
   border-radius: 7px;
 }
 .berq-info-box .feature-blocks .single-feature .h5 {
   font-size: 14px;
   font-weight: 600;
-  color: #0C2D66;
+  color: #0c2d66;
 }
 .berq-info-box .feature-blocks .single-feature p {
-  color: #0C2D66;
+  color: #0c2d66;
   font-size: 14px;
 }
 
 .berq-info-box.fluid-images ul li {
   margin-left: 20px;
-  color: #0C2D66;
+  color: #0c2d66;
 }
 
 .berq-info-box.fluid-images ul {
@@ -1062,7 +1196,7 @@ a.fluid-images-signup {
   padding: 12px 20px;
   text-transform: uppercase;
   color: #fff !important;
-  background: #5057FF;
+  background: #1f71ff;
   border-radius: 6px;
   display: inline-block;
 }
@@ -1077,8 +1211,12 @@ div#wpcontent {
   gap: 7px;
 }
 
+.berqwp-tab .icon {
+  display: flex;
+}
 .berqwp-tab .icon svg {
   width: 20px;
+  height: auto;
   color: #000;
 }
 
@@ -1087,4 +1225,172 @@ div#wpcontent {
   align-items: center;
   gap: 7px;
   color: #fff;
+}
+
+.bwp-action-btn {
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  background-color: #1f71ff;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  gap: 6px;
+  transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s all;
+  text-decoration: none !important;
+  border: 1px solid transparent;
+}
+.bwp-action-btn.light {
+  background-color: #fff;
+  color: #0c2d66;
+  border: 1px solid #d4dff2;
+}
+.bwp-action-btn:hover {
+  background-color: #3d44d9;
+  color: #fff;
+  border: 1px solid transparent;
+}
+.bwp-action-btn svg {
+  width: 15px;
+  height: auto;
+}
+
+.berq-triple-boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.berq-stats-count {
+  font-weight: bold;
+  font-size: 20px;
+  margin: 13px 0;
+  color: #1f366c;
+}
+
+a.berq-stat-refresh {
+  position: absolute;
+  top: 18px;
+  right: 14px;
+}
+a.berq-stat-refresh svg {
+  fill: #8daee5;
+}
+
+.berqwp-optimization-modes-container {
+  margin-bottom: 10px;
+}
+.berqwp-optimization-modes-container .berqwp-inline-radio-select {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+.berqwp-optimization-modes-container .berqwp-inline-radio-select label {
+  max-width: 100%;
+  display: flex;
+  gap: 5px;
+  padding: 16px 15px;
+}
+.berqwp-optimization-modes-container .berqwp-inline-radio-select label.berqwp-best-performance {
+  position: relative;
+}
+.berqwp-optimization-modes-container .berqwp-inline-radio-select label.berqwp-best-performance::before {
+  content: "Best Performance";
+  position: absolute;
+  top: 10px;
+  right: 8px;
+  font-size: 12px;
+  background-color: #cbffbc;
+  color: #1f8d00;
+  padding: 3px 9px;
+  border-radius: 10px;
+}
+.berqwp-optimization-modes-container .berqwp-inline-radio-select label.berqwp-best-performance.selected::before {
+  background-color: #538ef4;
+  color: #fff;
+}
+.berqwp-optimization-modes-container .berqwp-inline-radio-select label div {
+  font-size: 15px;
+}
+.berqwp-optimization-modes-container .berqwp-inline-radio-select label input {
+  margin-top: 1px;
+}
+.berqwp-optimization-modes-container .berqwp-inline-radio-select label p {
+  font-weight: normal;
+  margin-top: 6px;
+  margin-bottom: 0;
+  font-size: 14px;
+}
+.berqwp-optimization-modes-container .berqwp-inline-radio-select label.selected p {
+  color: #fff !important;
+}
+
+.berq-toggle {
+  position: relative;
+  width: 55px;
+  min-width: 55px;
+  height: 27px;
+  display: block;
+  background: #fafaff;
+  border-radius: 30px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #cbdeff;
+}
+.berq-toggle input {
+  display: none;
+}
+.berq-toggle input:checked + .berq-toggle-switch {
+  background-color: #1f71ff;
+}
+.berq-toggle input:checked + .berq-toggle-switch::before {
+  left: calc(93% - 19px);
+  background-color: #fff;
+}
+.berq-toggle .berq-toggle-switch {
+  background-color: transparent;
+  display: block;
+  height: 100%;
+  transition: all 0.3s ease-out;
+}
+.berq-toggle .berq-toggle-switch::before {
+  content: "";
+  position: absolute;
+  height: 19px;
+  background: #002159;
+  width: 19px;
+  border-radius: 30px;
+  left: 7%;
+  top: 3px;
+  transition: all 0.3s ease-out;
+}
+
+.berq-box-content.berq-setting-toggle {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+}
+.berq-box-content.berq-setting-toggle .berq-toggle {
+  /* margin-top: 10px; */
+}
+
+.berq-info-box.berq-setting-group .group-container:not(:first-child) {
+  padding-top: 20px;
+  border-top: 1px solid #e9e8ff;
+  margin-top: 20px;
+}
+
+.berq-box-title.cloud-exclusive::after {
+  content: "Cloud exclusive";
+  font-weight: normal;
+  font-size: 12px;
+  margin-left: 10px;
+  background: #2aad2a;
+  color: #fff;
+  padding: 3px 6px;
+  border-radius: 20px;
+  margin-top: 0px !important;
+  display: inline-block;
+  position: absolute;
 }/*# sourceMappingURL=style.css.map */

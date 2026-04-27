@@ -17,13 +17,15 @@ class berqUpload
 
         if (empty($html)) {
             $start = microtime(true);
-            $response = wp_remote_get($url . '?nocache=' . time(), [
-                'cookies' => [],
-                'headers' => [
-                    'User-Agent'      => 'Mozilla/5.0 (BerqWP)',
-                    'Cache-Control'   => 'no-cache, no-store, must-revalidate',
-                    'Pragma'          => 'no-cache',
-                ],
+            $response = wp_remote_get($url . '?berqwpnocache=' . time(), [
+                // 'sslverify' => false,
+                // 'httpversion' => '2.0',
+                // 'cookies' => [],
+                // 'headers' => [
+                //     'User-Agent'      => 'Mozilla/5.0 (BerqWP)',
+                //     'Cache-Control'   => 'no-cache, no-store, must-revalidate',
+                //     'Pragma'          => 'no-cache',
+                // ],
                 'sslverify' => false,
                 'httpversion' => '2.0',
                 'timeout' => 30
@@ -50,9 +52,9 @@ class berqUpload
                 ];
             }
 
-            $html = preg_replace('/\?nocache=\d+&/', '?', $html);
-            $html = preg_replace('/\?nocache=\d+/', '', $html);
-            $html = preg_replace('/nocache%3D\d+(%26)?/', '', $html);
+            $html = preg_replace('/\?berqwpnocache=\d+&/', '?', $html);
+            $html = preg_replace('/\?berqwpnocache=\d+/', '', $html);
+            $html = preg_replace('/berqwpnocache%3D\d+(%26)?/', '', $html);
         }
 
         // Parse HTML once and reuse the DOM across all asset extraction methods

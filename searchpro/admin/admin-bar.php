@@ -74,18 +74,20 @@ if (!class_exists('berqAdminBar')) {
                 )
             );
 
-            $wp_admin_bar->add_menu(
-                array(
-                    'parent' => 'berqWP',
-                    'id' => 'warmup-cache',
-                    'title' => 'Warmup cache',
-                    'href' => wp_nonce_url(admin_url('admin-post.php?action=warmup_cache'), 'warmup_cache_action'),
-                    'meta' => array(
-                        'class' => 'warmup-cache-link',
-                        'title' => 'Warmup BerqWP cache',
-                    ),
-                )
-            );
+            if (berqwp_can_use_cloud()) {
+                $wp_admin_bar->add_menu(
+                    array(
+                        'parent' => 'berqWP',
+                        'id' => 'warmup-cache',
+                        'title' => 'Warmup cache',
+                        'href' => wp_nonce_url(admin_url('admin-post.php?action=warmup_cache'), 'warmup_cache_action'),
+                        'meta' => array(
+                            'class' => 'warmup-cache-link',
+                            'title' => 'Warmup BerqWP cache',
+                        ),
+                    )
+                );
+            }
 
             if (is_multisite()) {
                 $wp_admin_bar->add_menu(array(
@@ -106,33 +108,35 @@ if (!class_exists('berqAdminBar')) {
                 }
             }
 
-            $wp_admin_bar->add_menu(
-                array(
-                    'parent' => 'berqWP',
-                    // ID of the parent menu item
-                    'id' => 'flush-cdn',
-                    'title' => 'Flush CDN & page cache',
-                    'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_cdn'), 'berq_flush_cdn_action'),
-                    'meta' => array(
-                        'class' => 'flush-cdn-cache',
+            if (berqwp_can_use_cloud()) {
+                $wp_admin_bar->add_menu(
+                    array(
+                        'parent' => 'berqWP',
+                        // ID of the parent menu item
+                        'id' => 'flush-cdn',
                         'title' => 'Flush CDN & page cache',
-                    ),
-                )
-            );
+                        'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_cdn'), 'berq_flush_cdn_action'),
+                        'meta' => array(
+                            'class' => 'flush-cdn-cache',
+                            'title' => 'Flush CDN & page cache',
+                        ),
+                    )
+                );
 
-            $wp_admin_bar->add_menu(
-                array(
-                    'parent' => 'berqWP',
-                    // ID of the parent menu item
-                    'id' => 'flush-criticalcss',
-                    'title' => 'Flush critical CSS cache',
-                    'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_criticalcss'), 'berq_flush_criticalcss_action'),
-                    'meta' => array(
-                        'class' => 'flush-criticalcss',
+                $wp_admin_bar->add_menu(
+                    array(
+                        'parent' => 'berqWP',
+                        // ID of the parent menu item
+                        'id' => 'flush-criticalcss',
                         'title' => 'Flush critical CSS cache',
-                    ),
-                )
-            );
+                        'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_flush_criticalcss'), 'berq_flush_criticalcss_action'),
+                        'meta' => array(
+                            'class' => 'flush-criticalcss',
+                            'title' => 'Flush critical CSS cache',
+                        ),
+                    )
+                );
+            }
 
             if (!is_admin()) {
                 $page_url = bwp_get_request_url();
@@ -151,20 +155,22 @@ if (!class_exists('berqAdminBar')) {
                     )
                 );
 
-                // Add the request cache
-                $wp_admin_bar->add_menu(
-                    array(
-                        'parent' => 'berqWP',
-                        // ID of the parent menu item
-                        'id' => 'request-page-cache',
-                        'title' => 'Force cache',
-                        'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_request_cache&uri=' . urlencode($page_url)), 'berq_request_cache_action'),
-                        'meta' => array(
-                            'class' => 'request-page-cache-link',
-                            'title' => 'Force cache for this page',
-                        ),
-                    )
-                );
+                if (berqwp_can_use_cloud()) {
+                    // Add the request cache
+                    $wp_admin_bar->add_menu(
+                        array(
+                            'parent' => 'berqWP',
+                            // ID of the parent menu item
+                            'id' => 'request-page-cache',
+                            'title' => 'Force cache',
+                            'href' => wp_nonce_url(admin_url('admin-post.php?action=berq_request_cache&uri=' . urlencode($page_url)), 'berq_request_cache_action'),
+                            'meta' => array(
+                                'class' => 'request-page-cache-link',
+                                'title' => 'Force cache for this page',
+                            ),
+                        )
+                    );
+                }
             }
         }
 

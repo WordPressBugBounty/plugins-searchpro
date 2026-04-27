@@ -53,6 +53,21 @@ function berqwp_uninstall_delete_site_options() {
 	delete_option('berqwp_cache_rules');
 	delete_option('berqwp_sync_addons');
 	delete_option('berqwp_can_use_fluid_images');
+	delete_option('berqwp_preload_yt_poster');
+	delete_option('berqwp_enable_critical_css');
+	delete_option('berqwp_async_excluded_styles');
+	delete_option('berqwp_delay_third_party_scripts');
+	delete_option('berqwp_lazy_render');
+	delete_option('berqwp_enable_webp');
+	delete_option('berqwp_lazy_load_videos');
+	delete_option('berqwp_force_include_critical_css');
+	delete_option('berqwp_exclude_lazy_load_images');
+	delete_option('berqwp_exclude_third_party_js');
+	delete_option('berqwp_exclude_js');
+	delete_option('berqwp_exclude_css');
+	delete_option('berq_exclude_cdn');
+	delete_option('berq_css_optimization');
+	delete_option('berq_js_optimization');
 }
 
 if (is_multisite()) {
@@ -100,6 +115,8 @@ if (is_multisite()) {
 	berqwp_delete_license_key();
 	berqwp_delete_network_option('berq_lic_response_cache');
 	berqwp_delete_network_option('berq_lic_cache_expire');
+	berqwp_delete_network_option('berqwp_lic_response_cache');
+	berqwp_delete_network_option('berqwp_lic_cache_expire');
 
 	// Delete blog map
 	$map_file = WP_CONTENT_DIR . '/cache/berqwp/blog-map.json';

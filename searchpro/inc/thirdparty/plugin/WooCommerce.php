@@ -6,11 +6,16 @@ use BerqWP\BerqWP;
 
 class berqWooCommerce extends berqIntegrations {
     function __construct() {
-        add_action( 'woocommerce_product_set_stock_status', [$this, 'flush_product_cache'] );
+        add_action( 'woocommerce_product_set_stock_status', [$this, 'stock_update'] );
+        // add_action( 'woocommerce_delete_product_transients', [$this, 'delete_transient'] );
 
-        if (!class_exists('\JtlWooCommerceConnector\Controllers\ProductController')) {
-            add_action( 'woocommerce_delete_product_transients', [$this, 'flush_product_cache'] );
-        }
+        add_action('woocommerce_order_status_changed', function() {
+            remove_action('woocommerce_delete_product_transients', [$this, 'delete_transient']);
+        }, 1);
+
+        add_action('woocommerce_order_status_changed', function() {
+            add_action('woocommerce_delete_product_transients', [$this, 'delete_transient']);
+        }, 999);
 
         add_action( 'wc_delete_related_product_transients_async', function () {
             add_filter( 'berqwp_can_flush_cache_on_post_update', '__return_false' );
@@ -18,7 +23,7 @@ class berqWooCommerce extends berqIntegrations {
 
         add_action('woocommerce_scheduled_sales', [$this, 'product_sale_end_actions']);
         // add_filter('berqwp_purge_home_post_types', [$this, 'purge_home']);
-        
+
     }
 
     function purge_home($post_types) {
@@ -41,7 +46,27 @@ class berqWooCommerce extends berqIntegrations {
         $product_url = get_permalink( $post_id );
         $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
         $berqwp->purge_criticlecss_url($product_url);
-        
+
+    }
+
+    function stock_update($post_id) {
+
+        global $berq_log;
+        $berq_log->info("WC stock update fired: $post_id");
+
+        $this->flush_product_cache($post_id);
+    }
+
+    function delete_transient($post_id) {
+
+        if (class_exists('\JtlWooCommerceConnector\Controllers\ProductController')) {
+            return;
+        }
+
+        global $berq_log;
+        $berq_log->info("WC delete transients fired: $post_id");
+
+        $this->flush_product_cache($post_id);
     }
 
     function flush_product_cache($post_id) {

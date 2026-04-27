@@ -451,7 +451,7 @@ class berqHeartbeat
             wp_mkdir_p($dir);
         }
 
-        return (bool) @file_put_contents($this->lock_file, time());
+        return (bool) @file_put_contents($this->lock_file, time(), LOCK_EX);
     }
 
     /**
@@ -496,4 +496,4 @@ class berqHeartbeat
     }
 }
 
-add_action('init', fn() => new berqHeartbeat());
+// add_action('init', fn() => new berqHeartbeat());

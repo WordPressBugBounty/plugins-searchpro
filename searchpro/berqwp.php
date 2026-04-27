@@ -3,7 +3,7 @@
  * Plugin Name:       BerqWP
  * Plugin URI:        https://berqwp.com
  * Description:       Automatically pass Core Web Vitals for WordPress and boost your speed score to 90+ for both mobile and desktop without any technical skills.
- * Version:           3.1.21
+ * Version:           4.0.15
  * Requires at least: 5.3
  * Requires PHP:      7.4
  * Author:            BerqWP
@@ -16,7 +16,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BERQWP_VERSION')) {
-	define('BERQWP_VERSION', '3.1.21');
+	define('BERQWP_VERSION', '4.0.15');
 }
 
 if (!defined('optifer_PATH')) {
@@ -53,17 +53,18 @@ global $bwp_current_page;
 $bwp_current_page = null;
 
 // Initialize BerqWP SDK
-require_once optifer_PATH . '/BerqWP/vendor-scoped/autoload.php';
-require_once optifer_PATH . '/BerqWP/src/Vendor/SimpleHtmlDom/simple_html_dom.php';
+require_once optifer_PATH . '/BerqWP/vendor/autoload.php';
+// require_once optifer_PATH . '/BerqWP/src/Vendor/SimpleHtmlDom/simple_html_dom.php';
 
 require_once optifer_PATH . '/inc/crawler/berqDetectCrawler.php';
 require_once optifer_PATH . '/inc/class-berqconfigs.php';
-require_once optifer_PATH . '/vendor/autoload.php';
-require_once optifer_PATH . '/vendor/woocommerce/action-scheduler/action-scheduler.php';
+// require_once optifer_PATH . '/vendor/autoload.php';
+// require_once optifer_PATH . '/vendor/woocommerce/action-scheduler/action-scheduler.php';
 require_once optifer_PATH . '/inc/class-berqlogs.php';
 require_once optifer_PATH . '/inc/helper-functions.php';
 require_once optifer_PATH . '/inc/common-functions.php';
 require_once optifer_PATH . '/inc/dropin-functions.php';
+require_once optifer_PATH . '/inc/photon/class-berqUsedCSS.php';
 require_once optifer_PATH . '/inc/photon/class-berqPageOptimizer.php';
 require_once optifer_PATH . '/inc/class-berqintegrations.php';
 require_once optifer_PATH . '/inc/class-berqwp.php';

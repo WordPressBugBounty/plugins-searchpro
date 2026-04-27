@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 3.1.21
+Stable tag: 4.0.15
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -39,13 +39,13 @@ Since all popular page speed testing tools use similar methods, you'll get the s
 - **BerqWP-optimized websites have an average bounce rate of 4.78% on mobile and 6.18% on desktop.**
 
 ## 🔥 Features:
+- **Local Optimization (Free):** Run BerqWP entirely on your own server with no account or license key required. Includes full-page caching, lazy loading, LCP preloading, URL prefetching, prerender on hover, font optimization, and four optimization modes. Free forever.
+
 - **Zero Configuration:** BerqWP comes with optimal settings that work perfectly for 99% of users. It requires no configurations.
 
-- **Automatic Cache Warmup:** Keep your cache always primed. Automatically generate new cache to ensure every user experiences fast loading times.
+- **Automatic Cache Warmup:** Keep your cache always primed. Automatically generate new cache to ensure every user experiences fast loading times. Available on BerqWP Cloud.
 
-- **Fluid Images:** Automatically delivers container-sized, retina-ready WebP images via BerqWP CDN to boost your site speed and improve user experience across all devices.
-
-- **Instant Cache:** BerqWP instantly creates a basic optimized cache, while the fully optimized cache is generated in the background on our cloud servers.
+- **Fluid Images:** Automatically serves each image at the right size for the visitor's screen in the best format their browser supports: AVIF, WebP, or original. Delivered via BerqWP's image CDN with full responsive srcset, lazy loading, and zero changes to your original files. Available on BerqWP Cloud.
 
 - **Cache Invalidation:** When you make a change on your website, BerqWP automatically detects the change and recreates the cache for that page.
 
@@ -84,14 +84,18 @@ Since all popular page speed testing tools use similar methods, you'll get the s
 
 
 ## How Does BerqWP Work?
-Unlike traditional speed optimization plugins, BerqWP optimizes your website using our proprietary optimization software called the **Photon Engine**. Instead of handling resource-intensive tasks on your web server, which can slow it down, BerqWP processes optimizations externally. This is crucial because heavy tasks like **critical CSS generation, WebP conversion, and JavaScript optimization** can overwhelm ordinary servers when performed at scale.
+BerqWP v4 introduces two optimization methods: **Local** and **BerqWP Cloud**.
 
-Here’s how it works:
+**Local (Free)** runs entirely on your own server using PHP. No account, no license key, no external dependencies. It includes core optimizations: full-page caching, lazy loading, LCP preloading, image dimension attributes, URL prefetching, prerender on hover, and font optimization. It is our way of giving back to the WordPress community.
 
-* When a webpage is added to the **Photon Engine** queue, BerqWP fetches the page’s HTML.
-* Various optimizations are applied, including HTML minification, image conversion, lazy loading, and JavaScript execution control.
-* Once optimized, the Photon Engine stores the **fully optimized HTML** in your website as a form of cache.
-* To handle traffic before optimization is complete, BerqWP creates an **instant cache**, a placeholder cache with minimal optimizations, ensuring fast page loads even before full optimization.
+**BerqWP Cloud (Premium)** performs every optimization on our cloud infrastructure using the **Photon Engine**. This is not just a superset of Local. It is a fundamentally different level of optimization. BerqWP Cloud handles everything: critical CSS generation, WebP conversion, Fluid Images, JavaScript execution tuning, CDN delivery, and Web Vitals Analytics. Beyond features, BerqWP Cloud delivers broader compatibility with themes and plugins through real-time patches that are applied automatically as the WordPress ecosystem evolves, without requiring a plugin update.
+
+Here’s how BerqWP Cloud works:
+
+* The plugin sends only two things to our servers: your **page URL** and your **plugin settings**. Nothing else leaves your server.
+* Our cloud servers fetch your page directly using Cloudflare Workers, which are far less likely to be blocked by hosting firewalls than traditional server-to-server requests. All optimization is performed on BerqWP's own cloud infrastructure.
+* Every optimization is applied on our cloud servers: image conversion, critical CSS generation, lazy loading, JavaScript execution control, and more.
+* Once optimized, the Photon Engine stores the **fully optimized HTML** on your website as cache.
 
 ## ✅ Advanced Cache for Faster Server Response Time
 BerqWP utilizes the WordPress **advanced-cache.php** file to deliver cached pages as fast as possible. By bypassing unnecessary database queries and reducing the number of files loaded on each request, BerqWP significantly improves **server response time (TTFB – Time to First Byte)**, ensuring that your pages load within milliseconds.
@@ -122,6 +126,24 @@ Loading external stylesheets can delay rendering, so BerqWP generates **Critical
 * The remaining CSS loads **asynchronously**, ensuring fast page rendering without affecting layout or design.
 
 
+## ✅ Fluid Images – Automatic Next-Gen Image Delivery
+Fluid Images is one of BerqWP's most powerful features. It automatically serves each image at exactly the right size for the visitor's screen and in the best format their browser supports, without any manual work or changes to your original files.
+
+**How it works:**
+
+* BerqWP replaces standard `<img>` tags with responsive versions that include a full srcset of size variants: 200w, 400w, 600w, 800w, 1000w, 1200w, and the original width.
+* Images are delivered from BerqWP's dedicated image CDN at `images.berqwp.com`, which selects the optimal format based on the visitor's browser.
+* Format cascade: **AVIF** (smallest file size, best compression) → **WebP** (broad browser support) → **original format** (full fallback). Format selection is handled server-side using the browser's `Accept` header. The image URL never changes.
+* Images are lazy loaded with an inline SVG placeholder that matches the exact dimensions of the original, preventing any layout shift (CLS) while the real image loads.
+* The `sizes` attribute is automatically set using responsive breakpoints, so the browser always requests the smallest image that fills the container. No oversized images on mobile.
+* **Original files are never modified.** File extensions remain unchanged. Format delivery happens transparently via the `Content-Type` HTTP header.
+
+**Requirements:**
+
+* Fluid Images must be enabled in **BerqWP > Image Optimization**
+* BerqWP CDN must be enabled in **BerqWP > Content Delivery Network**
+* Available on BerqWP Cloud only
+
 ## ✅ BerqWP CDN – Global Performance Boost
 BerqWP integrates with **Cloudflare CDN** to ensure static assets (images, CSS, JavaScript, web fonts) load from the nearest server to the visitor’s location. This results in:
 
@@ -135,12 +157,12 @@ BerqWP integrates with **Cloudflare CDN** to ensure static assets (images, CSS, 
 ## ✅ Optimization Modes for Flexibility
 BerqWP offers four optimization modes:
 
-* **Basic** – Minimal optimizations, ensuring stability.
-* **Medium** – A balance between performance and compatibility.
-* **Blaze** – A balance between performance and User Experience.
-* **Aggressive** – Best for high-speed results
+* **Standard** – Core optimizations including image optimization, page cache, and URL prefetch. Maximum compatibility.
+* **Smart** – Asynchronous JavaScript and CSS loading. Highly stable, great for complex sites.
+* **Blaze** – Asynchronous CSS with delayed JavaScript. Design-first optimization for high performance with visual stability.
+* **Turbo** – Delayed CSS and JavaScript for minimal initial requests and best possible performance.
 
-For best results, we recommend using **Aggressive mode**, but switching to a different mode can help if compatibility issues arise.
+For best results, we recommend starting with **Turbo mode**, but stepping down to Blaze or Smart can help if compatibility issues arise.
 
 
 ## 👩‍💻 Real User Success Stories
@@ -164,8 +186,8 @@ _"The BerqWP plugin is incredibly easy to use, even for those who are not optimi
 
 ## ⚙️ How to set up BerqWP in 3 Steps?
 1. Ensure that you have deactivated any speed optimization plugins on your website. Then, install and activate the BerqWP plugin.
-2. Activate the license key.
-3. Relax and take it easy. Our automatic cache warm-up mechanism will handle the rest for you.
+2. Choose your optimization method. Select **Local** for a free, no-account-required setup, or activate your license key to enable **BerqWP Cloud** for the full optimization suite.
+3. Relax and take it easy. BerqWP will handle the rest for you.
 
 ## 📌 Plugin Support:
 We value both BerqWP Free and Premium users. If you encounter any issues, please enable **"Sandbox Mode"** and submit a support ticket. For **BerqWP Premium** users, we have a dedicated support center on our website.
@@ -181,10 +203,10 @@ We value both BerqWP Free and Premium users. If you encounter any issues, please
 == Frequently Asked Questions ==
 
 = Why is the plugin slug searchpro when your product is called BerqWP? =
-Early in development we registered our plugin under the searchpro namespace on WordPress.org. Unfortunately, WordPress.org doesn’t allow slugs to be renamed once created. Rest assured, this is only a directory name—every feature, every update, and every bit of our branding is still BerqWP. You won’t see “Search Pro” anywhere in the UI, URLs, or your dashboards after installation.
+Early in development we registered our plugin under the searchpro namespace on WordPress.org. Unfortunately, WordPress.org doesn’t allow slugs to be renamed once created. Rest assured, this is only a directory name. Every feature, every update, and every bit of our branding is still BerqWP. You won’t see “Search Pro” anywhere in the UI, URLs, or your dashboards after installation.
 
 = How does BerqWP work? =
-BerqWP sends your website’s pages to our Photon Engine, where we optimize them and store optimized copies on your website as cache. This means BerqWP doesn’t use your server’s resources for optimization.
+BerqWP offers two optimization methods. With **Local**, the plugin runs core optimizations directly on your server using PHP, with no account or license needed. With **BerqWP Cloud**, the plugin sends only your page URL and plugin settings to our servers. Our Photon Engine then fetches and processes everything directly using Cloudflare Workers, applies every optimization on our cloud infrastructure, and stores the fully optimized HTML back on your site as cache. Nothing else leaves your server.
 
 = What are the requirements to run BerqWP? =
 All you need is a WordPress website running on PHP 7.4 or above.
@@ -234,6 +256,14 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 4.0.15 =
+* [New Feature] Introduced Local Optimization method: run BerqWP entirely on your own server for free, with no account or license key required. Includes full-page caching, lazy loading, LCP preloading, image dimension attributes, URL prefetching, prerender on hover, and font optimization.
+* [New Feature] Added BerqWP Cloud optimization method for the full premium feature suite including critical CSS, WebP conversion, Fluid Images, BerqWP CDN, JavaScript execution modes, and Web Vitals Analytics.
+* [New Feature] Added Prerender Page on Link Hover using the browser's Speculation Rules API.
+* [Enhancement] Renamed optimization modes: Basic is now Standard, Medium is now Smart, Aggressive is now Turbo.
+* [Enhancement] Server-side cache delivery on Apache via automatic .htaccess rewrite rules, serving cached pages before PHP loads.
+* [Enhancement] New cache file path structure: host/path/index.html.gz for improved compatibility and clarity.
 
 = 3.1.21 =
 * [Enhancement] Reduced file reads.

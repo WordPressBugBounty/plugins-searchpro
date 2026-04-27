@@ -4,15 +4,19 @@ if (!defined('ABSPATH')) exit;
 class berqConfigs {
     public $config_file;
     private $defaults = [
-        'site_id'           => '',
-        'exclude_cookies'   => [],
-        'exclude_urls'      => [],
-        'cache_lifespan'    => MONTH_IN_SECONDS,
-        'page_compression'  => false,
+        'site_id'               => '',
+        'secret'                => '',
+        'home_url'              => '',
+        'optimization_method'   => '',
+        'exclude_cookies'       => [],
+        'exclude_urls'          => [],
+        'cache_lifespan'        => MONTH_IN_SECONDS,
+        'page_compression'      => false,
     ];
 
     private static $cached_config = null;
     private static $cached_blog_id = null;
+    private static $instance = null;
 
     function __construct() {
         $base_dir = WP_CONTENT_DIR . '/cache/berqwp/';
@@ -54,6 +58,13 @@ class berqConfigs {
 
             self::$cached_config = $merged_config;
         }
+    }
+
+    static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new berqConfigs();
+        }
+        return self::$instance;
     }
 
     /**

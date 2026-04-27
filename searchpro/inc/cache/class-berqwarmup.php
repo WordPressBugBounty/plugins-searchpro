@@ -14,14 +14,16 @@ if (!class_exists('berqWarmup')) {
             // Automatic cache warmup
             // add_action('init', [$this, 'warmup_home']);
             add_action('berqwp_flush_all_cache', [$this, 'warmup_home']);
+            add_action('berqwp_flush_all_cache', [$this, 'warmup_sitemap']);
             add_action('warmup_cache_quickly', 'warmup_cache_by_url');
-            add_action('bwp_warmup_sitemap', [$this, 'warmup_sitemap']);
-            add_action('berqwp_flush_all_cache', [$this, 'request_warmup_cache']);
-            add_action('berqwp_cache_warmup', [$this, 'request_warmup_cache']);
+            add_action('berqwp_cache_warmup', [$this, 'warmup_sitemap']);
+            // add_action('bwp_warmup_sitemap', [$this, 'warmup_sitemap']);
+            // add_action('berqwp_flush_all_cache', [$this, 'request_warmup_cache']);
+            // add_action('berqwp_cache_warmup', [$this, 'request_warmup_cache']);
 
-            if (isset($_GET['bwp_preload'])) {
-                add_action('wp', [$this, 'preload_buffer'], 999);
-            }
+            // if (isset($_GET['bwp_preload'])) {
+            //     add_action('wp', [$this, 'preload_buffer'], 999);
+            // }
         }
 
         function warmup_home()
@@ -37,14 +39,23 @@ if (!class_exists('berqWarmup')) {
 
         function warmup_sitemap($async = false)
         {
-            return;
+            if (!berqwp_can_use_cloud()) {
+                return;
+            }
+
+            global $berq_log;
+            $berq_log->info("Warming cache using sitemap.");
+
+            // Remove require cache warning
+            update_option('bwp_require_flush_cache', 0);
+
             $post_data = [
                 'license_key' => berqwp_get_license_key(),
                 'site_url' => home_url(),
                 'cache_warmup' => true,
             ];
             $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
-            $berqwp->request_cache_warmup($post_data, $async);
+            $berqwp->request_cache_warmup($post_data, true);
         }
 
         function request_warmup_cache()
@@ -130,6 +141,8 @@ if (!class_exists('berqWarmup')) {
                         }
                     }
                 }
+
+                wp_reset_postdata(); 
             }
 
             // Fetch author URLs

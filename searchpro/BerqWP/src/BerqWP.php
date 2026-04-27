@@ -3,7 +3,8 @@ namespace BerqWP;
 use BerqWP\Cache;
 use BerqWP\CriticalCSS;
 use BerqWP\CDN;
-use BerqWP\GuzzleHttp\Client;
+// use BerqWP\GuzzleHttp\Client;
+use GuzzleHttp\Client;
 
 
 class BerqWP
@@ -12,6 +13,7 @@ class BerqWP
     protected $license_key = null;
     protected $cache_directory = null;
     protected $storage_dir = null;
+    static $endpoint = 'https://boost.berqwp.com/optimize/';
 
     function __construct($license_key, $cache_directory, $storage_dir) {
         $this->license_key = $license_key;
@@ -19,7 +21,7 @@ class BerqWP
         $this->storage_dir = $storage_dir;
 
         $this->client = new Client([
-            'base_uri' => 'https://boost.berqwp.com/photon/',
+            'base_uri' => self::$endpoint,
             'http_errors' => false,
             'verify' => false,
             'timeout'  => 30,
@@ -50,13 +52,23 @@ class BerqWP
     }
 
     function purge_cdn($domain) {
-        $critical = new CDN($this->client, $this->license_key);
-        return $critical->purge_all($domain);
+        $cdn = new CDN($this->client, $this->license_key);
+        return $cdn->purge_all($domain);
     }
 
-    function request_cache_warmup($post_data) {
+    function cdn_stale_assets($domain) {
+        $cdn = new CDN($this->client, $this->license_key);
+        return $cdn->stale_assets($domain);
+    }
+
+    function request_cache_warmup($post_data, $async = false) {
         $cache = new Cache($this->client, $this->cache_directory, $this->storage_dir);
-        return $cache->request_cache_warmup($post_data);
+        return $cache->request_cache_warmup($post_data, $async);
+    }
+
+    function queue_count($site_id) {
+        $cache = new Cache($this->client, $this->cache_directory, $this->storage_dir);
+        return $cache->queue_count($site_id);
     }
 
     function clear_cache_queue($site_url, $site_id) {

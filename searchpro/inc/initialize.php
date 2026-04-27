@@ -1,6 +1,6 @@
 <?php
 if (!defined('ABSPATH')) exit;
-$berqconfigs = new berqConfigs();
+$berqconfigs = berqConfigs::getInstance();
 $berqwp_configs = $berqconfigs->get_configs();
 
 if (get_option('berqwp_enable_sandbox') === false) {
@@ -17,10 +17,6 @@ if (get_option('berqwp_webp_quality') === false) {
 
 if (get_option('berqwp_image_lazyloading') === false) {
     update_option('berqwp_image_lazyloading', 1, false);
-}
-
-if (get_option('berqwp_disable_webp') === false) {
-    update_option('berqwp_disable_webp', 0, false);
 }
 
 if (get_option('berqwp_enable_cdn') === false) {
@@ -79,9 +75,11 @@ if (get_option('berqwp_optimize_post_types') === false) {
     update_option('berqwp_optimize_post_types', ['post', 'page', 'product'], false);
 }
 
-if (get_option('berq_exclude_js_css') === false) {
-    update_option('berq_exclude_js_css', [], false);
-}
+// if (get_option('berq_exclude_js_css') === false) {
+//     update_option('berq_exclude_js_css', [], false);
+// }
+
+
 
 if (get_option('berq_exclude_cdn') === false) {
     update_option('berq_exclude_cdn', [], false);
@@ -95,14 +93,14 @@ if (get_option('berq_ignore_urls_params') === false) {
     update_option('berq_ignore_urls_params', ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'msclkid'], false);
 }
 
-if (empty($berqwp_configs['site_id'])) {
-    $blog_id     = get_current_blog_id();
-    $network_id  = function_exists('get_current_network_id') ? get_current_network_id() : 1;
-    $siteurl     = get_option('siteurl');
-    $site_id = md5("berqwp|$network_id|$blog_id|$siteurl");
+// if (empty($berqwp_configs['site_id'])) {
+//     $blog_id     = get_current_blog_id();
+//     $network_id  = function_exists('get_current_network_id') ? get_current_network_id() : 1;
+//     $siteurl     = get_option('siteurl');
+//     $site_id = md5("berqwp|$network_id|$blog_id|$siteurl");
 
-    $berqconfigs->update_configs(['site_id' => $site_id]);
-}
+//     $berqconfigs->update_configs(['site_id' => $site_id]);
+// }
 
 
 // if (get_option('berq_exclude_urls', null) == null) {
@@ -110,45 +108,135 @@ if (empty($berqwp_configs['site_id'])) {
 
 //     if (class_exists('WooCommerce')) {
 //         // WooCommerce is active
-    
+
 //         // Get cart URL
 //         $cart_url = wc_get_cart_url();
-    
+
 //         // Get checkout URL
 //         $checkout_url = wc_get_checkout_url();
-    
+
 //         $exclude_urls[] = esc_url($cart_url);
 //         $exclude_urls[] = esc_url($checkout_url);
 
 //     }
-    
+
 //     update_option('berq_exclude_urls', $exclude_urls);
-    
+
 // }
 
-if (get_option('berq_exclude_urls', []) !== null) {
+if (get_option('berqwp_enable_critical_css') === false) {
+    update_option('berqwp_enable_critical_css', 1, false);
+}
+
+if (get_option('berqwp_force_include_critical_css') === false) {
+    update_option('berqwp_force_include_critical_css', [], false);
+}
+
+if (!empty(get_option('berq_exclude_js_css'))) {
+    $css_js_excludes = get_option('berq_exclude_js_css');
+    update_option('berqwp_exclude_css', $css_js_excludes, false);
+    update_option('berqwp_exclude_js', $css_js_excludes, false);
+
+    delete_option('berq_exclude_js_css');
+}
+
+if (get_option('berqwp_exclude_css') === false) {
+    update_option('berqwp_exclude_css', [], false);
+}
+
+if (get_option('berqwp_exclude_js') === false) {
+    update_option('berqwp_exclude_js', [], false);
+}
+
+if (get_option('berqwp_exclude_third_party_js') === false) {
+    update_option('berqwp_exclude_third_party_js', [], false);
+}
+
+if (get_option('berqwp_async_excluded_styles') === false) {
+    update_option('berqwp_async_excluded_styles', 0, false);
+}
+
+if (get_option('berqwp_defer_excluded_styles') === false) {
+    update_option('berqwp_defer_excluded_styles', 1, false);
+}
+
+if (get_option('berqwp_defer_excluded_js') === false) {
+    update_option('berqwp_defer_excluded_js', 1, false);
+}
+
+if (get_option('berqwp_delay_third_party_scripts') === false) {
+    update_option('berqwp_delay_third_party_scripts', 0, false);
+}
+
+if (get_option('berqwp_lazy_render') === false) {
+    update_option('berqwp_lazy_render', 0, false);
+}
+
+if (get_option('berqwp_prerender_on_hover') === false) {
+    update_option('berqwp_prerender_on_hover', 1, false);
+}
+
+if (get_option('berqwp_enable_webp') === false) {
+
+    $bwp_enable_webp = 1;
+    if (get_option('berqwp_disable_webp') !== false) {
+        $bwp_enable_webp = !get_option('berqwp_disable_webp');
+        delete_option('berqwp_disable_webp');
+    }
+
+    update_option('berqwp_enable_webp', (int) $bwp_enable_webp, false);
+}
+
+if (get_option('berqwp_exclude_lazy_load_images') === false) {
+    update_option('berqwp_exclude_lazy_load_images', [], false);
+}
+
+if (get_option('berqwp_lazy_load_videos') === false) {
+    update_option('berqwp_lazy_load_videos', 1, false);
+}
+
+
+if (get_option('berq_exclude_urls') === false) {
     $urls = get_option('berq_exclude_urls', []);
 
     if (class_exists('WooCommerce')) {
-        $cart_url = wc_get_cart_url();
-        $checkout_url = wc_get_checkout_url();
-        $should_update = false;
+        $page_excludes = [
+            wc_get_cart_url(),
+            wc_get_checkout_url(),
+            trailingslashit(wc_get_cart_url()),
+            trailingslashit(wc_get_checkout_url()),
+        ];
 
-        if (!empty($cart_url) && !in_array($cart_url, $urls) && trailingslashit($cart_url) !== trailingslashit(home_url())) {
-            $urls[] = esc_url($cart_url);
-            $should_update = true;
-        }
+        $page_excludes = array_unique($page_excludes);
+        
+        $page_excludes = array_filter($page_excludes, function ($url) use ($urls) {
+            return !empty($url) && !in_array($url, $urls) && $url !== trailingslashit(home_url());
+        });
 
-        if (!empty($checkout_url) && !in_array($checkout_url, $urls) && trailingslashit($checkout_url) !== trailingslashit(home_url())) {
-            $urls[] = esc_url($checkout_url);
-            $should_update = true;
-        }
+        $should_update = !empty($page_excludes);
+        $urls = array_merge($urls, $page_excludes);
+            
+
+        // if (!empty($cart_url) && !in_array($cart_url, $urls) && trailingslashit($cart_url) !== trailingslashit(home_url())) {
+        //     $urls[] = esc_url($cart_url);
+        //     $should_update = true;
+        // }
+
+        // if (!empty($checkout_url) && !in_array($checkout_url, $urls) && trailingslashit($checkout_url) !== trailingslashit(home_url())) {
+        //     $urls[] = esc_url($checkout_url);
+        //     $should_update = true;
+        // }
 
         if ($should_update) {
-            $berqconfigs->update_configs(['exclude_urls'=>$urls]);
+            $berqconfigs->update_configs(['exclude_urls' => $urls]);
             update_option('berq_exclude_urls', $urls, false);
 
         }
 
     }
+}
+
+
+if (!empty(get_option('berqwp_optimize_queue'))) {
+    delete_option('berqwp_optimize_queue');
 }

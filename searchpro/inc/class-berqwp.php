@@ -2,6 +2,7 @@
 if (!defined('ABSPATH'))
 	exit;
 
+use BerqWP\BerqWP as BerqWPCloud;
 use BerqWP\RateLimiter;
 
 if (!class_exists('berqWP')) {
@@ -61,7 +62,7 @@ if (!class_exists('berqWP')) {
 
 			// Sitemap for cache warmup
 			// add_action('wp', 'bwp_get_sitemap');
-			add_action('init', 'bwp_get_sitemap');
+			add_action('wp_loaded', 'bwp_get_sitemap', 999);
 
 			// BerqWP display logs
 			add_action('init', 'bwp_display_logs');
@@ -100,6 +101,9 @@ if (!class_exists('berqWP')) {
 			// Refresh license key
 			add_action('admin_post_bwp_refresh_license', [$this, 'handle_refresh_license_action']);
 
+			add_action('admin_post_switch_optimization_method_local', [$this, 'switch_optimization_method']);
+			add_action('admin_post_switch_optimization_method_cloud', [$this, 'switch_optimization_method']);
+
 			add_action('in_admin_header', [$this, 'remove_admin_notices']);
 
 			// Increase nonce life
@@ -121,6 +125,9 @@ if (!class_exists('berqWP')) {
 
 			// Update settings via API
 			add_action('init', 'bwp_update_configs_webhook');
+
+			// Active-status check from optimization server
+			add_action('init', 'bwp_check_status_webhook');
 
 			// Sync addons from cloud
 			add_action('init', [$this, 'sync_addons']);
@@ -144,6 +151,41 @@ if (!class_exists('berqWP')) {
             }
 
             return self::$instance;
+        }
+
+        function switch_optimization_method() {
+            // Check if the user has the necessary nonce and the action matches
+			if (isset($_GET['action']) && $_GET['action'] === 'switch_optimization_method_local' && wp_verify_nonce($_GET['_wpnonce'], 'switch_optimization_method_local_action')) {
+
+
+			    $berqconfigs = berqConfigs::getInstance();
+				$berqconfigs->update_configs(['optimization_method' => 'local']);
+
+				$redirect_url = wp_get_referer();
+
+				// Redirect back to the referring page after clearing the cache
+				wp_safe_redirect($redirect_url);
+				exit;
+			}
+
+			if (isset($_GET['action']) && $_GET['action'] === 'switch_optimization_method_cloud' && wp_verify_nonce($_GET['_wpnonce'], 'switch_optimization_method_cloud_action')) {
+
+                $berqconfigs = berqConfigs::getInstance();
+                $configs = $berqconfigs->get_configs();
+
+                if (empty($configs['secret'])) {
+                    $berqconfigs->update_configs(['optimization_method' => '']);
+                } else {
+                    $berqconfigs->update_configs(['optimization_method' => 'cloud']);
+                }
+
+
+				$redirect_url = wp_get_referer();
+
+				// Redirect back to the referring page after clearing the cache
+				wp_safe_redirect($redirect_url);
+				exit;
+			}
         }
 
 		function sync_addons()
@@ -244,7 +286,7 @@ if (!class_exists('berqWP')) {
 			check_ajax_referer('wp_rest', 'nonce');
 
 			$url = home_url('/?berqwp_compression_test=' . time());
-			$berqconfigs = new berqConfigs();
+			$berqconfigs = berqConfigs::getInstance();
 			$testfile = optifer_cache . 'gzip-compression-test.gz';
 			$html = gzencode('Hello World!');
 			@file_put_contents($testfile, $html);
@@ -271,7 +313,8 @@ if (!class_exists('berqWP')) {
 		function increase_nonce_life($default_life)
 		{
 
-			if (!is_user_logged_in() && bwp_pass_account_requirement()) {
+			// if (!is_user_logged_in() && bwp_pass_account_requirement()) {
+			if (!is_user_logged_in()) {
 				return 30 * DAY_IN_SECONDS;
 			}
 
@@ -297,6 +340,33 @@ if (!class_exists('berqWP')) {
 
 		function admin_scripts()
 		{
+
+		    // settings page specific assets
+            if ( isset($_GET['page']) && $_GET['page'] == 'berqwp' ) {
+
+                wp_enqueue_style(
+    				'bwp-google-fonts',
+    				"https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap",
+    				[],
+    				BERQWP_VERSION
+    			);
+
+                wp_enqueue_style(
+                    'bwp-jquery-datatable',
+                    optifer_URL . '/admin/css/dataTables.dataTables.min.css',
+                    [],
+                    BERQWP_VERSION
+                );
+
+                wp_enqueue_style(
+                    'bwp-settings-style',
+                    optifer_URL . '/admin/css/style.css',
+                    [],
+                    BERQWP_VERSION
+                );
+
+            }
+
 			wp_enqueue_style(
 				'bwp-global-styles', // Handle for the style
 				optifer_URL . 'admin/css/global.css', // URL to the CSS file
@@ -310,11 +380,13 @@ if (!class_exists('berqWP')) {
 			// Check if the user has the necessary nonce and the action matches
 			if (isset($_GET['action']) && $_GET['action'] === 'bwp_refresh_license' && wp_verify_nonce($_GET['_wpnonce'], 'bwp_refresh_license_action')) {
 
-				$transient_key = 'berq_lic_response_cache';
-				$expire_transient_key = 'berq_lic_cache_expire';
+				// $transient_key = 'berq_lic_response_cache';
+				// $expire_transient_key = 'berq_lic_cache_expire';
 
-				berqwp_delete_network_option($transient_key);
-				berqwp_delete_network_option($expire_transient_key);
+				// berqwp_delete_network_option($transient_key);
+				// berqwp_delete_network_option($expire_transient_key);
+
+				berqwp_delete_network_option('berqwp_license_cache');
 
 				// clear cache from cloud
 				bwp_request_purge_license_key_cache();
@@ -598,6 +670,103 @@ if (!class_exists('berqWP')) {
 			}
 		}
 
+		function handle_upgrade() {
+
+            $berqconfigs = berqConfigs::getInstance();
+    		$configs = $berqconfigs->get_configs();
+            $site_id = $configs['site_id'];
+            $license_key = berqwp_get_license_key();
+            global $berq_log;
+
+            if (!empty($configs['optimization_method']) && $configs['optimization_method'] == 'cloud' && empty($license_key)) {
+
+                $berqconfigs->update_configs([
+                    'secret' => '',
+                    'optimization_method' => 'local'
+                ]);
+                return;
+            }
+
+			$license_check_only = false;
+
+            if ( !empty($configs['secret']) && !empty($configs['optimization_method']) && $configs['optimization_method'] == 'cloud' && !empty($license_key) && empty(berqwp_get_network_option('berqwp_license_cache')) ) {
+				$license_check_only = true;
+            }
+
+            // user first time upgrades to v4
+            $first_upgrade = empty($configs['optimization_method']) && !empty($license_key);
+            $missing_secret = empty($configs['secret']) && !empty($configs['optimization_method']) && $configs['optimization_method'] == 'cloud' && !empty($license_key);
+
+    		if ($first_upgrade || $missing_secret || !empty($license_check_only)) {
+
+                // $berq_log->info("Authenticating secret");
+
+                // $lic_response = wp_remote_post(BerqWPCloud::$endpoint."authenticate", [
+                //     'timeout' => 30,
+                //     'body'  => $request_body
+                // ]);
+
+                // if (is_wp_error($lic_response)) {
+                //     $berq_log->info("Couldn't reach BerqWP server.");
+                //     return;
+                // }
+
+                // $lic_body = wp_remote_retrieve_body($lic_response);
+                // $lic_json = json_decode($lic_body);
+
+                // if (empty($lic_json)) {
+                //     $berq_log->info("Authenticate secret invalid response");
+                //     return;
+                // }
+
+				$lic_json = $this->authenticate_license($license_key, $license_check_only);
+
+                if (!empty($lic_json->lic) && $lic_json->lic->result == 'success' && ($lic_json->lic->message == 'License key activated' || $lic_json->lic->status == 'active')) {
+
+                    if (!empty($lic_json->secret)) {
+                        $berqconfigs->update_configs([
+                            'secret' => $lic_json->secret,
+                            'optimization_method' => 'cloud'
+                        ]);
+                    }
+
+                    berqwp_update_network_option('berqwp_license_cache', $lic_json->lic);
+
+                    $berq_log->info("Authentication success.");
+
+                    // Fresh installation
+					if (get_option('berqwp_can_use_fluid_images') === false) {
+
+						if ($lic_json->lic->product_ref !== 'AppSumo Deal') {
+							update_option('berqwp_can_use_fluid_images', 1);
+						} else {
+							update_option('berqwp_can_use_fluid_images', 0);
+							update_option('berqwp_sync_addons', true);
+						}
+					}
+
+                } else {
+
+                    $berq_log->info("Authentication failed.");
+                    berqwp_remove_license_key();
+
+                    $berqconfigs->update_configs([
+                        'secret' => '',
+                        'optimization_method' => 'local'
+                    ]);
+
+                    berqwp_delete_network_option('berqwp_license_cache');
+                }
+
+            }
+
+            if (!empty(berqwp_get_network_option('berqwp_license_cache'))) {
+                $this->is_key_verified = true;
+                $this->key_response = berqwp_get_network_option('berqwp_license_cache');
+            }
+
+		}
+
 		function initialize()
 		{
 
@@ -612,17 +781,24 @@ if (!class_exists('berqWP')) {
 			// Set default settings
 			require_once optifer_PATH . '/inc/initialize.php';
 
-			// Activate the license from parent site
-			if (defined('BERQWP_LICENSE_KEY')) {
-				$this->activate_license_from_multi_site();
+			$this->handle_upgrade();
+
+			if (berqwp_can_use_cloud()) {
+				$license_key = berqwp_get_license_key();
+				$lic_json = $this->authenticate_license($license_key, true);
+
+				if (!empty($lic_json->lic) && $lic_json->lic->result == 'success' && ($lic_json->lic->message == 'License key activated' || $lic_json->lic->status == 'active')) {
+					berqwp_update_network_option('berqwp_license_cache', $lic_json->lic);
+				}
 			}
+
+			// Activate the license from parent site
+			// if (defined('BERQWP_LICENSE_KEY')) {
+			// 	$this->activate_license_from_multi_site();
+			// }
 
 			if (is_admin()) {
 				$this->berq_post_types();
-			}
-
-			if (get_option('berqwp_disable_emojis') == 1) {
-				// $this->disable_emoji();
 			}
 
 			// if (is_admin() && isset($_GET['bwp_get_ip'])) {
@@ -631,36 +807,37 @@ if (!class_exists('berqWP')) {
 			// 	exit;
 			// }
 
-			if (is_admin() && !empty(berqwp_get_license_key())) {
-				$license_key = berqwp_get_license_key();
+			// if (is_admin() && !empty(berqwp_get_license_key())) {
+			// 	$license_key = berqwp_get_license_key();
 
-				global $berq_log;
-				// $berq_log->info("License key check from initialize function.");
+			// 	global $berq_log;
+			// 	// $berq_log->info("License key check from initialize function.");
 
-				$key_response = $this->verify_license_key($license_key);
+			// 	$key_response = $this->verify_license_key($license_key);
 
-				if (!empty($key_response) && $key_response->result == 'success' && $key_response->status == 'active') {
-					$this->is_key_verified = true;
-					$this->key_response = $key_response;
+			// 	if (!empty($key_response) && $key_response->result == 'success' && $key_response->status == 'active') {
+			// 		$this->is_key_verified = true;
+			// 		$this->key_response = $key_response;
 
-					// Fresh installation
-					if (get_option('berqwp_can_use_fluid_images') === false) {
+			// 		// Fresh installation
+			// 		if (get_option('berqwp_can_use_fluid_images') === false) {
 
-						if ($key_response->product_ref !== 'AppSumo Deal') {
-							update_option('berqwp_can_use_fluid_images', 1);
-						} else {
-							update_option('berqwp_can_use_fluid_images', 0);
-							update_option('berqwp_sync_addons', true);
-						}
-					}
-				} else {
-					$this->is_key_verified = false;
+			// 			if ($key_response->product_ref !== 'AppSumo Deal') {
+			// 				update_option('berqwp_can_use_fluid_images', 1);
+			// 			} else {
+			// 				update_option('berqwp_can_use_fluid_images', 0);
+			// 				update_option('berqwp_sync_addons', true);
+			// 			}
+			// 		}
 
-					if (!empty($key_response) && $key_response->result == 'error') {
-						berqwp_delete_license_key();
-					}
-				}
-			}
+			// 	} else {
+			// 		$this->is_key_verified = false;
+
+			// 		if (!empty($key_response) && $key_response->result == 'error') {
+			// 			berqwp_delete_license_key();
+			// 		}
+			// 	}
+			// }
 
 			// redirect to berqwp admin page
 			if (get_transient('berqwp_redirect')) {
@@ -710,21 +887,13 @@ if (!class_exists('berqWP')) {
 				update_option('bwp_quit_feedback', true);
 			}
 
-			if (!empty(berqwp_get_license_key())) {
-				$license_key = berqwp_get_license_key();
 
-				global $berq_log;
-				// $berq_log->info("License key check for admin notices.");
-
-				$key_response = $this->verify_license_key($license_key);
-
-				if (!empty($key_response) && $key_response->result == 'success' && $key_response->status == 'expired') {
-					?>
-					<div class="notice notice-error">
-						<p><strong>Error:</strong> <?php echo $plugin_name; ?> license key has expired. Please renew your subscription.</p>
-					</div>
-				<?php
-				}
+			if (!empty($this->key_response) && $this->key_response->result == 'success' && $this->key_response->status == 'expired') {
+				?>
+				<div class="notice notice-error">
+					<p><strong>Error:</strong> <?php echo $plugin_name; ?> license key has expired. Please renew your subscription.</p>
+				</div>
+			<?php
 			}
 
 			// Check connection
@@ -841,7 +1010,7 @@ if (!class_exists('berqWP')) {
 				]);
 			}
 
-			if (berq_is_localhost()) {
+			if (berq_is_localhost() && berqwp_can_use_cloud()) {
 				bwp_notice('warning', 'Localhost environment detected:', "<p>$plugin_name requires a live, publicly accessible website to function.</p>", []);
 			}
 
@@ -907,8 +1076,78 @@ if (!class_exists('berqWP')) {
 			return array_merge($links, $mylinks);
 		}
 
+		function authenticate_license($license_key, $check_only = false) {
+
+			$berqconfigs = berqConfigs::getInstance();
+            $berqwp_configs = $berqconfigs->get_configs();
+            $site_id = $berqwp_configs['site_id'];
+
+            if (empty($site_id)) {
+                $blog_id     = get_current_blog_id();
+                $network_id  = function_exists('get_current_network_id') ? get_current_network_id() : 1;
+                $siteurl     = get_option('siteurl');
+                $site_id = md5("berqwp|$network_id|$blog_id|$siteurl");
+
+                $berqconfigs->update_configs(['site_id' => $site_id]);
+            }
+
+			global $berq_log;
+			$transient_key = 'berqwp_lic_response_cache'; // Set a unique key for the transient
+			$expire_transient_key = 'berqwp_lic_cache_expire'; // Set a unique key for the transient
+
+			if (!$check_only) {
+				berqwp_delete_network_option($transient_key);
+			}
+
+			// Check if the response is already cached
+			$lic_json = berqwp_get_network_option($transient_key);
+			$cache_expire_time = (int) berqwp_get_network_option($expire_transient_key);
+
+			if (false === $lic_json || $cache_expire_time < time()) {
+
+				$berq_log->info("Authenticating license key");
+
+				$body = [
+					'license_key' => $license_key,
+					'site_id' => $site_id,
+					'site_url' => home_url(),
+				];
+
+				if ($check_only) {
+					$body['check'] = true;
+				}
+
+				$lic_response = wp_remote_post(BerqWPCloud::$endpoint."authenticate", [
+					'timeout' => 30,
+					'body'  => $body
+				]);
+
+				if (is_wp_error($lic_response)) {
+                    $berq_log->info("Couldn't reach BerqWP server.");
+                    return;
+                }
+	
+				$lic_body = wp_remote_retrieve_body($lic_response);
+				$lic_json = json_decode($lic_body);
+
+				if (!empty($lic_json)) {
+					berqwp_update_network_option($transient_key, $lic_json);
+					berqwp_update_network_option($expire_transient_key, time() + DAY_IN_SECONDS);
+				}
+
+			}
+
+
+			return $lic_json;
+
+		}
+
 		function verify_license_key($license_key, $action = 'slm_check')
 		{
+			if ($action !== 'slm_deactivate') {
+				return;
+			}
+			
 			// Action
 			// slm_activate
 			// slm_deactivate
@@ -1001,7 +1240,7 @@ if (!class_exists('berqWP')) {
 				// $client->post('?' . $query_string, $api_params);
 				// $client->setTimeout(30);
 
-				$client = new \BerqWP\GuzzleHttp\Client([
+				$client = new \GuzzleHttp\Client([
 					'timeout' => 60,
 					'http_errors' => false,
 					'verify' => false,
@@ -1219,7 +1458,8 @@ if (!class_exists('berqWP')) {
 			// License activation
 			if (!empty($_POST['berqwp_license_key'])) {
 				$key = sanitize_text_field($_POST['berqwp_license_key']);
-				$key_response = $this->verify_license_key($key, 'slm_activate');
+				// $key_response = $this->verify_license_key($key, 'slm_activate');
+				$key_response = $this->authenticate_license($key);
 				if (!empty($key_response) && isset($key_response->result) && $key_response->result == 'success') {
 					berqwp_update_license_key($key);
 				}
@@ -1234,6 +1474,8 @@ if (!class_exists('berqWP')) {
 				berqwp_delete_license_key();
 				berqwp_delete_network_option('berq_lic_response_cache');
 				berqwp_delete_network_option('berq_lic_cache_expire');
+				berqwp_delete_network_option('berqwp_lic_response_cache');
+				berqwp_delete_network_option('berqwp_lic_cache_expire');
 			}
 
 			// Flush all sites cache
@@ -1307,7 +1549,11 @@ if (!class_exists('berqWP')) {
 
 		function admin_page()
 		{
-			if ($this->is_key_verified) {
+
+		    $berqconfigs = berqConfigs::getInstance();
+			$configs = $berqconfigs->get_configs();
+
+			if (!empty($configs['optimization_method'])) {
 				require_once optifer_PATH . 'admin/admin-page.php';
 			} else {
 				require_once optifer_PATH . 'admin/intro-page.php';

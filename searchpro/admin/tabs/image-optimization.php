@@ -48,14 +48,20 @@ if (!defined('ABSPATH'))
     <div class="berq-info-box fluid-images">
         <h3 class="berq-box-title"><?php esc_html_e('Fluid Images', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e('Automatically resize and deliver retina-ready WebP images according to the image container size. "Fluid Images" generates and serves multiple optimized image versions for mobile, tablet, laptop, and desktop screens, ensuring every device gets the perfect image for its display.', 'searchpro'); ?>
-            </p>
-            <?php if (($this->key_response->product_ref == 'AppSumo Deal' && get_option('berqwp_can_use_fluid_images')) || $this->key_response->product_ref !== 'AppSumo Deal') { ?>
-            <label class="berq-check">
-                <input type="checkbox" name="berqwp_fluid_images" <?php checked(1, get_option('berqwp_fluid_images'), true); ?>>
-                <?php esc_html_e('Enable Fluid Images', 'searchpro'); ?>
-            </label>
-            <?php } ?>
+            <div class="berq-box-content berq-setting-toggle">
+                <div class="berq-option-content">
+                    <p><?php esc_html_e('Automatically resize and deliver retina-ready WebP images according to the image container size. "Fluid Images" generates and serves multiple optimized image versions for mobile, tablet, laptop, and desktop screens, ensuring every device gets the perfect image for its display.', 'searchpro'); ?>
+                    </p>
+
+
+                </div>
+                <?php if (($this->key_response->product_ref == 'AppSumo Deal' && get_option('berqwp_can_use_fluid_images')) || $this->key_response->product_ref !== 'AppSumo Deal') {
+
+                    berqwp_render_toggle('berqwp_fluid_images', get_option('berqwp_fluid_images'));
+                }
+                ?>
+            </div>
+
             <div class="feature-blocks">
                 <div class="single-feature">
                     <div class="h5"><?php esc_html_e('Container-Based Resizing', 'searchpro'); ?></div>
@@ -82,25 +88,25 @@ if (!defined('ABSPATH'))
     </div>
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Disable WebP Images', 'searchpro'); ?></h3>
-        <div class="berq-box-content">
-            <p><?php esc_html_e('Disabling WebP images may be helpful when you\'re using other tools to generate WebP images.', 'searchpro'); ?>
-            </p>
-            <label class="berq-check">
-                <input type="checkbox" name="berqwp_disable_webp" <?php checked(1, get_option('berqwp_disable_webp'), true); ?>>
-                <?php esc_html_e('Disable WebP images', 'searchpro'); ?>
-            </label>
+        <div class="berq-box-content berq-setting-toggle">
+            <div class="berq-option-content">
+                <p><?php esc_html_e('Disabling WebP images may be helpful when you\'re using other tools to generate WebP images.', 'searchpro'); ?>
+                </p>
+
+            </div>
+            <?php berqwp_render_toggle('berqwp_disable_webp', get_option('berqwp_disable_webp')); ?>
         </div>
     </div>
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Lazy Load Images', 'searchpro'); ?></h3>
-        <div class="berq-box-content">
-            <p><?php esc_html_e('Optimize your web page loading time by loading only the images that are visible on
-                the screen. The remaining images will be loaded as soon as the user scrolls to them.', 'searchpro'); ?>
-            </p>
-            <label class="berq-check">
-                <input type="checkbox" name="berqwp_image_lazyloading" <?php checked(1, get_option('berqwp_image_lazyloading'), true); ?>>
-                <?php esc_html_e('Enable lazy loading for images', 'searchpro'); ?>
-            </label>
+        <div class="berq-box-content berq-setting-toggle">
+            <div class="berq-option-content">
+                <p><?php esc_html_e('Optimize your web page loading time by loading only the images that are visible on
+                    the screen. The remaining images will be loaded as soon as the user scrolls to them.', 'searchpro'); ?>
+                </p>
+
+            </div>
+            <?php berqwp_render_toggle('berqwp_image_lazyloading', get_option('berqwp_image_lazyloading')); ?>
         </div>
     </div>
     <button type="submit" class="berqwp-save"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"
