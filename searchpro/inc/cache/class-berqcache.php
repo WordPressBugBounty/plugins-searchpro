@@ -83,10 +83,13 @@ if (!class_exists('berqCache')) {
             add_action('berqwp_deactivate_plugin', 'bwp_cf_delete_rules');
             add_action('berqwp_activate_plugin', [$this, 'check_cf_rules']);
 
-            // Apache htaccess cache rules
+            // Apache htaccess cache rules (skip on LiteSpeed — remove any existing rules)
             add_action('berqwp_activate_plugin',     'bwp_write_htaccess_rules');
             add_action('berqwp_flush_all_cache',     'bwp_write_htaccess_rules');
             add_action('berqwp_deactivate_plugin',   'bwp_remove_htaccess_rules');
+            if (bwp_is_openlitespeed_server()) {
+                add_action('berqwp_activate_plugin', 'bwp_remove_htaccess_rules');
+            }
             add_action('berqwp_update_sandbox_mode', 'bwp_sync_htaccess_on_sandbox_change');
 
             // Clear queue list on cloud

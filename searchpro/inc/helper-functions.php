@@ -1880,7 +1880,7 @@ HTACCESS;
 
 function bwp_write_htaccess_rules($ignore_sandbox = false)
 {
-    if (!got_mod_rewrite()) {
+    if (!got_mod_rewrite() || bwp_is_openlitespeed_server()) {
         return;
     }
 

@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 4.0.15
+Stable tag: 4.0.16
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -256,6 +256,9 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 6. Monitor core web vitals in real time with Web Vitals Analytics.
 
 == Changelog ==
+
+= 4.0.16 =
+* [Bug] Prevent adding htaccess cache rules for LiteSpeed.
 
 = 4.0.15 =
 * [New Feature] Introduced Local Optimization method: run BerqWP entirely on your own server for free, with no account or license key required. Includes full-page caching, lazy loading, LCP preloading, image dimension attributes, URL prefetching, prerender on hover, and font optimization.

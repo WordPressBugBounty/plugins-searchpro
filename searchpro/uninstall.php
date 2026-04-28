@@ -20,7 +20,7 @@ if (!defined('optifer_cache')) {
 use BerqWP\BerqWP;
 
 // Initialize BerqWP SDK
-require_once optifer_PATH . '/BerqWP/vendor-scoped/autoload.php';
+require_once optifer_PATH . '/BerqWP/vendor/autoload.php';
 
 // Load functions
 require_once optifer_PATH . '/inc/helper-functions.php';

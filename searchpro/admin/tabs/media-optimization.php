@@ -50,13 +50,13 @@ $exclude_lazy_load_lines = implode("\n", $exclude_lazy_load);
                     </p>
                 </div>
                 <?php 
-                if ( !($this->key_response->product_ref == 'AppSumo Deal' && !get_option('berqwp_can_use_fluid_images')) ) {
+                if ( !(!empty($this->key_response->product_ref) && $this->key_response->product_ref == 'AppSumo Deal' && !get_option('berqwp_can_use_fluid_images')) ) {
                     berqwp_render_toggle('berqwp_fluid_images', get_option('berqwp_fluid_images')); 
                 }
                 ?>
             </div>
 
-            <?php if ($this->key_response->product_ref == 'AppSumo Deal' && !get_option('berqwp_can_use_fluid_images')) { ?>
+            <?php if (!empty($this->key_response->product_ref) && $this->key_response->product_ref == 'AppSumo Deal' && !get_option('berqwp_can_use_fluid_images')) { ?>
                 <ul>
                     <li><?php esc_html_e('Unlimited Websites', 'searchpro'); ?></li>
                     <li><?php esc_html_e('Unlimited CDN Bandwidth', 'searchpro'); ?></li>
