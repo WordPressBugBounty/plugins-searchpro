@@ -464,12 +464,11 @@ if (!class_exists('berqCache')) {
 
         public static function delete_page_cache_files($page_url)
         {
-            $cache_dir = bwp_get_cache_dir() . bwp_build_cache_path($page_url);
+            $cache_file = bwp_get_cache_dir() . bwp_build_cache_path($page_url) . '/index.html.gz';
 
-            if (is_dir($cache_dir)) {
-                berqwp_unlink_recursive($cache_dir);
+            if (file_exists($cache_file)) {
+                unlink($cache_file);
             }
-
         }
 
         public static function purge_page($page_url, $flush_criticalcss = false)
@@ -818,6 +817,12 @@ if (!class_exists('berqCache')) {
             }
 
             if (!berqwp_can_use_cloud()) {
+                return false;
+            }
+
+            $status_code = http_response_code();
+
+            if ($status_code !== 200) {
                 return false;
             }
 

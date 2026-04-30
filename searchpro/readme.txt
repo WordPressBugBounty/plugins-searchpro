@@ -1,9 +1,9 @@
-=== BerqWP - Automated All-In-One Page Speed Optimization for Core Web Vitals, Cache, CDN, Images, CSS, and JavaScript ===
+=== BerqWP - All-in-One WordPress Speed & Performance Optimization Plugin | PageSpeed 90+, Cache, CDN, Next-Gen Images & Core Web Vitals ===
 Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 4.0.16
+Stable tag: 4.0.17
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -248,14 +248,18 @@ No worries, we have a dedicated support team ready to help you with any assistan
 Please create a support ticket via https://wordpress.org/support/plugin/searchpro/ so we can assist you.
 
 == Screenshots ==
-1. Plugin settings page.
-2. Exceptional website performance results.
-3. BerqWP speed optimization results comparison.
-4. All modern speed optimization features.
-5. Unnoticeable Image Optimization.
-6. Monitor core web vitals in real time with Web Vitals Analytics.
+1. Hero image
+2. Dashboard
+3. Cache Management
+4. CSS & JavaScript
+5. Media Optimization
+6. CDN
+7. Integration
 
 == Changelog ==
+
+= 4.0.17 =
+* [Bug] Fixed all page cache files getting deleted when attempt to flush a single page.
 
 = 4.0.16 =
 * [Bug] Prevent adding htaccess cache rules for LiteSpeed.
