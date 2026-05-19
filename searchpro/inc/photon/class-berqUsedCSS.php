@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-use voku\helper\HtmlDomParser;
+use BerqWP_Deps\voku\helper\HtmlDomParser;
 
 class berqUsedCSS {
 

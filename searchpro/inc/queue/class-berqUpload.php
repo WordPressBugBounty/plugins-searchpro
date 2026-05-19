@@ -1,7 +1,7 @@
 <?php
 
 use BerqWP\Cache;
-use function BerqWP\Vendor\SimpleHtmlDom\berqwp_str_get_html;
+use BerqWP_Deps\voku\helper\HtmlDomParser;
 
 class berqUpload
 {
@@ -58,7 +58,7 @@ class berqUpload
         }
 
         // Parse HTML once and reuse the DOM across all asset extraction methods
-        $dom = berqwp_str_get_html($html);
+        $dom = HtmlDomParser::str_get_html($html);
 
         $start = microtime(true);
         self::process_css($dom);
@@ -335,7 +335,7 @@ class berqUpload
         }
 
         // Use scoped Guzzle client
-        $client = new \BerqWP\GuzzleHttp\Client([
+        $client = new \BerqWP_Deps\GuzzleHttp\Client([
             'timeout' => 60,
             'verify' => false, // Disable SSL verification
         ]);
@@ -498,7 +498,7 @@ class berqUpload
             }
 
             return true;
-        } catch (\BerqWP\GuzzleHttp\Exception\RequestException $e) {
+        } catch (\BerqWP_Deps\GuzzleHttp\Exception\RequestException $e) {
             $berq_log->error("Guzzle request failed: " . $e->getMessage());
             throw new \Exception('Could not upload page to BerqWP server: ' . $e->getMessage());
         } catch (\Exception $e) {

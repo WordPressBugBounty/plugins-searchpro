@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 4.0.17
+Stable tag: 4.0.18
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -257,6 +257,11 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 7. Integration
 
 == Changelog ==
+
+= 4.0.18 =
+* [Enhancement] Added "Recently Optimized Pages" to the plugin dashboard.
+* [Enhancement] Improved custom post type detection.
+* [Bug] Scoped Composer packages to avoid conflicts with other plugins.
 
 = 4.0.17 =
 * [Bug] Fixed all page cache files getting deleted when attempt to flush a single page.

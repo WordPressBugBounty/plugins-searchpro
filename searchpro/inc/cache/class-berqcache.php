@@ -34,7 +34,8 @@ if (!class_exists('berqCache')) {
             // add_action('berqwp_cache_warmup', [$this, 'request_warmup_cache']);
 
             // Delete cache files when the mode changes
-            add_action('berqwp_before_update_optimization_mode', [$this, 'delete_cache_files']);
+            // add_action('berqwp_before_update_optimization_mode', [$this, 'delete_cache_files']);
+            add_action('berqwp_on_update_optimization_mode', [$this, 'delete_cache_files']);
 
             // Reverse proxy cache support
             add_action('berqwp_stored_page_cache', [$this, 'flush_reverse_proxy_cache']);
@@ -43,6 +44,11 @@ if (!class_exists('berqCache')) {
 
             // Clear cache warmup lock after storing the cache
             add_action('berqwp_stored_page_cache', 'bwp_clear_warmup_lock');
+
+            // Log recently optimized pages
+            add_action('berqwp_stored_page_cache', 'bwp_log_recently_optimized_page', 20, 1);
+            add_action('berqwp_flush_all_cache',   'bwp_clear_recently_optimized_log');
+            add_action('berqwp_flush_page_cache',  'bwp_remove_recently_optimized_entry', 10, 1);
 
             add_action('init', [$this, 'bypass_cache']);
 
@@ -79,7 +85,7 @@ if (!class_exists('berqCache')) {
             add_action('berqwp_stored_page_cache', [$this, 'flush_cf_page']);
             add_action('berqwp_flush_page_cache', [$this, 'flush_cf_page']);
             add_action('berqwp_flush_all_cache', 'bwp_cf_flush_all');
-            add_action('berqwp_update_sandbox_mode', 'bwp_cf_flush_all');
+            add_action('berqwp_on_update_sandbox_mode', 'bwp_cf_flush_all');
             add_action('berqwp_deactivate_plugin', 'bwp_cf_delete_rules');
             add_action('berqwp_activate_plugin', [$this, 'check_cf_rules']);
 
@@ -90,7 +96,7 @@ if (!class_exists('berqCache')) {
             if (bwp_is_openlitespeed_server()) {
                 add_action('berqwp_activate_plugin', 'bwp_remove_htaccess_rules');
             }
-            add_action('berqwp_update_sandbox_mode', 'bwp_sync_htaccess_on_sandbox_change');
+            add_action('berqwp_on_update_sandbox_mode', 'bwp_sync_htaccess_on_sandbox_change');
 
             // Clear queue list on cloud
             add_action('berqwp_deactivate_plugin', 'berqwp_clear_cache_queue');

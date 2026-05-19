@@ -862,6 +862,6 @@
             "install-path": "../voku/simple_html_dom"
         }
     ],
-    "dev": true,
+    "dev": false,
     "dev-package-names": []
 }

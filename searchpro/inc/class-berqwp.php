@@ -80,6 +80,7 @@ if (!class_exists('berqWP')) {
 			add_action('wp_ajax_berqwp_refresh_cache_stats', [$this, 'refresh_cache_stats']);
 
 			add_action('wp_ajax_berqwp_get_optimized_pages', [$this, 'berqwp_get_optimized_pages']);
+			add_action('wp_ajax_berqwp_recently_optimized_pages', [$this, 'ajax_recently_optimized_pages']);
 
 			add_action('admin_enqueue_scripts', [$this, 'admin_scripts']);
 
@@ -565,6 +566,57 @@ if (!class_exists('berqWP')) {
 		}
 
 
+
+		function ajax_recently_optimized_pages()
+		{
+			check_ajax_referer('wp_rest', 'nonce');
+
+			$search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
+			$start  = max(0, intval($_POST['start'] ?? 0));
+			$length = max(1, intval($_POST['length'] ?? 10));
+
+			$log = json_decode(get_option('berqwp_recently_optimized', '[]'), true);
+			if (!is_array($log)) $log = [];
+
+			if (!empty($search)) {
+				$s         = strtolower(rtrim($search, '/'));
+				$home      = strtolower(rtrim(home_url(), '/'));
+				// Strip the site root from the search term so we compare paths only.
+				// e.g. "http://plugin-berqwp.local/" → "", "/about" → "/about"
+				$s_path    = ltrim(str_starts_with($s, $home) ? substr($s, strlen($home)) : $s, '/');
+
+				$log = array_values(array_filter($log, function ($e) use ($s, $home, $s_path) {
+					$url      = strtolower(rtrim($e['url'], '/'));
+					$url_path = ltrim(str_starts_with($url, $home) ? substr($url, strlen($home)) : $url, '/');
+					// Exact path match (covers homepage: both empty)
+					if ($url_path === $s_path) return true;
+					// Path starts with the search path (only if search is non-empty to avoid matching everything)
+					if ($s_path !== '' && str_starts_with($url_path, $s_path)) return true;
+					// Full URL substring fallback
+					return $s_path === '' ? $url === $home : stripos($url_path, $s_path) !== false;
+				}));
+
+				// Sort: exact path match first, prefix match second, substring last
+				usort($log, function ($a, $b) use ($home, $s_path) {
+					$pa = ltrim(str_starts_with(strtolower(rtrim($a['url'], '/')), $home)
+					    ? substr(strtolower(rtrim($a['url'], '/')), strlen($home)) : strtolower(rtrim($a['url'], '/')), '/');
+					$pb = ltrim(str_starts_with(strtolower(rtrim($b['url'], '/')), $home)
+					    ? substr(strtolower(rtrim($b['url'], '/')), strlen($home)) : strtolower(rtrim($b['url'], '/')), '/');
+					$ra = $pa === $s_path ? 0 : (str_starts_with($pa, $s_path) ? 1 : 2);
+					$rb = $pb === $s_path ? 0 : (str_starts_with($pb, $s_path) ? 1 : 2);
+					return $ra <=> $rb;
+				});
+			}
+
+			$total    = count($log);
+			$page_log = array_slice($log, $start, $length);
+
+			wp_send_json_success([
+				'data'             => $page_log,
+				'total'            => $total,
+				'records_filtered' => $total,
+			]);
+		}
 
 		function ashp_increase_concurrent_batches($concurrent_batches)
 		{
@@ -1240,7 +1292,7 @@ if (!class_exists('berqWP')) {
 				// $client->post('?' . $query_string, $api_params);
 				// $client->setTimeout(30);
 
-				$client = new \GuzzleHttp\Client([
+				$client = new \BerqWP_Deps\GuzzleHttp\Client([
 					'timeout' => 60,
 					'http_errors' => false,
 					'verify' => false,

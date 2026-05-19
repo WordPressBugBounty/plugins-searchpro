@@ -102,64 +102,6 @@ if ($cached_percentage < 0) {
 
         </div>
     </div>
-    <div class="berq-info-box before-after-comparision" style="display: none;">
-    <h3 class="berq-box-title"><?php esc_html_e('Google PageSpeed Score', 'searchpro'); ?></h3>
-        <div class="without-berqwp">
-            <?php
-            if (get_option('berqwp_enable_sandbox')) {
-                echo '<div class="berqw-sandbox">Sandbox Optimization</div>';
-            }
-            ?>
-            <div class="berq-speed-score"></div>
-            <p class="device-type"><?php esc_html_e('Device: Mobile', 'searchpro'); ?></p>
-            <p class="website-url">
-                <?php
-                $cache_directory = bwp_get_cache_dir();
-                // $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
-                $home_url = bwp_admin_home_url('/');
-                $is_home_ready = file_exists($cache_directory . md5($home_url) . '.gz');
-                $msg = '';
-
-                if (get_option('berqwp_enable_sandbox')) {
-                    $msg .= '?berqwp';
-                }
-
-                if ($is_home_ready == false) {
-                    $msg .= '<br>We\'re currently optimizing this page.';
-                }
-                echo wp_kses_post(bwp_admin_home_url('/') . $msg); ?>
-            </p>
-            <h4><?php esc_html_e('Mobile Score', 'searchpro'); ?></h4>
-        </div>
-        <div class="with-berqwp">
-            <?php
-            if (get_option('berqwp_enable_sandbox')) {
-                echo '<div class="berqw-sandbox">Sandbox Optimization</div>';
-            }
-            ?>
-            <div class="berq-speed-score"></div>
-            <p class="device-type"><?php esc_html_e('Device: Desktop', 'searchpro'); ?></p>
-            <p class="website-url">
-                <?php
-                $cache_directory = bwp_get_cache_dir();
-                // $home_slug = bwp_url_into_path(bwp_admin_home_url('/'));
-                $home_url = bwp_admin_home_url('/');
-                $is_home_ready = file_exists($cache_directory . md5($home_url) . '.gz');
-                $msg = '';
-
-                if (get_option('berqwp_enable_sandbox')) {
-                    $msg .= '?berqwp';
-                }
-
-                if ($is_home_ready == false) {
-                    $msg .= '<br>We\'re currently optimizing this page.';
-                }
-                echo wp_kses_post(bwp_admin_home_url('/') . $msg); ?>
-            </p>
-            <h4><?php esc_html_e('Desktop Score', 'searchpro'); ?></h4>
-        </div>
-    </div>
-
 
     <div class="berq-triple-boxes">
         <div class="berq-info-box" style="position: relative;">
@@ -218,97 +160,32 @@ if ($cached_percentage < 0) {
         <?php } ?>
     </div>
 
-    <div class="berq-info-box" style="display: none;">
-        <h3 class="berq-box-title"><?php esc_html_e('Cached Pages', 'searchpro'); ?></h3>
+    <div class="berq-info-box">
+        <h3 class="berq-box-title"><?php esc_html_e('Recently Optimized Pages (Max. 200)', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <div class="cache-percentage"><p><b><?php echo $cached_percentage; ?>%</b> (<?php echo $optimized_pages; ?>) of your pages are currently cached. <span class="bwp-cache-count"></span><span class="bwp-pending-optimization"></span></p></div>
-            <div class="cached-pages-bar">
-                <div class="progress-bar" style="width:<?php echo $cached_percentage; ?>%"></div>
+            <div class="berq-recently-optimized-toolbar">
+                <input type="text" id="berq-recent-search" placeholder="<?php esc_attr_e('Search URL…', 'searchpro'); ?>" class="berq-recent-search-input" />
             </div>
-
-            <?php
-            if (!empty($this->key_response->product_ref) && $this->key_response->product_ref == 'Free Account' && bwp_cached_pages_count() >= 10) {
-                bwp_dash_notification("You've reached the limit of 10 optimized pages for your free BerqWP account. Upgrade now to optimize unlimited pages and get the best performance for your entire site!", "warning");
-            }
-            ?>
-
-            <div class="optimized-pages">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Page URL</th>
-                            <th>Cache Status</th>
-                            <th>Last Optimized Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    // if (!empty($optimized_pages)) {
-                    //     foreach ($optimized_pages as $page) {
-                    //         $row_html = "<tr>";
-                    //         $row_html .= "<td>";
-                    //         $row_html .= $page['url'];
-                    //         $row_html .= "</td>";
-                    //         $row_html .= "<td>";
-                    //         $row_html .= $page['status'];
-                    //         $row_html .= "</td>";
-                    //         $row_html .= "<td>";
-                    //         $row_html .= date('Y-m-d H:i:s', $page['last_modified']);
-                    //         $row_html .= "</td>";
-                    //         $row_html .= "</tr>";
-                    //         echo $row_html;
-                    //     }
-                    // }
-                    ?>
-
-                    </tbody>
-                </table>
+            <table class="berq-image-settings berq-recent-table">
+                <colgroup><col style="width:75%"><col style="width:25%"></colgroup>
+                <thead>
+                    <tr>
+                        <th><?php esc_html_e('Page URL', 'searchpro'); ?></th>
+                        <th><?php esc_html_e('Cached At', 'searchpro'); ?></th>
+                    </tr>
+                </thead>
+                <tbody id="berq-recent-tbody">
+                    <tr><td colspan="2"><?php esc_html_e('Loading…', 'searchpro'); ?></td></tr>
+                </tbody>
+            </table>
+            <div class="berq-recent-pagination">
+                <button type="button" class="berq-btn" id="berq-recent-prev" disabled><?php esc_html_e('← Prev', 'searchpro'); ?></button>
+                <span id="berq-recent-page-info"></span>
+                <button type="button" class="berq-btn" id="berq-recent-next"><?php esc_html_e('Next →', 'searchpro'); ?></button>
             </div>
         </div>
     </div>
-    <div class="berq-dual-box" style="display:none">
 
-        <?php if (bwp_show_account()) { ?>
-            <div class="berq-info-box" style="position:relative;">
-                <a title="Refresh license key" href="<?php echo esc_attr(wp_nonce_url(admin_url('admin-post.php?action=bwp_refresh_license'), 'bwp_refresh_license_action')); ?>" class="berqwp-refresh-license-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#29ac20"><path d="M229.08-205.08v-52H310l-13.08-13.84q-42.3-39.62-68.61-92.62-26.31-53-26.31-115.69 0-93.69 55.23-165.96 55.23-72.27 140.77-98.96v54.23q-63.39 25.3-103.69 81.73Q254-551.77 254-479.23q0 49.92 20.27 92.65 20.27 42.73 54.81 73.27l15.38 15.39v-74.54h52v167.38H229.08ZM562-215.85v-54.23q63.39-25.3 103.69-81.73Q706-408.23 706-480.77q0-49.92-20.27-92.65-20.27-42.73-54.81-73.27l-15.38-15.39v74.54h-52v-167.38h167.38v52H650l13.08 13.84q43.46 38.47 69.19 92.04Q758-543.46 758-480.77q0 93.69-55.23 165.96-55.23 72.27-140.77 98.96Z"/></svg>
-                </a>
-                <h3 class="berq-box-title"><?php esc_html_e('My Account', 'searchpro'); ?></h3>
-                <div class="berq-box-content">
-
-                    <?php if (!empty($this->key_response->product_ref) && $this->key_response->product_ref !== 'AppSumo Deal') { ?>
-                    <p>
-                        <?php esc_html_e('License:', 'searchpro'); ?>
-                        <?php echo esc_html( $this->key_response->product_ref ); ?>
-                    </p>
-                    <?php } ?>
-
-                    <p><?php esc_html_e('License status:', 'searchpro'); ?>
-                        <?php echo esc_html( $this->key_response->status ); ?>
-                    </p>
-
-                    <?php if (!empty($this->key_response->product_ref) && $this->key_response->product_ref !== 'AppSumo Deal' && $this->key_response->product_ref !== 'Free Account') { ?>
-                    <p><?php esc_html_e('Expiration date:', 'searchpro'); ?>
-                        <?php echo esc_html( $this->key_response->date_expiry ); ?>
-                    </p>
-                    <?php } ?>
-
-                </div>
-            </div>
-        <?php } ?>
-        <div class="berq-info-box">
-            <h3 class="berq-box-title"><?php esc_html_e('Quick Actions', 'searchpro'); ?></h3>
-            <div class="berq-box-content">
-                <a href="<?php echo esc_attr(wp_nonce_url(admin_url('admin-post.php?action=clear_cache'), 'clear_cache_action')); ?>" class="berq-btn"><?php esc_html_e('Flush cache', 'searchpro'); ?></a>
-
-                <?php if (bwp_show_docs()) { ?>
-                <a href="https://berqwp.com/help-center/" target="_blank" class="berq-btn"><?php esc_html_e('Visit help center', 'searchpro'); ?></a>
-                <?php } ?>
-
-            </div>
-        </div>
-
-    </div>
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Sandbox', 'searchpro'); ?></h3>
         <div class="berq-box-content berq-setting-toggle">
@@ -346,3 +223,98 @@ if ($cached_percentage < 0) {
         </svg>
         <?php esc_html_e('Save changes', 'searchpro'); ?></button>
 </div>
+
+<style>
+.berq-recently-optimized-toolbar { margin-bottom: 14px; }
+.berq-recent-search-input {
+    width: 100%; max-width: 360px;
+    padding: 5px 12px !important;
+    border: 1px solid #e2eaf5 !important; 
+    border-radius: 6px !important;
+    font-size: 13px !important; 
+    color: #353535 !important; 
+    outline: none !important;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(83,113,167,0.06);
+}
+.berq-recent-search-input:focus { border-color: #1f71ff; box-shadow: 0 0 0 3px rgba(31,113,255,0.1); }
+.berq-recent-search-input.berq-recent-searching {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='%23c5d3ea' stroke-width='3'/%3E%3Cpath d='M12 2a10 10 0 0 1 10 10' fill='none' stroke='%231f71ff' stroke-width='3' stroke-linecap='round'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='0.7s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+.berq-recent-table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+.berq-recent-table th, .berq-recent-table td { padding: 8px 10px; font-size: 13px; color: #465774; border-bottom: 1px solid #e8eef8; word-break: break-all; }
+.berq-recent-table th { font-weight: 600; color: #0d2958; background: #f7faff; }
+.berq-recent-table td a { color: #1f71ff; text-decoration: none; }
+.berq-recent-table td a:hover { text-decoration: underline; }
+.berq-recent-pagination { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+#berq-recent-page-info { font-size: 13px; color: #465774; flex: 1; text-align: center; }
+button.berq-btn {
+    background: #fff; border-radius: 6px; padding: 8px 16px;
+    color: #384a69; font-size: 13px; font-weight: 500;
+    border: 1px solid #dbe9fe; box-shadow: 0 0 7px -6px #000;
+    cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+    line-height: normal;
+}
+button.berq-btn:hover:not(:disabled) { background: #3d44d9; border-color: #3d44d9; color: #fff; }
+button.berq-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+
+<script>
+(function($) {
+    var recentPage = 0, recentLength = 10, recentSearch = '', recentTotal = 0;
+
+    function loadRecentPages() {
+        var $input = $('#berq-recent-search');
+        $input.addClass('berq-recent-searching');
+        $('#berq-recent-tbody').css('opacity', '0.45');
+
+        let berq_nounce = '<?php echo esc_html(wp_create_nonce('wp_rest')); ?>';
+        $.post(ajaxurl, {
+            action: 'berqwp_recently_optimized_pages',
+            nonce:  berq_nounce,
+            start:  recentPage * recentLength,
+            length: recentLength,
+            search: recentSearch,
+        }, function(res) {
+            $input.removeClass('berq-recent-searching');
+            $('#berq-recent-tbody').css('opacity', '');
+            if (!res || !res.success) return;
+            recentTotal = res.data.total;
+            var rows = '';
+            if (!res.data.data || res.data.data.length === 0) {
+                rows = '<tr><td colspan="2" style="color:#6071a4;"><?php echo esc_js(__('No cached pages logged yet.', 'searchpro')); ?></td></tr>';
+            } else {
+                $.each(res.data.data, function(_, e) {
+                    rows += '<tr><td><a href="' + e.url + '" target="_blank" rel="noopener">' + e.url + '</a></td><td>' + e.cached_at + '</td></tr>';
+                });
+            }
+            $('#berq-recent-tbody').html(rows);
+            var from = recentTotal === 0 ? 0 : recentPage * recentLength + 1;
+            var to   = Math.min((recentPage + 1) * recentLength, recentTotal);
+            $('#berq-recent-page-info').text(from + '–' + to + ' / ' + recentTotal);
+            $('#berq-recent-prev').prop('disabled', recentPage === 0);
+            $('#berq-recent-next').prop('disabled', to >= recentTotal);
+        });
+    }
+
+    var searchTimer;
+    $('#berq-recent-search').on('input', function() {
+        clearTimeout(searchTimer);
+        var val = $(this).val();
+        searchTimer = setTimeout(function() {
+            recentSearch = val;
+            recentPage   = 0;
+            loadRecentPages();
+        }, 350);
+    });
+
+    $('#berq-recent-prev').on('click', function() { recentPage--; loadRecentPages(); });
+    $('#berq-recent-next').on('click', function() { recentPage++; loadRecentPages(); });
+
+    loadRecentPages();
+})(jQuery);
+</script>

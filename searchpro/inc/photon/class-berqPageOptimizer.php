@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) exit;
 
 use BerqWP\Cache;
-use voku\helper\HtmlDomParser;
+use BerqWP_Deps\voku\helper\HtmlDomParser;
 
 class berqPageOptimizer {
     public $page_slug = null;

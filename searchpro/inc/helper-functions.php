@@ -1,7 +1,7 @@
 <?php
 
 use BerqWP\BerqWP;
-use voku\helper\HtmlDomParser;
+use BerqWP_Deps\voku\helper\HtmlDomParser;
 
 if (!defined('ABSPATH'))
     exit;
@@ -491,7 +491,7 @@ function bwp_is_partial_cache($identifier)
         $buffer = file_get_contents($cache_file);
 
         if (!empty($buffer)) {
-            $html = berqwp_str_get_html($buffer);
+            $html = HtmlDomParser::str_get_html($buffer);
 
             if ($html !== false) {
                 $style_tag = $html->find('style#berqwp-critical-css', 0);
@@ -1505,6 +1505,22 @@ function bwp_get_sitemap()
                         $url = trailingslashit( home_url( '/' . $rewrite_map[ $post_type ] . '/' . $post_name ) );
                     }
 
+                    // SEO Generator
+                    if (class_exists('NSG_Seo_Generator')) {
+                        $nsg   = NSG_Seo_Generator::get_instance();
+                        $slugs = $nsg->nsg_get_seo_page_slugs( $post_id );
+
+                        if ( is_array( $slugs ) ) {
+                            foreach ( $slugs as $slug ) {
+                                $generated_url = trailingslashit( $url ) . $slug . '/';
+
+                                if (bwp_can_optimize_page_url($generated_url)) {
+                                    $sitemap_urls[] = $generated_url;
+                                }
+                            }
+                        }
+                    }
+
                     $translation_urls = apply_filters('berqwp_page_translation_urls', [], $url);
 
                     if (!bwp_can_optimize_page_url($url)) {
@@ -2250,6 +2266,50 @@ function berqwp_render_toggle($name, $checked) {
     <div class="berq-toggle-switch"></div>
 </label>
 <?php
+}
+
+function bwp_log_recently_optimized_page($page_url)
+{
+    if (empty($page_url)) return;
+
+    // berqwp_stored_page_cache passes a slug/path, not a full URL — reconstruct it
+    if (!str_starts_with($page_url, 'http')) {
+        $page_url = home_url($page_url);
+    }
+    $page_url = urldecode($page_url);
+
+    $log = json_decode(get_option('berqwp_recently_optimized', '[]'), true);
+    if (!is_array($log)) $log = [];
+
+    // Remove existing entry for this URL so re-caching moves it to the top
+    $log = array_values(array_filter($log, fn($e) => $e['url'] !== $page_url));
+
+    array_unshift($log, [
+        'url'       => esc_url_raw($page_url),
+        'cached_at' => current_time('Y-m-d H:i:s'),
+    ]);
+
+    if (count($log) > 200) {
+        $log = array_slice($log, 0, 200);
+    }
+
+    update_option('berqwp_recently_optimized', wp_json_encode($log), false);
+}
+
+function bwp_clear_recently_optimized_log()
+{
+    delete_option('berqwp_recently_optimized');
+}
+
+function bwp_remove_recently_optimized_entry($page_url)
+{
+    if (empty($page_url)) return;
+
+    $log = json_decode(get_option('berqwp_recently_optimized', '[]'), true);
+    if (!is_array($log)) return;
+
+    $log = array_values(array_filter($log, fn($e) => $e['url'] !== $page_url));
+    update_option('berqwp_recently_optimized', wp_json_encode($log), false);
 }
 
 function berqwp_can_use_cloud() {

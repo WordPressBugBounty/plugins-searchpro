@@ -344,7 +344,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
     // If the option is changed
     if (bwp_is_option_updated('berqwp_enable_sandbox') === true) {
         $berq_log->info('Updated berqwp_enable_sandbox');
-        do_action('berqwp_update_sandbox_mode');
+        do_action('berqwp_on_update_sandbox_mode');
     }
 
     if (isset($_POST['berqwp_enable_sandbox'])) {
@@ -659,13 +659,14 @@ if (isset($_POST['berqwp_save_nonce'])) {
     if (isset($_POST['berq_opt_mode'])) {
 
         $val = sanitize_text_field($_POST['berq_opt_mode']);
-
-        if ($val !== get_option( 'berq_opt_mode' )) {
-            do_action( 'berqwp_before_update_optimization_mode' );
-            delete_option( 'bwp_require_flush_cache' );
-        }
+        $current_val = get_option( 'berq_opt_mode' );
 
         update_option('berq_opt_mode', $val);
+
+        if ($val !== $current_val) {
+            do_action( 'berqwp_on_update_optimization_mode' );
+            delete_option( 'bwp_require_flush_cache' );
+        }
     }
 
     if (isset($_POST['berq_exclude_cdn'])) {
