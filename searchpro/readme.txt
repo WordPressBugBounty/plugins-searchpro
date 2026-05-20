@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
 Tested up to: 6.9
-Stable tag: 4.0.18
+Stable tag: 4.0.19
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -257,6 +257,9 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 7. Integration
 
 == Changelog ==
+
+= 4.0.19 =
+* [Bug] Fixed undefined function wp_mkdir_p() error for Hostinger.
 
 = 4.0.18 =
 * [Enhancement] Added "Recently Optimized Pages" to the plugin dashboard.

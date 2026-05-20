@@ -20,7 +20,7 @@ if (!defined('optifer_cache')) {
 use BerqWP\BerqWP;
 
 // Initialize BerqWP SDK
-require_once optifer_PATH . '/BerqWP/vendor/autoload.php';
+require_once optifer_PATH . '/BerqWP/vendor-prefixed/vendor/scoper-autoload.php';
 
 // Load functions
 require_once optifer_PATH . '/inc/helper-functions.php';
@@ -68,6 +68,7 @@ function berqwp_uninstall_delete_site_options() {
 	delete_option('berq_exclude_cdn');
 	delete_option('berq_css_optimization');
 	delete_option('berq_js_optimization');
+	delete_option('berqwp_recently_optimized');
 }
 
 if (is_multisite()) {

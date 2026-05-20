@@ -40,7 +40,13 @@ class berqConfigs {
 
         // Ensure the cache directory exists
         if (!is_dir($config_dir)) {
-            wp_mkdir_p($config_dir);
+            @mkdir($config_dir, 0755, true);
+        }
+
+        // If dir still doesn't exist (e.g. permissions failure), use defaults and skip disk I/O
+        if (!is_dir($config_dir)) {
+            self::$cached_config = $this->defaults;
+            return;
         }
 
         if (!file_exists($this->config_file)) {
