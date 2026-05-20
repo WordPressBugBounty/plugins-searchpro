@@ -13,6 +13,7 @@ scope:
 	    --config=scoper.inc.php \
 	    --output-dir=vendor-prefixed \
 	    --force --no-interaction
+	/opt/local/bin/php83 fix-autoload-static.php
 
 
 clean:

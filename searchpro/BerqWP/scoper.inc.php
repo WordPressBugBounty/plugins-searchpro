@@ -53,35 +53,20 @@ return [
     ],
 
     'patchers' => [
-        // autoload_static.php lives in namespace Composer\Autoload, so its PSR-4 map
-        // keys are literal strings without the BerqWP_Deps prefix. PHP-Scoper doesn't
-        // rewrite them because it excludes the Composer namespace. This patcher adds
-        // the prefix to every vendor namespace key so the ClassLoader can resolve
-        // BerqWP_Deps\GuzzleHttp\*, BerqWP_Deps\voku\*, etc.
+        // Composer\InstalledVersions is declared by many plugins without a class_exists
+        // guard, causing "cannot redeclare class" fatals. Wrap our copy in a guard.
+        // Note: autoload_static.php is generated output by php-scoper, not an input file,
+        // so it cannot be patched here — it is fixed by fix-autoload-static.php in Makefile.
         static function (string $filePath, string $prefix, string $content): string {
-            if (!str_ends_with($filePath, 'composer/autoload_static.php')) {
+            if (!str_ends_with($filePath, 'composer/InstalledVersions.php')) {
                 return $content;
             }
-
-            $vendorNamespaces = [
-                'voku\\helper\\'                    => 24,
-                'Symfony\\Polyfill\\Php80\\'         => 36,
-                'Symfony\\Component\\CssSelector\\'  => 43,
-                'Psr\\Http\\Message\\'               => 30,
-                'Psr\\Http\\Client\\'                => 29,
-                'GuzzleHttp\\Psr7\\'                 => 29,
-                'GuzzleHttp\\Promise\\'              => 32,
-                'GuzzleHttp\\'                       => 24,
-            ];
-
-            foreach ($vendorNamespaces as $ns => $newLen) {
-                // Prefix the key in $prefixLengthsPsr4 and $prefixDirsPsr4
-                $content = str_replace("'$ns'", "'{$prefix}\\\\{$ns}'", $content);
-                // Fix the length value (original length without prefix → new length with prefix)
-                $oldLen = strlen($ns);
-                $content = str_replace("'{$prefix}\\\\{$ns}' => $oldLen", "'{$prefix}\\\\{$ns}' => $newLen", $content);
-            }
-
+            $content = str_replace(
+                "class InstalledVersions\n{",
+                "if (!class_exists('Composer\\\\InstalledVersions', false)) {\nclass InstalledVersions\n{",
+                $content
+            );
+            $content = rtrim($content) . "\n} // end class_exists check\n";
             return $content;
         },
     ],

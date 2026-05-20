@@ -2,8 +2,8 @@
 Contributors: berqwp, thevisionofhamza, berqier
 Tags: core web vitals, cache, cdn, critical css, speed
 Requires at least: 5.3
-Tested up to: 6.9
-Stable tag: 4.0.19
+Tested up to: 7.0
+Stable tag: 4.0.21
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -320,6 +320,9 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 * [Bug] Fixed partial uploads of static files by verifying uploads using file hashes.
 * [Bug] Fixed broken images.
 * [Bug] Fixed an issue where new content changes were not reflected.
+
+= 4.0.21 =
+* [Bug] Fixed Composer version conflict with other plugins.
 
 = 3.0.19 =
 * [Bug] Fixed an issue where cache was not being served without the advanced-cache drop-in plugin.

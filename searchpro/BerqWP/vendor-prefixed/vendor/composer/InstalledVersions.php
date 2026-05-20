@@ -22,6 +22,7 @@ use Composer\Semver\VersionParser;
  *
  * @final
  */
+if (!class_exists('Composer\\InstalledVersions', false)) {
 class InstalledVersions
 {
     /**
@@ -343,3 +344,4 @@ class InstalledVersions
         return $installed;
     }
 }
+} // end class_exists check
