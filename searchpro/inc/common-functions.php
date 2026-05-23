@@ -93,6 +93,11 @@ function bwp_build_cache_path($url) {
 }
 
 function bwp_serve_advanced_cache($serve_from = 'plugin') {
+    
+    if (php_sapi_name() === 'cli' || (defined('WP_CLI') && WP_CLI)) {
+        return;
+    }
+
     if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'GET' && !bwp_is_user_logged_in() && !bwp_is_ajax() && !berqDetectCrawler::is_crawler() && bwp_pass_cookie_requirement()) {
         $berqconfigs = berqConfigs::getInstance();
         $configs = $berqconfigs->get_configs();

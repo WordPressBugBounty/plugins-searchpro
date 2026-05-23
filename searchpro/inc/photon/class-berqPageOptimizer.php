@@ -726,6 +726,7 @@ class berqPageOptimizer {
                             cancelable: true
                         });
                         document.dispatchEvent(event);
+                        document.dispatchEvent(new Event('readystatechange'));
                         window.dispatchEvent(new Event('load'));
 
 

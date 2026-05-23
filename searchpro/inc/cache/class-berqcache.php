@@ -112,6 +112,13 @@ if (!class_exists('berqCache')) {
 
             // detect when theme/plugin is installed or updated
             add_action( 'upgrader_process_complete', [$this, 'process_updates'], 10, 2 );
+
+            // handle menu update
+            add_action( 'wp_update_nav_menu', [$this, 'handle_menu_update'], 10, 2 );
+
+            // handle customizer save
+            add_action( 'customize_save', [$this, 'handle_customizer_update'] );
+
         }
 
         static function getInstance() {
@@ -125,25 +132,74 @@ if (!class_exists('berqCache')) {
             return self::$instance;
         }
 
+        function handle_customizer_update( $wp_customize ) {
+
+            global $berq_log;
+            $berq_log->info("Customizer updated");
+
+            $this->flush_all();
+
+        }
+
+        function handle_menu_update( $menu_id, $menu_data ) {
+
+            global $berq_log;
+            $berq_log->info("Site menu updated");
+
+            $this->flush_all();
+
+        }
+
+        function flush_all() {
+
+            global $berq_log;
+            $berq_log->info("Flushing everything");
+
+            if (berqwp_can_use_cloud()) {
+
+                // flush critical css
+                $this->purge_critical_css_cache();
+    
+                // stale cdn
+                self::stale_cloud_assets();
+
+            }
+
+            // clear cache
+            $this->delete_cache_files();
+        }
+
         function process_updates( WP_Upgrader $upgrader, array $hook_extra ) {
 
             if (!berqwp_can_use_cloud()) {
                 return;
             }
 
-            $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
-            $parsed_url = wp_parse_url(home_url());
-            $domain = $parsed_url['host'];
-
             global $berq_log;
             $berq_log->info("Processing updates");
 
+            self::stale_cloud_assets();
+            $this->purge_critical_css_cache();
+
+        }
+
+        static function stale_cloud_assets() {
+            if (!berqwp_can_use_cloud()) {
+                return;
+            }
+
+            global $berq_log;
+            $berq_log->info("Marking cloud assets stale");
+
+            $berqwp = new BerqWP(berqwp_get_license_key(), null, null);
+            $parsed_url = wp_parse_url(home_url());
+            $domain = $parsed_url['host'];
+            
             // mark cdn assets stale
             $berqwp->cdn_stale_assets($domain);
 
             // flush all critical css cache
             $berqwp->purge_critilclcss($domain);
-
         }
 
         function process_migration() {
@@ -371,6 +427,10 @@ if (!class_exists('berqCache')) {
                 return;
             }
 
+            if ($new_status == 'draft' && $old_status == 'draft') {
+                return;
+            }
+
             if ($new_status == 'auto-draft') {
                 return;
             }
@@ -580,9 +640,11 @@ if (!class_exists('berqCache')) {
                 return;
             }
 
-            if (!is_admin()) {
-                return;
-            }
+            // prevents scheduled post public 
+            // via wp cron
+            // if (!is_admin()) {
+            //     return;
+            // }
 
             $post_type = get_post_type($post_id);
             $post_url = get_permalink($post_id);
