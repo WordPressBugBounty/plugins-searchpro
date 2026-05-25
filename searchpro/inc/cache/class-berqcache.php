@@ -141,7 +141,7 @@ if (!class_exists('berqCache')) {
 
         }
 
-        function handle_menu_update( $menu_id, $menu_data ) {
+        function handle_menu_update( $menu_id, $menu_data = null ) {
 
             global $berq_log;
             $berq_log->info("Site menu updated");
