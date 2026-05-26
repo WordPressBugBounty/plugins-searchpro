@@ -1512,7 +1512,7 @@ if (!class_exists('berqWP')) {
 				$key = sanitize_text_field($_POST['berqwp_license_key']);
 				// $key_response = $this->verify_license_key($key, 'slm_activate');
 				$key_response = $this->authenticate_license($key);
-				if (!empty($key_response) && isset($key_response->result) && $key_response->result == 'success') {
+				if (!empty($key_response->lic) && isset($key_response->lic->result) && $key_response->lic->result == 'success') {
 					berqwp_update_license_key($key);
 				}
 			}

@@ -3,7 +3,7 @@ Contributors: berqwp
 Tags: seo, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.0
-Stable tag: 4.0.23
+Stable tag: 4.0.25
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -196,6 +196,10 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 7. Integration
 
 == Changelog ==
+
+= 4.0.25 =
+* [Enhancement] UI improvements
+* [Bug] Fixed license activation bug on multi site network
 
 = 4.0.23 =
 * [Bug] Fixed too few arguments error on menu update.

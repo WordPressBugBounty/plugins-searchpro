@@ -1235,7 +1235,8 @@ div#wpcontent {
   background-color: #1f71ff;
   color: #fff;
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: 8px !important;
+  outline: none !important;
   gap: 6px;
   transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s all;
   text-decoration: none !important;
@@ -1254,6 +1255,16 @@ div#wpcontent {
 .bwp-action-btn svg {
   width: 15px;
   height: auto;
+}
+
+a.bwp-action-btn.light.bwp-upgrade-btn {
+    background: linear-gradient(315deg, #1f72ff, #6f13ff);
+    color: #fff;
+    padding: 10px 16px;
+}
+
+.bwp-action-btn .icon {
+    display: flex;
 }
 
 .berq-triple-boxes {

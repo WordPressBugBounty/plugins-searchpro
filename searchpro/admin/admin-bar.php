@@ -35,9 +35,6 @@ if (!class_exists('berqAdminBar')) {
 
         function add_admin_bar_menu()
         {
-            if (empty(berqwp_get_license_key())) {
-                return;
-            }
 
             if (!current_user_can('edit_posts')) {
                 return;

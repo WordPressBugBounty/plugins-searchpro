@@ -30,6 +30,14 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
 
                         ?>" alt="BerqWP Logo">
             <div class="berqwp-header-right">
+                <?php if (empty(berqwp_get_license_key())) { ?>
+                    <a class="bwp-action-btn light bwp-upgrade-btn" href="https://berqwp.com/pricing/?referrer=plugin-installation" target="_blank">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rocket-icon lucide-rocket"><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"/><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"/></svg>
+                        </div>
+                        Try Premium (Free Trial)
+                    </a>
+                <?php } ?>
                 <div class="optimization-methods-switch <?php echo esc_attr($configs['optimization_method'])?>" title="Optimization method">
                     <a class="method-local" href="<?php echo esc_attr(wp_nonce_url(admin_url('admin-post.php?action=switch_optimization_method_local'), 'switch_optimization_method_local_action')); ?>">
                         <div class="icon">
@@ -56,11 +64,18 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                 </div>
 
                 <a class="bwp-action-btn light" href="<?php echo esc_attr(wp_nonce_url(admin_url('admin-post.php?action=clear_cache'), 'clear_cache_action')); ?>">
+                    <div class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brush-cleaning-icon lucide-brush-cleaning"><path d="m16 22-1-4"/><path d="M19 14a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2h-3a1 1 0 0 1-1-1V4a2 2 0 0 0-4 0v5a1 1 0 0 1-1 1H6a2 2 0 0 0-2 2v1a1 1 0 0 0 1 1"/><path d="M19 14H5l-1.973 6.767A1 1 0 0 0 4 22h16a1 1 0 0 0 .973-1.233z"/><path d="m8 22 1-4"/></svg>
+                    </div>
                     Flush cache
                 </a>
 
                 <?php if ($berqwp_can_use_cloud) { ?>
                 <a class="bwp-action-btn" href="<?php echo esc_attr(wp_nonce_url(admin_url('admin-post.php?action=warmup_cache'), 'warmup_cache_action')); ?>">
+
+                    <div class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-ccw-icon lucide-refresh-ccw"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+                    </div>
                     Warmup cache
                 </a>
                 <?php } ?>
@@ -123,6 +138,10 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                     <?php esc_html_e('License', 'searchpro'); ?>
                 </div>
                 <?php } ?>
+                <a class="berqwp-tab tab-link" target="_blank" href="https://www.facebook.com/groups/1660827728253423">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="24"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 440 146.7 540.8 258.2 568.5L258.2 398.2L205.4 398.2L205.4 320L258.2 320L258.2 286.3C258.2 199.2 297.6 158.8 383.2 158.8C399.4 158.8 427.4 162 438.9 165.2L438.9 236C432.9 235.4 422.4 235 409.3 235C367.3 235 351.1 250.9 351.1 292.2L351.1 320L434.7 320L420.3 398.2L351 398.2L351 574.1C477.8 558.8 576 450.9 576 320z"/></svg></svg></div>
+                    <?php esc_html_e('Join BerqWP Community', 'searchpro'); ?>
+                </a>
             </div>
             <div class="berqwp-tab-content">
                 <?php do_action('berqwp_notices'); ?>
@@ -289,7 +308,7 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
 
             // init_opt_slider();
 
-            $('.berqwp-tab').click(function() {
+            $('.berqwp-tab[data-tab]').click(function() {
                 let tab = $(this).attr('data-tab');
                 $("html, body").animate({
                     scrollTop: $(".berqwp-dashbaord").offset().top - 30
