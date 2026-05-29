@@ -608,7 +608,7 @@ if (!class_exists('berqCache')) {
             // }
 
             $page_url = home_url($slug);
-            $host = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+            $host = !empty($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) : '';
             berqReverseProxyCache::purge_cache($page_url);
         }
 

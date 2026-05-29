@@ -11,10 +11,10 @@ $cdn_exclude_keywords = implode("\n", $cdn_exclude);
     <h2 class="berq-tab-title"><?php esc_html_e('Content Delivery Network (CDN)', 'searchpro'); ?></h2>
     <div class="berq-info-box berq-setting-group">
         <div class="group-container">
-            <h3 class="berq-box-title <?php echo !$berqwp_can_use_cloud ? 'cloud-exclusive' : ''; ?>"><?php esc_html_e("$plugin_name CDN", 'searchpro'); ?></h3>
+            <h3 class="berq-box-title <?php echo !$berqwp_can_use_cloud ? 'cloud-exclusive' : ''; ?>"><?php printf( /* translators: %s: Plugin name */ esc_html__('%s CDN', 'searchpro'), esc_html($plugin_name) ); ?></h3>
             <div class="berq-box-content berq-setting-toggle">
                 <div class="berq-option-content">
-                    <p><?php esc_html_e("$plugin_name CDN delivers static files instantly to enhance website performance and user experience globally.", 'searchpro'); ?></p>
+                    <p><?php printf( /* translators: %s: Plugin name */ esc_html__('%s CDN delivers static files instantly to enhance website performance and user experience globally.', 'searchpro'), esc_html($plugin_name) ); ?></p>
                 </div>
                 <?php berqwp_render_toggle('berqwp_enable_cdn', get_option('berqwp_enable_cdn')); ?>
             </div>

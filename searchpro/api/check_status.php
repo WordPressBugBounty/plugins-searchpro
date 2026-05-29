@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET['berqwp_webhook']) && 
     $data = json_decode($jsonData, true);
 
     if ($data === null) {
-        echo json_encode(['status' => 'error', 'msg' => 'Invalid request body']);
+        echo wp_json_encode(['status' => 'error', 'msg' => 'Invalid request body']);
         exit;
     }
 
@@ -15,17 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_GET['berqwp_webhook']) && 
     $license_key_hash = sanitize_text_field($data['license_key_hash'] ?? '');
 
     if (empty($license_key)) {
-        echo json_encode(['status' => 'inactive']);
+        echo wp_json_encode(['status' => 'inactive']);
         exit;
     }
 
     if (empty($license_key_hash) || $license_key_hash !== md5($license_key)) {
-        echo json_encode(['status' => 'error', 'msg' => 'Request authentication failed']);
+        echo wp_json_encode(['status' => 'error', 'msg' => 'Request authentication failed']);
         http_response_code(403);
         exit;
     }
 
-    echo json_encode([
+    echo wp_json_encode([
         'status'   => 'active',
         'version'  => BERQWP_VERSION,
         'site_url' => home_url(),

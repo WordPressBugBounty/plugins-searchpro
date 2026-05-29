@@ -60,7 +60,7 @@ do_action('berqwp_notices');
 
                 <div class="continue-local" style="display: none;">
                     <div class="inner">
-                        <input type="email" name="berqwp_local_user_email" placeholder="Enter your email" required>
+                        <input type="email" name="berqwp_local_user_email" placeholder="Enter your email (optional)">
                         <button type="submit" disabled>Continue</button>
                     </div>
                 </div>
@@ -115,9 +115,10 @@ do_action('berqwp_notices');
                     $('#berqwp-intro .continue-local').show();
                     $('#berqwp-intro .continue-cloud').hide();
 
-                    $('input[name="berqwp_local_user_email"]').prop('required', true);
+                    $('input[name="berqwp_local_user_email"]').prop('required', false);
                     $('input[name="berqwp_local_user_email"]').prop('disabled', false);
                     $('input[name="berqwp_license_key"]').prop('required', false);
+                    $('.continue-local button[type="submit"]').prop('disabled', false);
                 }
 
                 if (val == 'cloud') {
@@ -142,13 +143,6 @@ do_action('berqwp_notices');
                 }
             })
 
-            $('input[name="berqwp_local_user_email"]').on('change, input', function() {
-                if ($(this).val().length > 0) {
-                    $('.continue-local button[type="submit"]').prop('disabled', false);
-                } else {
-                    $('.continue-local button[type="submit"]').prop('disabled', true);
-                }
-            })
 
 
         })

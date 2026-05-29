@@ -190,7 +190,7 @@ if ($cached_percentage < 0) {
         <h3 class="berq-box-title"><?php esc_html_e('Sandbox', 'searchpro'); ?></h3>
         <div class="berq-box-content berq-setting-toggle">
             <div class="berq-option-content">
-                <p><?php esc_html_e("The Sandbox feature allows you to test $plugin_name's optimizations without impacting real visitors. Note that pages will load slower when sandbox mode is enabled.", 'searchpro'); ?>
+                <p><?php printf( /* translators: %s: Plugin name */ esc_html__("The Sandbox feature allows you to test %s's optimizations without impacting real visitors. Note that pages will load slower when sandbox mode is enabled.", 'searchpro'), esc_html($plugin_name) ); ?>
 
                 <?php if (bwp_show_docs()) { ?>
                 <a href="https://berqwp.com/help-center/sandbox-mode-and-how-to-use-it/" target="_blank"><?php esc_html_e("Learn more", 'searchpro'); ?></a>

@@ -27,8 +27,8 @@ function bwp_pass_cookie_requirement() {
 
 function bwp_get_request_url() {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost'; // Fallback to 'localhost' if unavailable
-    $uri = $_SERVER['REQUEST_URI'] ?? '/';
+    $host = isset($_SERVER['HTTP_HOST']) ? strip_tags(stripslashes($_SERVER['HTTP_HOST'])) : 'localhost';
+    $uri = isset($_SERVER['REQUEST_URI']) ? strip_tags(stripslashes($_SERVER['REQUEST_URI'])) : '/';
     $url = $scheme . $host . $uri;
     return strtolower($url);
 }

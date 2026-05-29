@@ -1,40 +1,34 @@
-=== BerqWP - All-in-One WordPress Speed & Performance Optimization Plugin | PageSpeed 90+, Cache, CDN, Next-Gen Images & Core Web Vitals ===
-Contributors: berqwp
+=== BerqWP - Automatic Website Speed Optimization ===
+Contributors: berqwp, thevisionofhamza
 Tags: seo, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.0
-Stable tag: 4.0.25
+Stable tag: 4.0.26
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Automatically boost your PageSpeed score to 90+ for both mobile & desktop and pass Core Web Vitals for WordPress website without any coding skills.
+BerqWP is a WordPress performance plugin that applies speed optimization techniques to improve page load times and Core Web Vitals scores. It offers local optimization (free, no account needed) and cloud optimization (paid, offloads processing to BerqWP servers).
 
 == Description ==
 
-**Eliminate the Need for Multiple Plugins and Automate Performance Optimization Effortlessly.**
+[BerqWP](https://berqwp.com/?utm_source=wordpress-repo) is a WordPress performance plugin that applies speed optimization techniques recommended by [Google (web.dev)](https://web.dev/performance). It includes full-page caching, image lazy loading, LCP preloading, CSS/JS optimization, and more.
 
-[BerqWP](https://berqwp.com/?utm_source=wordpress-repo) is a 100% automatic **All-In-One speed optimization plugin** that automatically applies modern speed optimization techniques recommended by [Google (web.dev)](https://web.dev/performance) making your website lightning fast, so your website visitors can have the best hassle-free experience.
+BerqWP offers two optimization modes:
 
-Since all popular page speed testing tools use similar methods, you'll get the same results across tools like [Google PageSpeed Insights](https://pagespeed.web.dev/), [GTmetrix](https://gtmetrix.com/), [Pingdom](https://tools.pingdom.com/), and others.
+- **Local Optimization (Free):** All optimization runs on your server. No account or license key required.
+- **Cloud Optimization (Paid):** Offloads page processing to BerqWP’s servers for additional features like WebP conversion, Fluid Images, Critical CSS, CDN, and Web Vitals Analytics.
 
-## 💙 Why do people love BerqWP?
+## Demo
+https://youtu.be/DQrQcVleFrQ?si=zPZ-ZS21yOBmda61
 
-- **Automatically applies Google ([web.dev](https://web.dev/performance)) recommended optimizations to your website.**
-- **100% automatic (no configuration needed)**
-- **100% SEO friendly, no black hat**
-- **Drastically improve Core Web Vitals metrices**
-- **90+ speed score for mobile & desktop**
-- **Comes with CDN integrated**
-- **Monitor Core Web Vitals in real-time with Web Vitals Analytics**
-- **Works with all popular WordPress themes and plugins**
-- **Doesn’t break your website**
-- **Built for non-techies**
-- **Get instant support with BerqWP's AI assistant**
+## Features
 
-## 🎯 Real World Results
-- **88.6% of BerqWP-optimized websites have an average loading time below 3 seconds.**
-- **BerqWP-optimized websites have an average bounce rate of 4.78% on mobile and 6.18% on desktop.**
+- Works with all popular WordPress themes and plugins
+- SEO-friendly, no changes to your content
+- Supports Apache, Nginx, and LiteSpeed web servers
+- Compatible with Cloudflare, WooCommerce, multilingual plugins, and multisite networks
+- Sandbox mode to test optimizations without affecting real visitors
 
 ## 🔥 Local Optimization (Free):
 
@@ -46,7 +40,7 @@ Since all popular page speed testing tools use similar methods, you'll get the s
 
 - **Server-side Cache:** Delivers static cache files directly from your web server without hitting PHP & database, making loading lightning fast. Automatically configures cache rules for Apache, supports Nginx cache as well.
 
-- **Critical CSS:** Generates critical CSS (Used CSS) for each page individually, disabled by default for Local Optimization but can enabled using PHP filter hook `add_filter( 'berqwp_local_critical_css', '__return_true' );`
+- **Used CSS:** Extracts and inlines only the CSS used on each page, then loads remaining CSS based on your CSS Delivery Method setting. Can be enabled in the CSS & JavaScript tab when using Local Optimization. Also available via PHP filter: `add_filter( 'berqwp_local_used_css', '__return_true' );`
 
 - **Speculative API:** BerqWP makes returning visitors' experience instantly fast by using the browser's Speculative API, loading the webpage literally within milliseconds.
 
@@ -92,7 +86,7 @@ Since all popular page speed testing tools use similar methods, you'll get the s
 
 - **Much more!**
 
-**[Start free trial](https://berqwp.com/?utm_source=wordpress-repo), try BerqWP Premium for 14 days for free, cancel anytime. Your card will be charged at the end of the free trial.**
+Cloud Optimization requires a license key. [Sign up for free plan](https://berqwp.com/free-account/?utm_source=wordpress-repo).
 
 
 ## ✅ Optimization Modes for Flexibility
@@ -106,23 +100,7 @@ BerqWP offers four [optimization modes](https://berqwp.com/help-center/berqwp-op
 For best results, we recommend starting with **Turbo mode**, but stepping down to Blaze or Smart can help if compatibility issues arise.
 
 
-## 👩‍💻 Real User Success Stories
-* **★★★★★ [BerqWP beat NitroPack, LiteSpeed Cache, WP Rocket, Perfmatters, FlyingPress….](https://wordpress.org/support/topic/berqwp-beat-nitropack-litespeed-cache-wp-rocket-perfmatters-flyingpress/)**
-_"BerqWP beat NitroPack, LiteSpeed Cache, WP Rocket, Perfmatters, FlyingPress, W3 Total Cache, Super Cache and more. On their homepage you can test your site speed and they will show you the expected Page Speed Insights score. In my experience, once BerqWP plugin is installed, your PSI scores will be higher than their estimate. Connect your Cloudflare free account and get Edge Page Caching. Then set to Aggressive mode and enjoy higher scores without changing a single setting. BerqWP is Voodoo Magic!"_
-
-* **★★★★★ [Consistent 100/100 score, Great support](https://wordpress.org/support/topic/consistent-100-100-score-great-support/)**
-_"I have tried multiple caching software programs, but none of them were so easy to set up, and the results are incomparable! I have reached out several times to the support. They always respond, sometimes you have to wait (decent time), sometimes within a day they respond and solve your issue instantly. Keep up the good work!"_
-
-* **★★★★★ [Working really great](https://wordpress.org/support/topic/working-really-great/)**
-_"Just bought the pro plugin and started using it replacing the 10web io which was great but expensive for me, I was just a little worried whether this one would work ok without conflicting with my current plugins so i tested the free version first and it worked fine. Good customer support as well. I would recommend the pro plugin but try the free one first and then decide."_
-
-* **★★★★★ [A must have](https://wordpress.org/support/topic/a-must-have-532/)**
-_"It’s been a while without writing a review from my side, but BerqWP deserves my 5 stars.It’s incredible easy to use, seriously, a newbie could make it work easily. It improves loading times dramatically, to the point that I don’t really understand what’s the magic behind it (I’m not joking). I always thought that a bit more speed could be achieved at my websites, but not this much. I wasn’t aware that the servers that I use for my sites were capable of this speeds, and I always thought that part of the issue was using medium servers instead of top notch ones.Thank you so much guys! Keep doing your magic, I’ll spread the word about you as I really want you to succeed and last forever. Oh, and I really can’t believe how your plugin can exceed that much what other premium plugins achieve (I tried quite a few)."_
-
-* **★★★★★ [Plugin is incredibly easy to use](https://wordpress.org/support/topic/plugin-is-incredibly-easy-to-use/)**
-_"The BerqWP plugin is incredibly easy to use, even for those who are not optimization experts. The setup is intuitive, and it works flawlessly, even on websites built with Elementor Pro, without causing any issues. Additionally, their support team is active and consistently responds to inquiries promptly, instilling confidence in the service."_
-
-**[See all reviews](https://wordpress.org/support/plugin/searchpro/reviews/?filter=5)**
+**[See all reviews](https://wordpress.org/support/plugin/searchpro/reviews/)**
 
 
 ## ⚙️ How to set up BerqWP in 4 simple steps?
@@ -186,6 +164,21 @@ No worries, we have a dedicated support team ready to help you with any assistan
 = I’m a free user and need your help. =
 Please create a support ticket via https://wordpress.org/support/plugin/searchpro/ so we can assist you.
 
+== External Services ==
+
+This plugin connects to BerqWP's cloud servers to provide optimization services. These connections only occur when Cloud Optimization mode is enabled with a valid license key.
+
+= BerqWP Cloud (boost.berqwp.com) =
+Used for: Cloud-based page rendering and optimization, delivery of optimized HTML cache, CDN, critical CSS generation, and WebP image conversion.
+Data sent: Your site URL, page URLs, and a license key hash for authentication.
+
+= BerqWP API (berqwp.com) =
+Used for: License key verification and addon synchronization.
+Data sent: Your license key and site URL, only when activating or refreshing a license.
+
+- [Terms and Conditions](https://berqwp.com/terms-conditions/)
+- [Privacy Policy](https://berqwp.com/privacy-policy/)
+
 == Screenshots ==
 1. Hero image
 2. Dashboard
@@ -196,6 +189,16 @@ Please create a support ticket via https://wordpress.org/support/plugin/searchpr
 7. Integration
 
 == Changelog ==
+
+= 4.0.26 =
+* [Enhancement] Used CSS is now available for local optimization mode
+* [Enhancement] Review banner now shows for all users
+* [Enhancement] Email field on intro page is now optional
+* [Security] Added nonce sanitization across all admin actions
+* [Security] Added capability check to optimized pages AJAX handler
+* [Security] Fixed unsanitized $_SERVER, $_GET, and $_POST inputs
+* [Security] Replaced json_encode() with wp_json_encode() in API endpoints
+* [Bug] Fixed empty endpoint in batch cache request handler
 
 = 4.0.25 =
 * [Enhancement] UI improvements

@@ -55,6 +55,7 @@ function berqwp_uninstall_delete_site_options() {
 	delete_option('berqwp_can_use_fluid_images');
 	delete_option('berqwp_preload_yt_poster');
 	delete_option('berqwp_enable_critical_css');
+	delete_option('berqwp_enable_used_css');
 	delete_option('berqwp_async_excluded_styles');
 	delete_option('berqwp_delay_third_party_scripts');
 	delete_option('berqwp_lazy_render');

@@ -70,7 +70,7 @@ class berqHeartbeat
 ?>
         <script id="bwp-heartbeat">
             (function() {
-                var config = <?php echo json_encode($config); ?>;
+                var config = <?php echo wp_json_encode($config); ?>;
                 var active = true;
                 var failures = 0;
                 var maxFailures = 3;
@@ -492,7 +492,7 @@ class berqHeartbeat
     private function get_current_url(): string
     {
         $protocol = is_ssl() ? 'https://' : 'http://';
-        return $protocol . $_SERVER['HTTP_HOST'] . strtok($_SERVER['REQUEST_URI'], '?');
+        return $protocol . sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'] ?? '')) . strtok(sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'] ?? '/')), '?');
     }
 }
 

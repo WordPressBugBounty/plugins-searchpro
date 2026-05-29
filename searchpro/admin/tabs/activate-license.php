@@ -3,7 +3,7 @@ if (!defined('ABSPATH'))
     exit;
 ?>
 <div id="activate-license"  <?php bwp_is_tab('activate-license'); ?>>
-    <h2 class="berq-tab-title"><?php esc_html_e("$plugin_name License", 'searchpro'); ?></h2>
+    <h2 class="berq-tab-title"><?php printf( /* translators: %s: Plugin name */ esc_html__('%s License', 'searchpro'), esc_html($plugin_name) ); ?></h2>
     <style>
 
         div#berqwp-license-activation input[type="password"] {

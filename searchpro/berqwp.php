@@ -1,22 +1,24 @@
 <?php
 /**
  * Plugin Name:       BerqWP
- * Plugin URI:        https://berqwp.com
- * Description:       Automatically pass Core Web Vitals for WordPress and boost your speed score to 90+ for both mobile and desktop without any technical skills.
- * Version:           4.0.25
+ * Plugin URI:        https://berqwp.com/
+ * Description:       Automatically boost your WordPress website speed. Includes full-page caching, image optimization, CSS/JS delivery, and Core Web Vitals improvements.
+ * Version:           4.0.26
  * Requires at least: 5.3
  * Requires PHP:      7.4
  * Author:            BerqWP
- * Author URI:        https://berqwp.com
+ * Author URI:        https://berqwp.com/
  * Text Domain:       searchpro
  * Domain Path:       /languages
  * Network:           true
+ * License:           GPL-2.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BERQWP_VERSION')) {
-	define('BERQWP_VERSION', '4.0.25');
+	define('BERQWP_VERSION', '4.0.26');
 }
 
 if (!defined('optifer_PATH')) {

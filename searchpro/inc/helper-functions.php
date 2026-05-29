@@ -83,7 +83,6 @@ function berqwp_is_license_active() {
 
 function berqwp_activate_single_site() {
     if (empty(berqwp_get_license_key())) {
-        set_transient('bqwp_hide_feedback_notice', true, 60 * 60);
         set_transient('berqwp_redirect', true, 1);
     }
     update_option('berqwp_sync_addons', true);
@@ -1692,13 +1691,13 @@ function bwp_notice($status = '', $title = null, $message = null, $btn = [], $di
                     fill="#1f72ff" />
             </svg></div>
         <div class="content">
-            <div class="status-tag"><?php esc_html_e($status, 'searchpro'); ?></div>
+            <div class="status-tag"><?php echo esc_html($status); ?></div>
             <?php if (!empty($title)) { ?>
-                <h5><?php echo wp_kses_post(__($title, 'searchpro')); ?></h5>
+                <h5><?php echo wp_kses_post($title); ?></h5>
             <?php } ?>
 
             <?php if (!empty($message)) { ?>
-                <?php echo wp_kses_post(__($message, 'searchpro')); ?>
+                <?php echo wp_kses_post($message); ?>
             <?php } ?>
 
             <?php if (!empty($btn) && is_array($btn)) { ?>
@@ -1724,7 +1723,7 @@ function bwp_notice($status = '', $title = null, $message = null, $btn = [], $di
                         <a target="<?php echo esc_attr($bwp_btn['target']) ?? ''; ?>"
                             href="<?php echo esc_attr($bwp_btn['href']) ?? ''; ?>"
                             class="bwp-btn <?php echo esc_attr($bwp_btn['classes']) ?? ''; ?>">
-                            <?php echo esc_html__($bwp_btn['text'], 'searchpro') ?? ''; ?>
+                            <?php echo esc_html($bwp_btn['text']); ?>
                         </a>
                     <?php
                     }
@@ -1811,7 +1810,7 @@ function bwp_display_logs()
 
         // Check if the current user is logged in and has admin privileges
         if (!is_user_logged_in() || !current_user_can('administrator')) {
-            wp_die(__('You are not allowed to access this page.', 'berqwp'));
+            wp_die(__('You are not allowed to access this page.', 'searchpro'));
         }
 
         // Define the path to the BerqWP logs file

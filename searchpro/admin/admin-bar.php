@@ -174,7 +174,7 @@ if (!class_exists('berqAdminBar')) {
         function handle_clear_cache_action()
         {
             // Check if the user has the necessary nonce and the action matches
-            if (isset($_GET['action']) && $_GET['action'] === 'clear_cache' && wp_verify_nonce($_GET['_wpnonce'], 'clear_cache_action')) {
+            if (isset($_GET['action']) && $_GET['action'] === 'clear_cache' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'clear_cache_action')) {
 
                 $cache = berqCache::getInstance();
                 $cache->delete_cache_files(is_multisite()); // If is multisite flush all sites
@@ -196,7 +196,7 @@ if (!class_exists('berqAdminBar')) {
         function handle_warmup_cache_action()
         {
             // Check if the user has the necessary nonce and the action matches
-            if (isset($_GET['action']) && $_GET['action'] === 'warmup_cache' && wp_verify_nonce($_GET['_wpnonce'], 'warmup_cache_action')) {
+            if (isset($_GET['action']) && $_GET['action'] === 'warmup_cache' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'warmup_cache_action')) {
 
                 // trigger cache warmup
                 do_action('berqwp_cache_warmup');
@@ -212,9 +212,9 @@ if (!class_exists('berqAdminBar')) {
         function handle_purge_page_action()
         {
             // Check if the user has the necessary nonce and the action matches
-            if (isset($_GET['action']) && $_GET['action'] === 'berq_purge_page' && wp_verify_nonce($_GET['_wpnonce'], 'berq_purge_page_action')) {
+            if (isset($_GET['action']) && $_GET['action'] === 'berq_purge_page' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'berq_purge_page_action')) {
 
-                $page_url = $_GET['uri'];
+                $page_url = esc_url_raw(wp_unslash($_GET['uri'] ?? ''));
 
                 berqCache::purge_page($page_url, true);
 
@@ -231,9 +231,9 @@ if (!class_exists('berqAdminBar')) {
         function handle_request_cache_action()
         {
             // Check if the user has the necessary nonce and the action matches
-            if (isset($_GET['action']) && $_GET['action'] === 'berq_request_cache' && wp_verify_nonce($_GET['_wpnonce'], 'berq_request_cache_action')) {
+            if (isset($_GET['action']) && $_GET['action'] === 'berq_request_cache' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'berq_request_cache_action')) {
 
-                $page_url = $_GET['uri'];
+                $page_url = esc_url_raw(wp_unslash($_GET['uri'] ?? ''));
                 $slug = bwp_url_into_path($page_url);
 
                 if (is_admin()) {
@@ -252,7 +252,7 @@ if (!class_exists('berqAdminBar')) {
         function handle_flush_cdn_action()
         {
             // Check if the user has the necessary nonce and the action matches
-            if (isset($_GET['action']) && $_GET['action'] === 'berq_flush_cdn' && wp_verify_nonce($_GET['_wpnonce'], 'berq_flush_cdn_action')) {
+            if (isset($_GET['action']) && $_GET['action'] === 'berq_flush_cdn' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'berq_flush_cdn_action')) {
 
                 $cache = berqCache::getInstance();
                 $cache->flush_cdn();
@@ -268,7 +268,7 @@ if (!class_exists('berqAdminBar')) {
         function handle_berq_flush_site_action()
         {
             // Check if the user has the necessary nonce and the action matches
-            if (isset($_GET['action']) && isset($_GET['site_id']) && $_GET['action'] === 'berq_flush_site' && wp_verify_nonce($_GET['_wpnonce'], 'berq_flush_site_action')) {
+            if (isset($_GET['action']) && isset($_GET['site_id']) && $_GET['action'] === 'berq_flush_site' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'berq_flush_site_action')) {
 
                 $site_id = (int) sanitize_text_field($_GET['site_id']);
                 $cache = berqCache::getInstance();
@@ -293,7 +293,7 @@ if (!class_exists('berqAdminBar')) {
         function handle_flush_criticalcss_action()
         {
             // Check if the user has the necessary nonce and the action matches
-            if (isset($_GET['action']) && $_GET['action'] === 'berq_flush_criticalcss' && wp_verify_nonce($_GET['_wpnonce'], 'berq_flush_criticalcss_action')) {
+            if (isset($_GET['action']) && $_GET['action'] === 'berq_flush_criticalcss' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'berq_flush_criticalcss_action')) {
 
                 $parsed_url = wp_parse_url(home_url());
                 $domain = $parsed_url['host'];

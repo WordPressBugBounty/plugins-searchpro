@@ -34,7 +34,7 @@ foreach ($js_urls as $js_url) {
     
 }
 
-echo json_encode(
+echo wp_json_encode(
     [
         "status" => "success",
         "urls" => $return_url

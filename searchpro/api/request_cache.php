@@ -33,12 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['berqwp_request_cache']
         exit;
     }
 
-    $path = $_POST['page_slug'];
-    $page_url = $_POST['page_url'];
+    $path = sanitize_text_field(wp_unslash($_POST['page_slug']));
+    $page_url = esc_url_raw(wp_unslash($_POST['page_url']));
 
     if (bwp_can_warmup_cache($page_url)) {
         warmup_cache_by_url($page_url);
-        echo json_encode(['status' => 'success']);
+        echo wp_json_encode(['status' => 'success']);
     }
     
     exit;

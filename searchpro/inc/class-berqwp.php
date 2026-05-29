@@ -156,7 +156,7 @@ if (!class_exists('berqWP')) {
 
         function switch_optimization_method() {
             // Check if the user has the necessary nonce and the action matches
-			if (isset($_GET['action']) && $_GET['action'] === 'switch_optimization_method_local' && wp_verify_nonce($_GET['_wpnonce'], 'switch_optimization_method_local_action')) {
+			if (isset($_GET['action']) && $_GET['action'] === 'switch_optimization_method_local' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'switch_optimization_method_local_action')) {
 
 
 			    $berqconfigs = berqConfigs::getInstance();
@@ -169,7 +169,7 @@ if (!class_exists('berqWP')) {
 				exit;
 			}
 
-			if (isset($_GET['action']) && $_GET['action'] === 'switch_optimization_method_cloud' && wp_verify_nonce($_GET['_wpnonce'], 'switch_optimization_method_cloud_action')) {
+			if (isset($_GET['action']) && $_GET['action'] === 'switch_optimization_method_cloud' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'switch_optimization_method_cloud_action')) {
 
                 $berqconfigs = berqConfigs::getInstance();
                 $configs = $berqconfigs->get_configs();
@@ -379,7 +379,7 @@ if (!class_exists('berqWP')) {
 		function handle_refresh_license_action()
 		{
 			// Check if the user has the necessary nonce and the action matches
-			if (isset($_GET['action']) && $_GET['action'] === 'bwp_refresh_license' && wp_verify_nonce($_GET['_wpnonce'], 'bwp_refresh_license_action')) {
+			if (isset($_GET['action']) && $_GET['action'] === 'bwp_refresh_license' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'bwp_refresh_license_action')) {
 
 				// $transient_key = 'berq_lic_response_cache';
 				// $expire_transient_key = 'berq_lic_cache_expire';
@@ -405,6 +405,12 @@ if (!class_exists('berqWP')) {
 
 		function berqwp_get_optimized_pages()
 		{
+			check_ajax_referer('berqwp_get_optimized_pages_nonce', 'nonce');
+			if (!current_user_can('manage_options')) {
+				wp_send_json_error('Unauthorized', 403);
+				return;
+			}
+
 			if (!isset($_POST['start']) || !isset($_POST['length'])) {
 				wp_send_json_error('Invalid parameters');
 				return;
@@ -912,7 +918,7 @@ if (!class_exists('berqWP')) {
 						deactivate_plugins($plugin);
 					}
 				}
-				header('location: ' . esc_url(get_site_url() . add_query_arg($_GET)));
+				header('location: ' . esc_url(admin_url('admin.php') . add_query_arg(['page' => 'berqwp', 'tab_id' => sanitize_text_field(wp_unslash($_GET['tab_id'] ?? ''))])));
 				exit;
 			}
 		}
@@ -932,7 +938,7 @@ if (!class_exists('berqWP')) {
 			}
 
 			if (isset($_GET['dismiss_feedback'])) {
-				set_transient('bqwp_hide_feedback_notice', true, DAY_IN_SECONDS * 14);
+				set_transient('bwp_hide_feedback_notice', true, DAY_IN_SECONDS * 14);
 			}
 
 			if (isset($_GET['bwp_quit_feedback'])) {
@@ -982,7 +988,7 @@ if (!class_exists('berqWP')) {
 			// 	bwp_notice('warning', 'advanced-cache.php is not writable', "<p>$plugin_name can't write to wp-content/advanced-cache.php — please check file permissions or re-save settings to regenerate it.</p>", []);
 			// }
 
-			if (isset($_GET['page']) && $_GET['page'] == 'berqwp' && !get_transient('bqwp_hide_feedback_notice') && !get_option('bwp_quit_feedback') && $this->is_key_verified && bwp_show_account()) {
+			if (!get_transient('bwp_hide_feedback_notice') && !get_option('bwp_quit_feedback') && bwp_show_account()) {
 				bwp_notice('info bwp_feedback', 'Loving BerqWP\'s performance?', '<p>Show some love and help us grow 👉 - <a href="https://wordpress.org/support/plugin/searchpro/reviews/#new-post" target="_blank">Rate BerqWP Plugin</a>. Your insights shape our journey.</p>', [
 					[
 						'href' => 'https://wordpress.org/support/plugin/searchpro/reviews/#new-post',
@@ -1088,7 +1094,7 @@ if (!class_exists('berqWP')) {
 				echo '<div class="bwp-notice notice notice-error berqwp-plugin-conflict">';
 				echo wp_kses_post(__('<p><strong>BerqWP Plugin Conflict:</strong> The following plugins have a same nature as BerqWP plugin. Having multiple plugins of the same type can cause unexpected results.</p>', 'searchpro'));
 			?>
-				<form action="<?php echo esc_url(get_site_url() . add_query_arg($_GET)); ?>" method="post">
+				<form action="<?php echo esc_url(admin_url('admin.php') . add_query_arg(['page' => 'berqwp', 'tab_id' => sanitize_text_field(wp_unslash($_GET['tab_id'] ?? ''))])); ?>" method="post">
 
 					<?php
 					$my_nonce = wp_create_nonce('berqwp_plugins_deactivate');
@@ -1490,7 +1496,7 @@ if (!class_exists('berqWP')) {
 				'berqwp-network',
 				[$this, 'network_admin_page'],
 				'data:image/svg+xml;base64,' . base64_encode($svg),
-				10
+				80
 			);
 		}
 
@@ -1596,7 +1602,7 @@ if (!class_exists('berqWP')) {
 
 			$plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
-			add_menu_page($plugin_name, $plugin_name, 'manage_options', 'berqwp', [$this, 'admin_page'], 'data:image/svg+xml;base64,' . base64_encode($svg), 10);
+			add_menu_page($plugin_name, $plugin_name, 'manage_options', 'berqwp', [$this, 'admin_page'], 'data:image/svg+xml;base64,' . base64_encode($svg), 80);
 		}
 
 		function admin_page()

@@ -128,6 +128,10 @@ if (get_option('berqwp_enable_critical_css') === false) {
     update_option('berqwp_enable_critical_css', 1, false);
 }
 
+if (get_option('berqwp_enable_used_css') === false) {
+    update_option('berqwp_enable_used_css', 0, false);
+}
+
 if (get_option('berqwp_force_include_critical_css') === false) {
     update_option('berqwp_force_include_critical_css', [], false);
 }

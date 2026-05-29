@@ -88,7 +88,7 @@ class berqPageRules
                 <?php foreach ($rules as $index => $rule): ?>
                     <tr>
                         <td>
-                            <select name="berqwp_rules[<?php echo $index; ?>][action]">
+                            <select name="berqwp_rules[<?php echo esc_attr($index); ?>][action]">
                                 <option value="">—</option>
                                 <?php foreach ($actions as $key => $label): ?>
                                     <option value="<?php echo esc_attr($key); ?>" <?php selected($rule['action'] ?? '', $key); ?>>
@@ -98,7 +98,7 @@ class berqPageRules
                             </select>
                         </td>
                         <td>
-                            <select name="berqwp_rules[<?php echo $index; ?>][event]" class="berqwp-event">
+                            <select name="berqwp_rules[<?php echo esc_attr($index); ?>][event]" class="berqwp-event">
                                 <option value="">—</option>
                                 <?php foreach ($events as $key => $label): ?>
                                     <option value="<?php echo esc_attr($key); ?>" <?php selected($rule['event'] ?? '', $key); ?>>
@@ -108,7 +108,7 @@ class berqPageRules
                             </select>
                         </td>
                         <td>
-                            <select name="berqwp_rules[<?php echo $index; ?>][post_type]" class="berqwp-post-type">
+                            <select name="berqwp_rules[<?php echo esc_attr($index); ?>][post_type]" class="berqwp-post-type">
                                 <option value="">—</option>
                                 <?php foreach ($post_types as $key => $type): ?>
                                     <option value="<?php echo esc_attr($key); ?>" <?php selected($rule['post_type'] ?? '', $key); ?>>
@@ -169,7 +169,7 @@ class berqPageRules
 
     function save_rules($post_id)
     {
-        if (!isset($_POST['berqwp_rules_nonce']) || !wp_verify_nonce($_POST['berqwp_rules_nonce'], 'berqwp_rules_save')) return;
+        if (!isset($_POST['berqwp_rules_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['berqwp_rules_nonce'])), 'berqwp_rules_save')) return;
 
         $rules = get_option('berqwp_cache_rules');
         if (!is_array($rules)) $rules = [];

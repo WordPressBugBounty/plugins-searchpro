@@ -8,7 +8,7 @@ if (!defined('ABSPATH'))
         <div class="berqwp-webp-content">
             <div class="berq-box-content">
                 <h3 class="berq-box-title"><?php esc_html_e('WebP Conversion', 'searchpro'); ?></h3>
-                <p><?php esc_html_e("$plugin_name automatically converts images into the WebP format when creating the page cache. This helps improve website performance by reducing image file sizes without compromising quality. It does not modify the original images.", 'searchpro'); ?></p>
+                <p><?php printf( /* translators: %s: Plugin name */ esc_html__('%s automatically converts images into the WebP format when creating the page cache. This helps improve website performance by reducing image file sizes without compromising quality. It does not modify the original images.', 'searchpro'), esc_html($plugin_name) ); ?></p>
                 <table class="berq-image-settings">
                     <tr>
                         <td>

@@ -488,6 +488,12 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_enable_critical_css', 0);
     }
 
+    if (isset($_POST['berqwp_enable_used_css'])) {
+        update_option('berqwp_enable_used_css', 1);
+    } else {
+        update_option('berqwp_enable_used_css', 0);
+    }
+
     if (isset($_POST['berqwp_async_excluded_styles'])) {
         update_option('berqwp_async_excluded_styles', 1);
     } else {

@@ -81,7 +81,7 @@ class Cache
             return false;
         }
 
-        $endpoint = '';
+        $endpoint = 'cache/request';
 
         try {
             $requests = function ($post_data_arr) use ($endpoint) {

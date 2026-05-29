@@ -21,15 +21,43 @@ $exclude_third_party_js_lines = implode("\n", $exclude_third_party_js);
 ?>
 <div id="css-javascript" <?php bwp_is_tab('css-javascript'); ?>>
     <h2 class="berq-tab-title"><?php esc_html_e('CSS & JavaScript', 'searchpro'); ?></h2>
+    <?php if (!$berqwp_can_use_cloud): ?>
     <div class="berq-info-box berq-setting-group">
         <div class="group-container">
-            <h3 class="berq-box-title <?php echo !$berqwp_can_use_cloud ? 'cloud-exclusive' : ''; ?>">
+            <h3 class="berq-box-title">
+                <?php esc_html_e('Used CSS', 'searchpro'); ?>
+            </h3>
+            <div class="berq-box-content berq-setting-toggle">
+                <div class="berq-option-content">
+                    <p>
+                        <?php esc_html_e('Extract and inline only the CSS used on each page, then load remaining CSS based on the "CSS Delivery Method" setting.', 'searchpro'); ?>
+                    </p>
+                </div>
+                <?php berqwp_render_toggle('berqwp_enable_used_css', get_option('berqwp_enable_used_css')); ?>
+            </div>
+        </div>
+        <div class="group-container">
+            <h3 class="berq-box-title">
+                <?php esc_html_e('Force Include', 'searchpro'); ?>
+            </h3>
+            <div class="berq-box-content">
+                <p>
+                    <?php esc_html_e('Force include selectors in Used CSS. Enter regex, one per line.', 'searchpro'); ?>
+                </p>
+                <textarea name="berqwp_force_include_critical_css" cols="30" rows="10"><?php echo esc_textarea($include_critical_css_lines); ?></textarea>
+            </div>
+        </div>
+    </div>
+    <?php else: ?>
+    <div class="berq-info-box berq-setting-group">
+        <div class="group-container">
+            <h3 class="berq-box-title">
                 <?php esc_html_e('Generate Critical CSS', 'searchpro'); ?>
             </h3>
             <div class="berq-box-content berq-setting-toggle">
                 <div class="berq-option-content">
                     <p>
-                        <?php esc_html_e("Extract and inline the CSS needed to render above-the-fold content instantly, then load remaining CSS based on the \"CSS Delivery Method\" setting.", 'searchpro'); ?>
+                        <?php esc_html_e('Extract and inline the CSS needed to render above-the-fold content instantly, then load remaining CSS based on the "CSS Delivery Method" setting.', 'searchpro'); ?>
                     </p>
                 </div>
                 <?php berqwp_render_toggle('berqwp_enable_critical_css', get_option('berqwp_enable_critical_css')); ?>
@@ -46,8 +74,8 @@ $exclude_third_party_js_lines = implode("\n", $exclude_third_party_js);
                 <textarea name="berqwp_force_include_critical_css" cols="30" rows="10"><?php echo esc_textarea($include_critical_css_lines); ?></textarea>
             </div>
         </div>
-
     </div>
+    <?php endif; ?>
 
     <div class="berq-info-box berq-setting-group">
         <div class="group-container">
@@ -145,7 +173,7 @@ $exclude_third_party_js_lines = implode("\n", $exclude_third_party_js);
             </h3>
             <div class="berq-box-content">
                 <p>
-                    <?php esc_html_e("$plugin_name offers different JavaScript optimization modes, so every JavaScript-heavy website can unlock its true potential.", 'searchpro'); ?>
+                    <?php printf( /* translators: %s: Plugin name */ esc_html__('%s offers different JavaScript optimization modes, so every JavaScript-heavy website can unlock its true potential.', 'searchpro'), esc_html($plugin_name) ); ?>
                 </p>
                 <label class="berq-check">
                     <input type="radio" name="berqwp_javascript_execution_mode" value="4" <?php echo get_option('berqwp_javascript_execution_mode') == 4 ? 'checked' : ''; ?>>

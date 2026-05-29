@@ -30,7 +30,7 @@ class Cloudways extends berqIntegrations {
             $url = home_url();
         }
 
-        $host = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+        $host = !empty($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) : '';
         berqReverseProxyCache::purge_varnish_cache($url, ['127.0.0.1', $host], 'URLPURGE');
         return;
 
@@ -64,7 +64,7 @@ class Cloudways extends berqIntegrations {
         }
 
         $url = home_url('/.*');
-        $host = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+        $host = !empty($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) : '';
         berqReverseProxyCache::purge_varnish_cache($url, ['127.0.0.1', $host], 'PURGE');
         return;
 

@@ -149,7 +149,7 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                     <?php
                     wp_nonce_field('berqwp_save_settings', 'berqwp_save_nonce');
                     ?>
-                    <input type="hidden" name="bwp_current_tab_id" value="<?php echo !empty($_GET['tab_id']) ? sanitize_text_field($_GET['tab_id']) : 'dashboard'; ?>">
+                    <input type="hidden" name="bwp_current_tab_id" value="<?php echo !empty($_GET['tab_id']) ? esc_attr(sanitize_text_field(wp_unslash($_GET['tab_id']))) : 'dashboard'; ?>">
                     <?php
                     require_once optifer_PATH . '/admin/tabs/dashboard.php';
                     require_once optifer_PATH . '/admin/tabs/cache-management.php';
@@ -180,6 +180,7 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
             const bwp_controllers = [];
             // $('.bwp_feedback').hide();
             let berq_nounce = '<?php echo esc_html(wp_create_nonce('wp_rest')); ?>';
+            let bwp_pages_nonce = '<?php echo esc_html(wp_create_nonce('berqwp_get_optimized_pages_nonce')); ?>';
 
             window.addEventListener('beforeunload', () => {
                 bwp_controllers.forEach(c => c.abort());
@@ -410,6 +411,7 @@ if (function_exists('pll_current_language')) {
                         type: 'POST',
                         data: {
                             action: 'berqwp_get_optimized_pages',
+                            nonce: bwp_pages_nonce,
                             start: start,
                             length: length,
                             search: data.search.value

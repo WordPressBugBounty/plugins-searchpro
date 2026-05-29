@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && berqwp_can_use_cloud()) {
     global $berq_log;
 
     if (empty($license_key_hash) || empty($license_key) || $license_key_hash !== md5($license_key)) {
-        echo json_encode(['status' => 'error', 'msg' => 'Request authentication failed']);
+        echo wp_json_encode(['status' => 'error', 'msg' => 'Request authentication failed']);
         http_response_code(403);
         exit;
     }
@@ -48,13 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && berqwp_can_use_cloud()) {
     if ($status == 'success' && !empty($page_url) && $event == 'store_cache') {
 
         if (!bwp_can_optimize_page_url($page_url)) {
-            echo json_encode(['status' => 'error', 'msg' => 'Invalid page url.']);
+            echo wp_json_encode(['status' => 'error', 'msg' => 'Invalid page url.']);
             exit;
         }
 
         if (empty($html_url)) {
             $berq_log->info("Empty html url: $page_url");
-            echo json_encode(['status' => 'error', 'msg' => 'Empty html url']);
+            echo wp_json_encode(['status' => 'error', 'msg' => 'Empty html url']);
             exit;
         }
 
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && berqwp_can_use_cloud()) {
         // Check for errors
         if (is_wp_error($response) || $response_code !== 200) {
             $berq_log->info("Failed to download cache: $page_url");
-            echo json_encode(['status' => 'error', 'msg' => "Could not download html cache, $html_url"]);
+            echo wp_json_encode(['status' => 'error', 'msg' => "Could not download html cache, $html_url"]);
             exit;
         }
 
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && berqwp_can_use_cloud()) {
             delete_transient('berqwp_connection_status');
         }
 
-        echo json_encode(['status' => 'success']);
+        echo wp_json_encode(['status' => 'success']);
         exit;
     }
 }

@@ -1538,13 +1538,16 @@ class berqPageOptimizer {
             }
         }
 
-        $enable_critical_css = (bool) apply_filters('berqwp_local_critical_css', false);
+        $enable_used_css = (bool) apply_filters(
+            'berqwp_local_used_css',
+            apply_filters('berqwp_local_critical_css', (bool) get_option('berqwp_enable_used_css'))
+        );
 
-        if ($enable_critical_css && $this->settings['css_optimization'] !== 'disable') {
+        if ($enable_used_css && $this->settings['css_optimization'] !== 'disable') {
             $critical_css = new berqUsedCSS(get_option('home'));
             $critical_css->forceInclude($this->settings['force_include_critical_css']);
             $critical_css = $critical_css->process_css($buffer);
-            $critical_css = sprintf('<style data-berqwp-exclude id="berqwp-critical-css">%s</style>', $critical_css);
+            $critical_css = sprintf('<style data-berqwp-exclude id="berqwp-used-css">%s</style>', $critical_css);
     
             $buffer = berqwp_prependHtmlToHead($buffer, $critical_css);
             $buffer = $this->delay_styles($buffer);

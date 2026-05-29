@@ -32,7 +32,7 @@ $cache_lifespan = $configs['cache_lifespan'];
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Max. Cache Lifespan', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e("Set the maximum cache lifespan to control how long cached pages are stored before being refreshed. Note that {$plugin_name} automatically flushes the page cache when content is updated, so keeping the cache lifespan high is recommended.", 'searchpro'); ?></p>
+            <p><?php printf( /* translators: %s: Plugin name */ esc_html__('Set the maximum cache lifespan to control how long cached pages are stored before being refreshed. Note that %s automatically flushes the page cache when content is updated, so keeping the cache lifespan high is recommended.', 'searchpro'), esc_html($plugin_name) ); ?></p>
 
             <div class="berqwp-lifespan-options">
                 <label>
@@ -127,7 +127,7 @@ $cache_lifespan = $configs['cache_lifespan'];
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Exclude Cookies', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e("Prevent cached pages from being served when the following cookies are present. Enter a partial match or keyword from the cookie name to exclude it. Add one cookie ID per line. Example: woocommerce_cart_hash"); ?>
+            <p><?php esc_html_e("Prevent cached pages from being served when the following cookies are present. Enter a partial match or keyword from the cookie name to exclude it. Add one cookie ID per line. Example: woocommerce_cart_hash", 'searchpro'); ?>
 
             </p>
             <textarea name="berq_exclude_cookies" cols="30" rows="10"><?php echo esc_textarea($excluded_cookies); ?></textarea>
@@ -136,7 +136,7 @@ $cache_lifespan = $configs['cache_lifespan'];
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Ignore URL Parameters', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e("Ignore page URL parameters, these parameters will be disregarded and won't be cached separately. Enter one parameter per line."); ?>
+            <p><?php esc_html_e("Ignore page URL parameters, these parameters will be disregarded and won't be cached separately. Enter one parameter per line.", 'searchpro'); ?>
 
                 <?php if (bwp_show_docs()) { ?>
                     <a href="https://berqwp.com/help-center/ignore-url-parameters/" target="_blank"><?php esc_html_e('Learn more', 'searchpro'); ?></a>
