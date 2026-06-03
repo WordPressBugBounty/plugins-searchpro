@@ -980,6 +980,15 @@ if (!class_exists('berqCache')) {
                     exit();
                 }
 
+                // Prevent PHP/Apache from re-compressing the already-gzipped cache file
+                if (ini_get('zlib.output_compression')) {
+                    ini_set('zlib.output_compression', 'Off');
+                }
+                
+                while (ob_get_level()) {
+                    ob_end_clean();
+                }
+
                 header('Cache-Control: public, max-age=0, s-maxage=3600, must-revalidate', true);
                 header('Vary: Accept-Encoding, Cookie');
                 header('Content-Encoding: gzip', true);

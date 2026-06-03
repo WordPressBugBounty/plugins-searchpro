@@ -3,12 +3,12 @@ Contributors: berqwp, thevisionofhamza
 Tags: seo, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.0
-Stable tag: 4.0.26
+Stable tag: 4.0.27
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-BerqWP is a WordPress performance plugin that applies speed optimization techniques to improve page load times and Core Web Vitals scores. It offers local optimization (free, no account needed) and cloud optimization (paid, offloads processing to BerqWP servers).
+BerqWP is a WordPress performance plugin that applies speed optimization techniques to improve page load times and Core Web Vitals scores.
 
 == Description ==
 
@@ -24,10 +24,10 @@ https://youtu.be/DQrQcVleFrQ?si=zPZ-ZS21yOBmda61
 
 ## Features
 
-- Works with all popular WordPress themes and plugins
+- Works with all WordPress themes and plugins
+- All hostings are supported
 - SEO-friendly, no changes to your content
 - Supports Apache, Nginx, and LiteSpeed web servers
-- Compatible with Cloudflare, WooCommerce, multilingual plugins, and multisite networks
 - Sandbox mode to test optimizations without affecting real visitors
 
 ## 🔥 Local Optimization (Free):
@@ -88,6 +88,23 @@ https://youtu.be/DQrQcVleFrQ?si=zPZ-ZS21yOBmda61
 
 Cloud Optimization requires a license key. [Sign up for free plan](https://berqwp.com/free-account/?utm_source=wordpress-repo).
 
+## 👩‍💻 Real User Success Stories
+* **★★★★★ [BerqWP beat NitroPack, LiteSpeed Cache, WP Rocket, Perfmatters, FlyingPress….](https://wordpress.org/support/topic/berqwp-beat-nitropack-litespeed-cache-wp-rocket-perfmatters-flyingpress/)**
+_"BerqWP beat NitroPack, LiteSpeed Cache, WP Rocket, Perfmatters, FlyingPress, W3 Total Cache, Super Cache and more. On their homepage you can test your site speed and they will show you the expected Page Speed Insights score. In my experience, once BerqWP plugin is installed, your PSI scores will be higher than their estimate. Connect your Cloudflare free account and get Edge Page Caching. Then set to Aggressive mode and enjoy higher scores without changing a single setting. BerqWP is Voodoo Magic!"_
+
+* **★★★★★ [Consistent 100/100 score, Great support](https://wordpress.org/support/topic/consistent-100-100-score-great-support/)**
+_"I have tried multiple caching software programs, but none of them were so easy to set up, and the results are incomparable! I have reached out several times to the support. They always respond, sometimes you have to wait (decent time), sometimes within a day they respond and solve your issue instantly. Keep up the good work!"_
+
+* **★★★★★ [Working really great](https://wordpress.org/support/topic/working-really-great/)**
+_"Just bought the pro plugin and started using it replacing the 10web io which was great but expensive for me, I was just a little worried whether this one would work ok without conflicting with my current plugins so i tested the free version first and it worked fine. Good customer support as well. I would recommend the pro plugin but try the free one first and then decide."_
+
+* **★★★★★ [A must have](https://wordpress.org/support/topic/a-must-have-532/)**
+_"It’s been a while without writing a review from my side, but BerqWP deserves my 5 stars.It’s incredible easy to use, seriously, a newbie could make it work easily. It improves loading times dramatically, to the point that I don’t really understand what’s the magic behind it (I’m not joking). I always thought that a bit more speed could be achieved at my websites, but not this much. I wasn’t aware that the servers that I use for my sites were capable of this speeds, and I always thought that part of the issue was using medium servers instead of top notch ones.Thank you so much guys! Keep doing your magic, I’ll spread the word about you as I really want you to succeed and last forever. Oh, and I really can’t believe how your plugin can exceed that much what other premium plugins achieve (I tried quite a few)."_
+
+* **★★★★★ [Plugin is incredibly easy to use](https://wordpress.org/support/topic/plugin-is-incredibly-easy-to-use/)**
+_"The BerqWP plugin is incredibly easy to use, even for those who are not optimization experts. The setup is intuitive, and it works flawlessly, even on websites built with Elementor Pro, without causing any issues. Additionally, their support team is active and consistently responds to inquiries promptly, instilling confidence in the service."_
+
+**[See all reviews](https://wordpress.org/support/plugin/searchpro/reviews/)**
 
 ## ✅ Optimization Modes for Flexibility
 BerqWP offers four [optimization modes](https://berqwp.com/help-center/berqwp-optimization-modes/):
@@ -98,9 +115,6 @@ BerqWP offers four [optimization modes](https://berqwp.com/help-center/berqwp-op
 * **Turbo** – Delayed CSS and JavaScript for minimal initial requests and best possible performance.
 
 For best results, we recommend starting with **Turbo mode**, but stepping down to Blaze or Smart can help if compatibility issues arise.
-
-
-**[See all reviews](https://wordpress.org/support/plugin/searchpro/reviews/)**
 
 
 ## ⚙️ How to set up BerqWP in 4 simple steps?
@@ -189,6 +203,10 @@ Data sent: Your license key and site URL, only when activating or refreshing a l
 7. Integration
 
 == Changelog ==
+
+= 4.0.27 =
+* [Enhancement] Add cache header for locally hosted static files
+* [Bug] Fixed raw gzip being delivered on Apache.
 
 = 4.0.26 =
 * [Enhancement] Used CSS is now available for local optimization mode
