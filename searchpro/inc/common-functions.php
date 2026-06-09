@@ -170,6 +170,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
 
                 // header('Cache-Control: public, max-age=0, s-maxage=3600, must-revalidate', true);
                 header('Cache-Control: public, max-age=60, s-maxage=3600, stale-while-revalidate=60, must-revalidate', true);
+                // header("Content-Security-Policy: script-src 'self' blob: 'unsafe-inline'");
                 header('Vary: Accept-Encoding, Cookie');
                 header('Content-Encoding: gzip', true);
                 header('Content-Length: ' . filesize($cache_file), true);

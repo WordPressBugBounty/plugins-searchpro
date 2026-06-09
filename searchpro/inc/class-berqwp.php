@@ -1181,7 +1181,7 @@ if (!class_exists('berqWP')) {
 				]);
 
 				if (is_wp_error($lic_response)) {
-                    $berq_log->info("Couldn't reach BerqWP server.");
+                    $berq_log->info("Couldn't reach BerqWP server.".print_r($lic_response, true));
                     return;
                 }
 	

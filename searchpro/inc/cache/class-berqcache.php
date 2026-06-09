@@ -990,6 +990,7 @@ if (!class_exists('berqCache')) {
                 }
 
                 header('Cache-Control: public, max-age=0, s-maxage=3600, must-revalidate', true);
+                // header("Content-Security-Policy: script-src 'self' blob: 'unsafe-inline'");
                 header('Vary: Accept-Encoding, Cookie');
                 header('Content-Encoding: gzip', true);
                 header('Content-Length: ' . filesize($cache_file), true);

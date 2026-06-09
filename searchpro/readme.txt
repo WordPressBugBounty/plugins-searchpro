@@ -1,9 +1,9 @@
-=== BerqWP - Automatic Website Speed Optimization ===
+=== BerqWP - Automatic WordPress Website Speed Optimization ===
 Contributors: berqwp, thevisionofhamza
 Tags: seo, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.0
-Stable tag: 4.0.27
+Stable tag: 4.0.28
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -21,6 +21,14 @@ BerqWP offers two optimization modes:
 
 ## Demo
 https://youtu.be/DQrQcVleFrQ?si=zPZ-ZS21yOBmda61
+
+## Compatible Themes & Plugins
+
+BerqWP works with all WordPress themes and plugins. Here are just a few popular ones:
+
+**Themes:** Astra, GeneratePress, Divi, OceanWP, Kadence, Neve, Blocksy, Hello Elementor, and more.
+
+**Plugins:** Yoast SEO, Rank Math, All in One SEO, WooCommerce, Elementor, Divi Builder, Polylang, WPML, TranslatePress, Cloudflare, Complianz, CookieYes, and more.
 
 ## Features
 
@@ -178,6 +186,9 @@ No worries, we have a dedicated support team ready to help you with any assistan
 = I’m a free user and need your help. =
 Please create a support ticket via https://wordpress.org/support/plugin/searchpro/ so we can assist you.
 
+= Where do I report security bugs found in this plugin? =
+Please report security bugs found in the source code of the BerqWP plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/1f596c21-7f77-46cf-a109-eaf488b31eca). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+
 == External Services ==
 
 This plugin connects to BerqWP's cloud servers to provide optimization services. These connections only occur when Cloud Optimization mode is enabled with a valid license key.
@@ -193,6 +204,12 @@ Data sent: Your license key and site URL, only when activating or refreshing a l
 - [Terms and Conditions](https://berqwp.com/terms-conditions/)
 - [Privacy Policy](https://berqwp.com/privacy-policy/)
 
+== Compatible Themes & Plugins ==
+
+**Themes:** Astra, GeneratePress, Divi, OceanWP, Kadence, Neve, Blocksy, Hello Elementor
+
+**Plugins:** Yoast SEO, Rank Math, All in One SEO, WooCommerce, Elementor, Divi Builder, Polylang, WPML, TranslatePress, Cloudflare, Complianz, CookieYes
+
 == Screenshots ==
 1. Hero image
 2. Dashboard
@@ -203,6 +220,9 @@ Data sent: Your license key and site URL, only when activating or refreshing a l
 7. Integration
 
 == Changelog ==
+
+= 4.0.28 =
+* [Enhancement] Added "Flora v2" JavaScript execution mode.
 
 = 4.0.27 =
 * [Enhancement] Add cache header for locally hosted static files

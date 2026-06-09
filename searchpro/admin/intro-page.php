@@ -81,15 +81,15 @@ do_action('berqwp_notices');
 
         <?php endif; ?>
         <div class="cta-btns" style="display: none;">
-            <a href="https://berqwp.com/pricing/" class="btn" target="_blank">
+            <a href="https://berqwp.com/pricing/?source=plugin-intro-page" class="btn" target="_blank">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M12 8L15 13.2L18 10.5L17.3 14H6.7L6 10.5L9 13.2L12 8ZM12 4L8.5 10L3 5L5 16H19L21 5L15.5 10L12 4ZM19 18H5V19C5 19.6 5.4 20 6 20H18C18.6 20 19 19.6 19 19V18Z"
                         fill="white" />
                 </svg>
-                Purchase Premium (Free Trial)
+                Purchase Premium
             </a>
-            <!-- <a href="https://berqwp.com/free-account/" class="btn" target="_blank">
+            <a href="https://berqwp.com/free-account/?source=plugin-intro-page" class="btn" target="_blank">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H5.17L4 17.17V4H20V16Z"
@@ -99,7 +99,7 @@ do_action('berqwp_notices');
                 </svg>
 
                 Get Free Account
-            </a> -->
+            </a>
         </div>
     </div>
 </div>

@@ -176,6 +176,10 @@ $exclude_third_party_js_lines = implode("\n", $exclude_third_party_js);
                     <?php printf( /* translators: %s: Plugin name */ esc_html__('%s offers different JavaScript optimization modes, so every JavaScript-heavy website can unlock its true potential.', 'searchpro'), esc_html($plugin_name) ); ?>
                 </p>
                 <label class="berq-check">
+                    <input type="radio" name="berqwp_javascript_execution_mode" value="5" <?php echo get_option('berqwp_javascript_execution_mode') == 5 ? 'checked' : ''; ?>>
+                    <?php esc_html_e('Flora v2 - High Compatibility', 'searchpro'); ?>
+                </label>
+                <label class="berq-check">
                     <input type="radio" name="berqwp_javascript_execution_mode" value="4" <?php echo get_option('berqwp_javascript_execution_mode') == 4 ? 'checked' : ''; ?>>
                     <?php esc_html_e('Flora - High Compatibility (Default)', 'searchpro'); ?>
                 </label>
