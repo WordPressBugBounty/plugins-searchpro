@@ -3,24 +3,28 @@ Contributors: berqwp, thevisionofhamza
 Tags: seo, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.0
-Stable tag: 4.0.28
+Stable tag: 4.0.29
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-BerqWP is a WordPress performance plugin that applies speed optimization techniques to improve page load times and Core Web Vitals scores.
+All-in-one performance plugin to speed up your website automatically for SEO and Core Web Vitals.
 
 == Description ==
 
-[BerqWP](https://berqwp.com/?utm_source=wordpress-repo) is a WordPress performance plugin that applies speed optimization techniques recommended by [Google (web.dev)](https://web.dev/performance). It includes full-page caching, image lazy loading, LCP preloading, CSS/JS optimization, and more.
+[BerqWP](https://berqwp.com/?utm_source=wordpress-repo) is an **all-in-one WordPress performance plugin** that automatically optimizes your website for 90+ PageSpeed scores on mobile and desktop, passing Core Web Vitals to improve your search engine rankings.
 
-BerqWP offers two optimization modes:
+It handles everything including full-page caching, image optimization, LCP preloading and CSS/JS minification so you get a fast website without touching a single line of code.
+
+**No more juggling multiple plugins for caching, image optimization, minification and CDN. BerqWP replaces them all.**
+
+BerqWP offers two optimization methods:
 
 - **Local Optimization (Free):** All optimization runs on your server. No account or license key required.
 - **Cloud Optimization (Paid):** Offloads page processing to BerqWP’s servers for additional features like WebP conversion, Fluid Images, Critical CSS, CDN, and Web Vitals Analytics.
 
-## Demo
-https://youtu.be/DQrQcVleFrQ?si=zPZ-ZS21yOBmda61
+## Why Cloud Optimization
+On high traffic websites, cache becomes stale fast. Every new post, comment or content edit triggers a cache rebuild which puts heavy load on your server and can slow your site down or take it offline entirely. With Cloud Optimization, all processing happens on BerqWP's servers so your server stays free to do what it does best: serve your visitors.
 
 ## Compatible Themes & Plugins
 
@@ -48,7 +52,7 @@ BerqWP works with all WordPress themes and plugins. Here are just a few popular 
 
 - **Server-side Cache:** Delivers static cache files directly from your web server without hitting PHP & database, making loading lightning fast. Automatically configures cache rules for Apache, supports Nginx cache as well.
 
-- **Used CSS:** Extracts and inlines only the CSS used on each page, then loads remaining CSS based on your CSS Delivery Method setting. Can be enabled in the CSS & JavaScript tab when using Local Optimization. Also available via PHP filter: `add_filter( 'berqwp_local_used_css', '__return_true' );`
+- **Used CSS:** Extracts and inlines only the CSS used on each page, then loads remaining CSS based on your CSS Delivery Method setting. Can be enabled in the CSS & JavaScript tab when using Local Optimization.
 
 - **Speculative API:** BerqWP makes returning visitors' experience instantly fast by using the browser's Speculative API, loading the webpage literally within milliseconds.
 
@@ -220,6 +224,9 @@ Data sent: Your license key and site URL, only when activating or refreshing a l
 7. Integration
 
 == Changelog ==
+
+= 4.0.29 =
+* [Enhancement] UX improvements.
 
 = 4.0.28 =
 * [Enhancement] Added "Flora v2" JavaScript execution mode.

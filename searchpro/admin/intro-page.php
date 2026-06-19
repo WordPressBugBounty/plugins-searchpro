@@ -30,9 +30,9 @@ do_action('berqwp_notices');
                 <?php wp_nonce_field('berqwp_save_settings', 'berqwp_save_nonce'); ?>
                 <input type="hidden" name="berqwp_intro_page" value="1">
                 <div class="optimization-method-block">
-                    <h3>Choose Optimization Method:</h3>
-                    <p>Run optimization locally for free, or use BerqWP cloud for better performance and full feature access.</p>
-                    <div class="optimization-method-options">
+                    <!-- <h3>Choose Optimization Method:</h3> -->
+                    <p>Continue with free optimization or activate license key for premium performance and full feature access.</p>
+                    <div class="optimization-method-options" style="display:none">
                         <input type="radio" id="berqwp-om-local" name="berqwp_optimization_method" value="local">
                         <label for="berqwp-om-local" class="optimization-method">
                             <div class="icon">
@@ -45,7 +45,7 @@ do_action('berqwp_notices');
                             </div>
                             Optimize locally (free)
                         </label>
-                        <input type="radio" id="berqwp-om-cloud" name="berqwp_optimization_method" value="cloud">
+                        <input type="radio" id="berqwp-om-cloud" name="berqwp_optimization_method" value="cloud" checked>
                         <label for="berqwp-om-cloud" class="optimization-method">
                             <div class="icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cloudy-icon lucide-cloudy">
@@ -75,14 +75,14 @@ do_action('berqwp_notices');
                         echo wp_kses_post('<p style="color:red">' . $error . '</p>');
                     }
                     ?>
-                    <p class="license-msg" style="text-align: center;">Create an account to obtain a <a href="https://berqwp.com/pricing/" target="_blank">BerqWP license key</a>.</p>
+                    <p class="license-msg" style="text-align: center;">Create an account to obtain a <a href="https://berqwp.com/pricing/?source=plugin-intro-page" target="_blank">BerqWP license key</a>.</p>
                 </div>
             </form>
 
         <?php endif; ?>
-        <div class="cta-btns" style="display: none;">
+        <div class="cta-btns">
             <a href="https://berqwp.com/pricing/?source=plugin-intro-page" class="btn" target="_blank">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M12 8L15 13.2L18 10.5L17.3 14H6.7L6 10.5L9 13.2L12 8ZM12 4L8.5 10L3 5L5 16H19L21 5L15.5 10L12 4ZM19 18H5V19C5 19.6 5.4 20 6 20H18C18.6 20 19 19.6 19 19V18Z"
                         fill="white" />
@@ -90,7 +90,7 @@ do_action('berqwp_notices');
                 Purchase Premium
             </a>
             <a href="https://berqwp.com/free-account/?source=plugin-intro-page" class="btn" target="_blank">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H5.17L4 17.17V4H20V16Z"
                         fill="white" />
@@ -98,8 +98,12 @@ do_action('berqwp_notices');
                         fill="white" />
                 </svg>
 
-                Get Free Account
+                Try Premium for Free
             </a>
+        </div>
+
+        <div class="berqwp-continue-free">
+            <a href="<?php echo esc_attr(admin_url('admin.php?page=berqwp&activate-free')); ?>">Continue with free optimization</a>
         </div>
     </div>
 </div>

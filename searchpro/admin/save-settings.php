@@ -482,10 +482,22 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_preload_yt_poster', 0);
     }
 
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_enable_critical_css')) {
+        $berq_log->info('Updated berqwp_enable_critical_css');
+        update_option('bwp_require_flush_cache', 1);
+    }
+
     if (isset($_POST['berqwp_enable_critical_css'])) {
         update_option('berqwp_enable_critical_css', 1);
     } else {
         update_option('berqwp_enable_critical_css', 0);
+    }
+
+    // If the option is changed require flush cache
+    if (bwp_is_option_updated('berqwp_enable_used_css')) {
+        $berq_log->info('Updated berqwp_enable_used_css');
+        update_option('bwp_require_flush_cache', 1);
     }
 
     if (isset($_POST['berqwp_enable_used_css'])) {

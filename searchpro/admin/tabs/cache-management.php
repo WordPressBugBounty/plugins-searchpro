@@ -13,7 +13,9 @@ $post_type_names = get_post_types(array(
     'public' => true,
     // 'exclude_from_search' => false,
 ), 'names');
+
 unset($post_type_names['attachment']);
+unset($post_type_names['e-floating-buttons']);
 
 $taxonomy_names = get_taxonomies([
     'public'             => true,
@@ -78,7 +80,7 @@ $cache_lifespan = $configs['cache_lifespan'];
     <div class="berq-info-box">
         <h3 class="berq-box-title"><?php esc_html_e('Page Exclusions', 'searchpro'); ?></h3>
         <div class="berq-box-content">
-            <p><?php esc_html_e('Exclude pages from caching. Enter one page URL per line. You can use a wildcard by adding *. For example: https://yoursite.com/campaign/*', 'searchpro'); ?>
+            <p><?php esc_html_e('Exclude pages from cache. Enter one page URL per line. You can use a wildcard by adding *. For example: https://yoursite.com/campaign/*', 'searchpro'); ?>
 
                 <?php if (bwp_show_docs()) { ?>
                     <a href="https://berqwp.com/help-center/exclude-pages-from-being-cached/" target="_blank"><?php esc_html_e('Learn more', 'searchpro'); ?></a>

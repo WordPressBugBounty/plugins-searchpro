@@ -1639,19 +1639,19 @@ function bwp_is_tab($tab_id)
     if (!empty($_GET['tab_id'])) {
         if (sanitize_text_field($_GET['tab_id']) == $tab_id) {
             // echo ' style="display:block" ';
-            echo ' style="visibility:visible;opacity:1;height:auto;" ';
+            echo ' style="visibility:visible;opacity:1;height:auto;display:block;" ';
         } else {
             // echo ' style="display:none" ';
-            echo ' style="visibility:hidden;opacity:0;height:0;overflow:hidden;" ';
+            echo ' style="visibility:hidden;opacity:0;height:0;overflow:hidden;display:none;" ';
         }
     } else {
 
         if ($tab_id == $default_tab) {
             // echo ' style="display:block" ';
-            echo ' style="visibility:visible;opacity:1;height:auto;" ';
+            echo ' style="visibility:visible;opacity:1;height:auto;display:block;" ';
         } else {
             // echo ' style="display:none" ';
-            echo ' style="visibility:hidden;opacity:0;height:0;overflow:hidden;" ';
+            echo ' style="visibility:hidden;opacity:0;height:0;overflow:hidden;display:none;" ';
         }
     }
 }

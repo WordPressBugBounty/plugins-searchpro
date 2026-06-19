@@ -1517,7 +1517,7 @@ class berqPageOptimizer {
         }
 
         if ($this->settings['youtube_lazyloading']) {
-            $buffer = $this->lazy_load_iframes($buffer);
+            // $buffer = $this->lazy_load_iframes($buffer);
         }
 
         if ($this->settings['css_optimization'] == 'auto') {
@@ -1542,6 +1542,8 @@ class berqPageOptimizer {
             'berqwp_local_used_css',
             apply_filters('berqwp_local_critical_css', (bool) get_option('berqwp_enable_used_css'))
         );
+
+        // $enable_used_css = false; // disable
 
         if ($enable_used_css && $this->settings['css_optimization'] !== 'disable') {
             $critical_css = new berqUsedCSS(get_option('home'));

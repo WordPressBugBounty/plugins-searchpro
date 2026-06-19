@@ -21,8 +21,8 @@ $exclude_third_party_js_lines = implode("\n", $exclude_third_party_js);
 ?>
 <div id="css-javascript" <?php bwp_is_tab('css-javascript'); ?>>
     <h2 class="berq-tab-title"><?php esc_html_e('CSS & JavaScript', 'searchpro'); ?></h2>
-    <?php if (!$berqwp_can_use_cloud): ?>
-    <div class="berq-info-box berq-setting-group">
+
+    <div class="berq-info-box berq-setting-group" style="<?php echo $berqwp_can_use_cloud ? 'display:none!important;' : '' ?>" >
         <div class="group-container">
             <h3 class="berq-box-title">
                 <?php esc_html_e('Used CSS', 'searchpro'); ?>
@@ -48,8 +48,8 @@ $exclude_third_party_js_lines = implode("\n", $exclude_third_party_js);
             </div>
         </div>
     </div>
-    <?php else: ?>
-    <div class="berq-info-box berq-setting-group">
+
+    <div class="berq-info-box berq-setting-group" style="<?php echo !$berqwp_can_use_cloud ? 'display:none!important;' : '' ?>">
         <div class="group-container">
             <h3 class="berq-box-title">
                 <?php esc_html_e('Generate Critical CSS', 'searchpro'); ?>
@@ -75,7 +75,6 @@ $exclude_third_party_js_lines = implode("\n", $exclude_third_party_js);
             </div>
         </div>
     </div>
-    <?php endif; ?>
 
     <div class="berq-info-box berq-setting-group">
         <div class="group-container">

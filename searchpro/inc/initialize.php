@@ -52,7 +52,7 @@ if (get_option('berqwp_lazyload_youtube_embed') === false) {
 }
 
 if (get_option('berqwp_fluid_images') === false) {
-    update_option('berqwp_fluid_images', 0, false);
+    update_option('berqwp_fluid_images', 1, false);
 }
 
 if (get_option('berqwp_preload_yt_poster') === false) {
@@ -71,8 +71,55 @@ if (get_option('berq_opt_mode') === false) {
     update_option('berq_opt_mode', 2, false);
 }
 
+if (get_option('berqwp_optimize_taxonomies') === false) {
+
+    $taxonomy_names = get_taxonomies([
+        'public'             => true,
+        'publicly_queryable' => true,
+        'rewrite'            => true,
+        'show_ui'            => true, // optional but useful
+    ], 'names');
+
+    $taxonomy_names = array_keys($taxonomy_names);
+
+    update_option('berqwp_optimize_taxonomies', $taxonomy_names, false);
+
+}
+
 if (get_option('berqwp_optimize_post_types') === false) {
-    update_option('berqwp_optimize_post_types', ['post', 'page', 'product'], false);
+    // update_option('berqwp_optimize_post_types', ['post', 'page', 'product'], false);
+
+    $post_type_names = get_post_types(array(
+        'public' => true,
+        'exclude_from_search' => false,
+    ), 'names');
+    unset($post_type_names['attachment']);
+    unset($post_type_names['e-floating-buttons']);
+
+    $post_type_names = array_keys($post_type_names);
+    $post_type_names = array_merge($post_type_names, ['post', 'page']);
+    $post_type_names = array_unique($post_type_names);
+
+    $post_type_names = array_filter($post_type_names, function ($slug) {
+        // Get a sample post of this type
+        $sample = get_posts( [
+            'post_type'      => $slug,
+            'posts_per_page' => 1,
+            'post_status'    => 'publish',
+        ] );
+
+        if ( empty( $sample ) ) {
+            return false;
+        }
+
+        $url = get_permalink( $sample[0]->ID );
+
+        return strpos($url, '?') === false;
+
+    });
+
+    update_option('berqwp_optimize_post_types', $post_type_names, false);
+
 }
 
 // if (get_option('berq_exclude_js_css') === false) {
@@ -165,7 +212,7 @@ if (get_option('berqwp_defer_excluded_styles') === false) {
 }
 
 if (get_option('berqwp_defer_excluded_js') === false) {
-    update_option('berqwp_defer_excluded_js', 1, false);
+    update_option('berqwp_defer_excluded_js', 0, false);
 }
 
 if (get_option('berqwp_delay_third_party_scripts') === false) {

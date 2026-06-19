@@ -904,13 +904,13 @@ table.berq-image-settings {
 }
 #berqwp-intro .cta-btns a.btn {
   background: #1f71ff;
-  border-radius: 6px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
   color: #fff;
   padding: 15px 30px;
-  font-size: 18px;
+  font-size: 16px;
   text-decoration: none;
 }
 #berqwp-intro .cta-btns a.btn:hover {
@@ -1234,12 +1234,15 @@ div#wpcontent {
   align-content: center;
   background-color: #1f71ff;
   color: #fff;
-  padding: 8px 16px;
+  padding: 10px 16px;
   border-radius: 8px;
   gap: 6px;
   transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s all;
   text-decoration: none !important;
   border: 1px solid transparent;
+}
+.bwp-action-btn .icon {
+  display: flex;
 }
 .bwp-action-btn.light {
   background-color: #fff;
@@ -1254,6 +1257,11 @@ div#wpcontent {
 .bwp-action-btn svg {
   width: 15px;
   height: auto;
+}
+.bwp-action-btn.bwp-upgrade-btn {
+  background: #4d1fff;
+  color: #fff;
+  border-color: #4d1fff;
 }
 
 .berq-triple-boxes {
@@ -1382,7 +1390,7 @@ a.berq-stat-refresh svg {
 }
 
 .berq-box-title.cloud-exclusive::after {
-  content: "Cloud exclusive";
+  content: "Premium";
   font-weight: normal;
   font-size: 12px;
   margin-left: 10px;
@@ -1393,4 +1401,10 @@ a.berq-stat-refresh svg {
   margin-top: 0px !important;
   display: inline-block;
   position: absolute;
+}
+
+.berqwp-continue-free {
+  text-align: center;
+  font-size: 15px;
+  margin-top: 16px;
 }/*# sourceMappingURL=style.css.map */

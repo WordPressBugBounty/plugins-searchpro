@@ -154,6 +154,22 @@ if (!class_exists('berqWP')) {
             return self::$instance;
         }
 
+		function upgrade_notice() {
+
+			if (!berqwp_can_use_cloud()) {
+				return;
+			}
+
+			if (empty($this->key_response->product_ref)) {
+				return;
+			}
+			
+			if ($this->key_response->product_ref == 'Free Account' && bwp_cached_pages_count() >= 10) {
+
+				bwp_notice('warning', 'Free Plan Limit Reached', "<p>You've reached the limit of 10 optimized pages for your free BerqWP account. Upgrade now to optimize unlimited pages and get the best performance for your entire site!</p>");
+            }
+		}
+
         function switch_optimization_method() {
             // Check if the user has the necessary nonce and the action matches
 			if (isset($_GET['action']) && $_GET['action'] === 'switch_optimization_method_local' && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'switch_optimization_method_local_action')) {
@@ -161,6 +177,9 @@ if (!class_exists('berqWP')) {
 
 			    $berqconfigs = berqConfigs::getInstance();
 				$berqconfigs->update_configs(['optimization_method' => 'local']);
+
+				// Require flush cache
+				update_option('bwp_require_flush_cache', 1);
 
 				$redirect_url = wp_get_referer();
 
@@ -180,6 +199,8 @@ if (!class_exists('berqWP')) {
                     $berqconfigs->update_configs(['optimization_method' => 'cloud']);
                 }
 
+				// Require flush cache
+				update_option('bwp_require_flush_cache', 1);
 
 				$redirect_url = wp_get_referer();
 
@@ -925,6 +946,16 @@ if (!class_exists('berqWP')) {
 
 		function save_settings()
 		{
+
+			if (!empty($_GET['page']) && $_GET['page'] == 'berqwp' && isset($_GET['activate-free'])) {
+				$berqconfigs = berqConfigs::getInstance();
+				$berqconfigs->update_configs(['optimization_method' => 'local']);
+
+				$location = get_admin_url() . 'admin.php?page=berqwp';
+				wp_safe_redirect($location);
+				exit;
+			}
+
 			require_once optifer_PATH . '/admin/save-settings.php';
 		}
 
@@ -932,6 +963,8 @@ if (!class_exists('berqWP')) {
 		{
 
 			$plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
+
+			$this->upgrade_notice();
 
 			if (isset($_GET['berqwp_page_compression_enabled'])) {
 				bwp_notice('success', 'Page Compression Enabled', "<p>Page compression has been successfully enabled on your website.</p>");
@@ -988,7 +1021,11 @@ if (!class_exists('berqWP')) {
 			// 	bwp_notice('warning', 'advanced-cache.php is not writable', "<p>$plugin_name can't write to wp-content/advanced-cache.php — please check file permissions or re-save settings to regenerate it.</p>", []);
 			// }
 
-			if (!get_transient('bwp_hide_feedback_notice') && !get_option('bwp_quit_feedback') && bwp_show_account()) {
+			$berqconfigs = berqConfigs::getInstance();
+            $configs = $berqconfigs->get_configs();
+            $readyForCache = !empty($configs['optimization_method']);
+
+			if ($readyForCache && bwp_is_home_cached() && !get_transient('bwp_hide_feedback_notice') && !get_option('bwp_quit_feedback') && bwp_show_account()) {
 				bwp_notice('info bwp_feedback', 'Loving BerqWP\'s performance?', '<p>Show some love and help us grow 👉 - <a href="https://wordpress.org/support/plugin/searchpro/reviews/#new-post" target="_blank">Rate BerqWP Plugin</a>. Your insights shape our journey.</p>', [
 					[
 						'href' => 'https://wordpress.org/support/plugin/searchpro/reviews/#new-post',
@@ -998,7 +1035,7 @@ if (!class_exists('berqWP')) {
 					],
 					[
 						'href' => get_admin_url() . 'admin.php?page=berqwp&bwp_quit_feedback',
-						'text' => '👍 Already did',
+						'text' => '👍 Already done',
 						'classes' => '',
 						'target' => '',
 					],
@@ -1058,14 +1095,24 @@ if (!class_exists('berqWP')) {
 				bwp_notice('success', '', "<p>The cache for page ($forced_page) has been queued with high priority and will be generated soon.</p>", []);
 			}
 
-			if (get_option('bwp_require_flush_cache', false)) {
-				bwp_notice('warning', 'Cache Flush Required', '<p>To apply the changes, please flush the cache.</p>', [
+			if ($readyForCache && get_option('bwp_require_flush_cache', false)) {
+				$cache_rebuild_btns = [
 					[
 						'href' => esc_attr(wp_nonce_url(admin_url('admin-post.php?action=clear_cache'), 'clear_cache_action')),
 						'text' => 'Flush cache',
 						'classes' => '',
 					]
-				]);
+				];
+
+				if (berqwp_can_use_cloud()) {
+					$cache_rebuild_btns[] = [
+						'href' => esc_attr(wp_nonce_url(admin_url('admin-post.php?action=warmup_cache'), 'warmup_cache_action')),
+						'text' => 'Warmup cache',
+						'classes' => '',
+					];
+				}
+
+				bwp_notice('warning', 'Cache Flush Required', '<p>To apply the changes, please flush the cache.</p>', $cache_rebuild_btns);
 			}
 
 			if (berq_is_localhost() && berqwp_can_use_cloud()) {

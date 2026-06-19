@@ -37,14 +37,14 @@ if ($cached_percentage < 0) {
 <div id="dashboard" <?php bwp_is_tab('dashboard'); ?>>
     <h2 class="berq-tab-title">Dashboard</h2>
 
-    <?php if (bwp_show_docs()) { ?>
-    <!--<div class="berq-info-box guide">
+    <?php if (bwp_show_docs() && $berqwp_can_use_cloud) { ?>
+    <div class="berq-info-box guide">
         <div class="berq-box-content">
             <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-marked-icon lucide-book-marked"><path d="M10 2v8l3-3 3 3V2"/><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg></div>
             <p><?php esc_html_e('Guide:', 'searchpro'); ?> <a href="https://berqwp.com/help-center/get-started-with-berqwp/" target="_blank"><?php esc_html_e('Get Started With BerqWP', 'searchpro'); ?></a></p>
         </div>
 
-    </div>-->
+    </div>
     <?php } ?>
 
     <?php
