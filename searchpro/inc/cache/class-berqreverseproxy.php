@@ -9,7 +9,7 @@ class berqReverseProxyCache
 
     public static function handle_bypass()
     {
-		if (headers_sent()) {                                                                                                                                                
+		if (headers_sent()) {
 			return;
 		}
 

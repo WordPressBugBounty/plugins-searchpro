@@ -1480,6 +1480,7 @@ function bwp_get_sitemap()
         $berqconfigs = berqConfigs::getInstance();
         $configs = $berqconfigs->get_configs();
         $post_params['cache_lifespan'] = $configs['cache_lifespan'];
+        $post_params['sandbox'] = get_option('berqwp_enable_sandbox');
 
         if ($query->have_posts()) {
             $sitemap_urls = [];
@@ -1888,9 +1889,25 @@ Deny from all
     Order allow,deny
     Allow from all
 </FilesMatch>
+
+# Block PHP execution and dot-files to prevent webshell deployment
+<FilesMatch "\.php\d*$|\.phtml$|\.phar$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
 HTACCESS;
 
     file_put_contents($cache_dir . '.htaccess', $rules);
+
+    // Suppress directory listing
+    $index_stub = $cache_dir . 'index.php';
+    if (!file_exists($index_stub)) {
+        file_put_contents($index_stub, '<?php // Silence is golden');
+    }
 }
 
 function bwp_write_htaccess_rules($ignore_sandbox = false)
@@ -1910,6 +1927,7 @@ function bwp_write_htaccess_rules($ignore_sandbox = false)
         '    RewriteCond %{REQUEST_METHOD} !POST',
         '    RewriteCond %{QUERY_STRING} ^$',
         '    RewriteCond %{HTTP_COOKIE} !(wp\-postpass|wordpress_logged_in|comment_author|woocommerce_cart_hash|edd_items_in_cart) [NC]',
+        '    RewriteCond %{HTTP_USER_AGENT} !(Googlebot|Google-InspectionTool|Bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Applebot|AhrefsBot|SemrushBot|MJ12bot|DotBot|PetalBot|BLEXBot|archive\.org_bot|UptimeRobot|Pingdom|ChatGPT-User|GPTBot|ClaudeBot|Bytespider) [NC]',
         '    RewriteCond %{DOCUMENT_ROOT}/wp-content/cache/berqwp/html/%{HTTP_HOST}%{REQUEST_URI}/index.html.gz -f',
         '    RewriteRule .* /wp-content/cache/berqwp/html/%{HTTP_HOST}%{REQUEST_URI}/index.html.gz [L]',
         '</IfModule>',
@@ -1924,6 +1942,7 @@ function bwp_write_htaccess_rules($ignore_sandbox = false)
         '        Header set X-Served "server"',
         '        Header set Content-Encoding "gzip"',
         '        Header set Vary "Accept-Encoding, Cookie"',
+        '        Header set CDN-Cache-Control "max-age=2592000"',
         '        Header set Cache-Control "public, max-age=0, s-maxage=3600, must-revalidate"',
         '        Header set X-Content-Type-Options "nosniff"',
         '    </FilesMatch>',

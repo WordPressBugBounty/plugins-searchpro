@@ -31,7 +31,7 @@ do_action('berqwp_notices');
                 <input type="hidden" name="berqwp_intro_page" value="1">
                 <div class="optimization-method-block">
                     <!-- <h3>Choose Optimization Method:</h3> -->
-                    <p>Continue with free optimization or activate license key for premium performance and full feature access.</p>
+                    <!-- <p>Continue with free optimization or activate license key for premium performance and full feature access.</p> -->
                     <div class="optimization-method-options" style="display:none">
                         <input type="radio" id="berqwp-om-local" name="berqwp_optimization_method" value="local">
                         <label for="berqwp-om-local" class="optimization-method">
@@ -64,7 +64,7 @@ do_action('berqwp_notices');
                         <button type="submit" disabled>Continue</button>
                     </div>
                 </div>
-                <div class="continue-cloud" style="display: none;">
+                <div class="continue-cloud">
                     <div class="inner">
                         <input type="password" name="berqwp_license_key" placeholder="Enter your license key" autocomplete="off">
                         <button type="submit" disabled>Activate</button>
@@ -98,12 +98,12 @@ do_action('berqwp_notices');
                         fill="white" />
                 </svg>
 
-                Try Premium for Free
+                Get Free License
             </a>
         </div>
 
         <div class="berqwp-continue-free">
-            <a href="<?php echo esc_attr(admin_url('admin.php?page=berqwp&activate-free')); ?>">Continue with free optimization</a>
+            <a href="<?php echo esc_attr(admin_url('admin.php?page=berqwp&activate-free')); ?>">Continue self-hosted</a>
         </div>
     </div>
 </div>

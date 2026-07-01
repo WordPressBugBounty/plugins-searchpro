@@ -205,9 +205,14 @@ class berqUsedCSS {
 
                 foreach ($matches as $url) {
                     $url = trim($url);
+                    $baseUrl = self::getBaseUrl($this->site_url);
+
+                    if ($css_node->tag === 'link') {
+                        $baseUrl = $href;
+                    }
 
                     if (!empty($url) && self::is_valid_asset($url)) {
-                        $local_css = $this->replace_url($url, self::rel2abs($url, $href), $local_css);
+                        $local_css = $this->replace_url($url, self::rel2abs($url, $baseUrl), $local_css);
                     }
                 }
 

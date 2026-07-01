@@ -52,7 +52,7 @@ if (!class_exists('berqCache')) {
 
             add_action('init', [$this, 'bypass_cache']);
 
-            add_action('init', [$this, 'bypass_cache']);
+            // add_action('init', [$this, 'bypass_cache']);
 
             // Flush cache when there's a new comment
             add_action('wp_set_comment_status', [$this, 'handle_new_comment'], 10, 2);
@@ -482,10 +482,10 @@ if (!class_exists('berqCache')) {
         {
             if (is_user_logged_in()) {
                 // Add Vary: Cookie header to differentiate cached versions for logged-in users
-                header('Vary: Cookie');
-                header("Cache-Control: no-cache, no-store, must-revalidate");
-                header("Pragma: no-cache");
-                header("Expires: 0");
+                header('Vary: Accept-Encoding, Cookie');
+                // header("Cache-Control: no-cache, no-store, must-revalidate");
+                // header("Pragma: no-cache");
+                // header("Expires: 0");
             }
         }
 
@@ -969,7 +969,7 @@ if (!class_exists('berqCache')) {
                 header('X-File-Size: ' . filesize($cache_file), true);
                 header('Content-Type: text/html; charset=utf-8');
                 header("X-served: WP Hook");
-                header('Vary: Cookie');
+                header('Vary: Accept-Encoding, Cookie');
 
                 if ((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $lastModified) || (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag)) {
                     // The client's cache is still valid based on Last-Modified, respond with a 304 Not Modified
@@ -991,7 +991,6 @@ if (!class_exists('berqCache')) {
 
                 header('Cache-Control: public, max-age=0, s-maxage=3600, must-revalidate', true);
                 // header("Content-Security-Policy: script-src 'self' blob: 'unsafe-inline'");
-                header('Vary: Accept-Encoding, Cookie');
                 header('Content-Encoding: gzip', true);
                 header('Content-Length: ' . filesize($cache_file), true);
                 readfile($cache_file);

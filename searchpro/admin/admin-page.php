@@ -30,14 +30,16 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
 
                         ?>" alt="BerqWP Logo">
             <div class="berqwp-header-right">
-                <?php if (empty(berqwp_get_license_key())) { ?>
-                    <a class="bwp-action-btn light bwp-upgrade-btn" href="https://berqwp.com/pricing/?referrer=plugin-installation" target="_blank">
+                <?php if (empty(berqwp_get_license_key()) || $this->key_response->product_ref == 'Free Account') { ?>
+                    <a class="bwp-action-btn light bwp-upgrade-btn" href="https://berqwp.com/dashboard/?referrer=plugin-installation" target="_blank">
                         <div class="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rocket-icon lucide-rocket"><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"/><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"/></svg>
                         </div>
-                        Upgrade Performance
+                        <?php esc_html_e('Upgrade to Premium', 'searchpro'); ?>
                     </a>
                 <?php } ?>
+
+                <?php if ($this->is_key_verified) { ?>
                 <div class="optimization-methods-switch <?php echo esc_attr($configs['optimization_method'])?>" title="Optimization method">
                     <a class="method-local" href="<?php echo esc_attr(wp_nonce_url(admin_url('admin-post.php?action=switch_optimization_method_local'), 'switch_optimization_method_local_action')); ?>">
                         <div class="icon">
@@ -48,7 +50,7 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                                 <line x1="6" x2="6.01" y1="18" y2="18" />
                             </svg>
                         </div>
-                        Local (free)
+                        Self-hosted
 
                     </a>
 
@@ -62,6 +64,8 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                         BerqWP Cloud
                     </a>
                 </div>
+
+                <?php } ?>
 
                 <a class="bwp-action-btn light" href="<?php echo esc_attr(wp_nonce_url(admin_url('admin-post.php?action=clear_cache'), 'clear_cache_action')); ?>">
                     <div class="icon">
@@ -132,12 +136,10 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                     <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-blocks-icon lucide-blocks"><path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"/><rect x="14" y="2" width="8" height="8" rx="1"/></svg></div>
                     <?php esc_html_e('Integration', 'searchpro'); ?>
                 </div>
-                <?php if ($berqwp_can_use_cloud) { ?>
                 <div class="berqwp-tab <?php bwp_is_tab_nav('activate-license'); ?>" data-tab="activate-license">
                     <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings2-icon lucide-settings-2"><path d="M14 17H5"/><path d="M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg></div>
                     <?php esc_html_e('License', 'searchpro'); ?>
                 </div>
-                <?php } ?>
                 <a class="berqwp-tab tab-link" target="_blank" href="https://www.facebook.com/groups/1660827728253423">
                     <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="24"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 440 146.7 540.8 258.2 568.5L258.2 398.2L205.4 398.2L205.4 320L258.2 320L258.2 286.3C258.2 199.2 297.6 158.8 383.2 158.8C399.4 158.8 427.4 162 438.9 165.2L438.9 236C432.9 235.4 422.4 235 409.3 235C367.3 235 351.1 250.9 351.1 292.2L351.1 320L434.7 320L420.3 398.2L351 398.2L351 574.1C477.8 558.8 576 450.9 576 320z"/></svg></svg></div>
                     <?php esc_html_e('Join BerqWP Community', 'searchpro'); ?>
@@ -159,10 +161,7 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                     require_once optifer_PATH . '/admin/tabs/media-optimization.php';
                     // require_once optifer_PATH . '/admin/tabs/script-manager.php';
                     require_once optifer_PATH . '/admin/tabs/integration.php';
-
-                    if ($berqwp_can_use_cloud) {
-                        require_once optifer_PATH . '/admin/tabs/activate-license.php';
-                    }
+                    require_once optifer_PATH . '/admin/tabs/activate-license.php';
 
                     ?>
                 </form>

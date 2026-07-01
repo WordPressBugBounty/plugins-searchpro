@@ -4794,5 +4794,41 @@
       "addition_date": "2024/05/19",
       "instances": ["GroupMeBot/1.0"],
       "url": "https://groupme.com/"
+    },
+    {
+      "pattern": "Googlebot",
+      "addition_date": "2026/06/26",
+      "instances": ["Googlebot/2.1 (+http://www.google.com/bot.html)"],
+      "url": "https://developers.google.com/search/docs/crawling-indexing/googlebot"
+    },
+    {
+      "pattern": "Bingbot",
+      "addition_date": "2026/06/26",
+      "instances": ["Mozilla/5.0 (compatible; Bingbot/2.0; +http://www.bing.com/bingbot.htm)"],
+      "url": "https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0"
+    },
+    {
+      "pattern": "YandexBot",
+      "addition_date": "2026/06/26",
+      "instances": ["Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)"],
+      "url": "https://yandex.com/support/webmaster/robot-workings/check-yandex-robots.html"
+    },
+    {
+      "pattern": "Baiduspider",
+      "addition_date": "2026/06/26",
+      "instances": ["Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)"],
+      "url": "https://help.baidu.com/question?prod_id=99&class=0&id=3001"
+    },
+    {
+      "pattern": "DuckDuckBot",
+      "addition_date": "2026/06/26",
+      "instances": ["DuckDuckBot/1.1; (+http://duckduckgo.com/duckduckbot.html)"],
+      "url": "https://duckduckgo.com/duckduckbot"
+    },
+    {
+      "pattern": "Google-InspectionTool",
+      "addition_date": "2026/06/26",
+      "instances": ["Mozilla/5.0 (compatible; Google-InspectionTool/1.0)"],
+      "url": "https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers"
     }
   ]

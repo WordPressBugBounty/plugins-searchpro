@@ -766,6 +766,8 @@ table.berq-image-settings {
   max-width: 800px;
   margin: 0 auto;
   box-shadow: 0px 3px 5px 0px rgba(83, 113, 167, 0.05);
+  padding-bottom: 30px;
+  margin-top: 50px;
 }
 #berqwp-intro h2.title {
   font-size: 35px;
@@ -904,13 +906,13 @@ table.berq-image-settings {
 }
 #berqwp-intro .cta-btns a.btn {
   background: #1f71ff;
-  border-radius: 11px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   gap: 7px;
   color: #fff;
-  padding: 15px 30px;
-  font-size: 16px;
+  padding: 12px 20px;
+  font-size: 15px;
   text-decoration: none;
 }
 #berqwp-intro .cta-btns a.btn:hover {
@@ -1406,5 +1408,10 @@ a.berq-stat-refresh svg {
 .berqwp-continue-free {
   text-align: center;
   font-size: 15px;
-  margin-top: 16px;
+  margin-top: 80px;
+  align-self: end;
+}
+.berqwp-continue-free a {
+  color: #acbbd5;
+  text-decoration: none;
 }/*# sourceMappingURL=style.css.map */

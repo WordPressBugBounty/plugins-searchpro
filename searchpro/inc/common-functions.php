@@ -146,7 +146,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
                 header('X-File-Size: ' . filesize($cache_file), true);
                 header('Content-Type: text/html; charset=utf-8');
                 header("X-served: $serve_from");
-                header('Vary: Cookie');
+                // header('Vary: Cookie');
 
                 // Check if the client has a cached copy and if it's still valid using Last-Modified
                 if ((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $lastModified) || (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag)) {
@@ -170,6 +170,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
 
                 // header('Cache-Control: public, max-age=0, s-maxage=3600, must-revalidate', true);
                 header('Cache-Control: public, max-age=60, s-maxage=3600, stale-while-revalidate=60, must-revalidate', true);
+                header('cdn-cache-control: max-age=2592000');
                 // header("Content-Security-Policy: script-src 'self' blob: 'unsafe-inline'");
                 header('Vary: Accept-Encoding, Cookie');
                 header('Content-Encoding: gzip', true);

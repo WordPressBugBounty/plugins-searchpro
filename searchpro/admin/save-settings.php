@@ -12,7 +12,8 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
     $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
-    if (!empty($_POST['berqwp_intro_page']) && !berqwp_is_license_managed_by_network()) {
+    // if (!empty($_POST['berqwp_intro_page']) && !berqwp_is_license_managed_by_network()) {
+    if (!berqwp_is_license_managed_by_network()) {
         $optimization_method = sanitize_text_field($_POST['berqwp_optimization_method']);
 
         if ($optimization_method == 'local') {
@@ -37,7 +38,8 @@ if (isset($_POST['berqwp_save_nonce'])) {
             exit();
         }
 
-        if ($optimization_method == 'cloud' && !empty($_POST['berqwp_license_key'])) {
+        // if ($optimization_method == 'cloud' && !empty($_POST['berqwp_license_key'])) {
+        if (!empty($_POST['berqwp_license_key'])) {
             $license_key = sanitize_text_field($_POST['berqwp_license_key']);
             $berqconfigs = berqConfigs::getInstance();
             $berqwp_configs = $berqconfigs->get_configs();
@@ -242,6 +244,8 @@ if (isset($_POST['berqwp_save_nonce'])) {
 
         delete_transient('berq_lic_response_cache');
         delete_transient('berqwp_lic_response_cache');
+        berqwp_delete_network_option('berqwp_license_cache');
+
         berqwp_delete_license_key();
         berqwp_clear_cache_queue();
 
@@ -512,11 +516,11 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_async_excluded_styles', 0);
     }
 
-    // if (isset($_POST['berqwp_defer_excluded_styles'])) {
-    //     update_option('berqwp_defer_excluded_styles', 1);
-    // } else {
-    //     update_option('berqwp_defer_excluded_styles', 0);
-    // }
+    if (isset($_POST['berqwp_defer_excluded_js'])) {
+        update_option('berqwp_defer_excluded_js', 1);
+    } else {
+        update_option('berqwp_defer_excluded_js', 0);
+    }
 
     if (isset($_POST['berqwp_delay_third_party_scripts'])) {
         update_option('berqwp_delay_third_party_scripts', 1);
