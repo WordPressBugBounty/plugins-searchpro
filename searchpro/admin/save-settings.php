@@ -462,6 +462,50 @@ if (isset($_POST['berqwp_save_nonce'])) {
         update_option('berqwp_disable_emojis', 0);
     }
 
+    if (isset($_POST['berqwp_heartbeat_mode'])) {
+        $heartbeat_mode = sanitize_text_field($_POST['berqwp_heartbeat_mode']);
+        if (!in_array($heartbeat_mode, ['default', 'restrict', 'throttle', 'disable'], true)) {
+            $heartbeat_mode = 'default';
+        }
+        update_option('berqwp_heartbeat_mode', $heartbeat_mode);
+    }
+
+    if (isset($_POST['berqwp_heartbeat_interval'])) {
+        $heartbeat_interval = max(15, min(300, (int) sanitize_text_field($_POST['berqwp_heartbeat_interval'])));
+        update_option('berqwp_heartbeat_interval', $heartbeat_interval);
+    }
+
+    foreach ([
+        'berqwp_disable_embeds',
+        'berqwp_disable_xmlrpc',
+        'berqwp_remove_rest_head_links',
+        'berqwp_remove_head_meta',
+        'berqwp_disable_self_pingbacks',
+    ] as $bwp_debloat_option) {
+        update_option($bwp_debloat_option, isset($_POST[$bwp_debloat_option]) ? 1 : 0);
+    }
+
+    if (isset($_POST['berqwp_db_schedule_frequency'])) {
+        $db_schedule_frequency = sanitize_text_field($_POST['berqwp_db_schedule_frequency']);
+        if (!in_array($db_schedule_frequency, ['daily', 'weekly', 'monthly'], true)) {
+            $db_schedule_frequency = 'weekly';
+        }
+        update_option('berqwp_db_schedule_frequency', $db_schedule_frequency);
+    }
+
+    if (isset($_POST['berqwp_db_revision_limit'])) {
+        update_option('berqwp_db_revision_limit', max(0, (int) sanitize_text_field($_POST['berqwp_db_revision_limit'])));
+    }
+
+    $_POST['berqwp_db_scheduled_tasks'] = $_POST['berqwp_db_scheduled_tasks'] ?? [];
+    if (is_array($_POST['berqwp_db_scheduled_tasks'])) {
+        update_option('berqwp_db_scheduled_tasks', array_map('sanitize_text_field', wp_unslash($_POST['berqwp_db_scheduled_tasks'])));
+    }
+
+    update_option('berqwp_db_schedule_enabled', isset($_POST['berqwp_db_schedule_enabled']) ? 1 : 0);
+
+    do_action('berqwp_reschedule_db_cron');
+
     // If the option is changed require flush cache
     if (bwp_is_option_updated('berqwp_lazyload_youtube_embed')) {
         $berq_log->info('Updated berqwp_lazyload_youtube_embed');

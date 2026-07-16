@@ -60,7 +60,7 @@ if (get_option('berqwp_preload_yt_poster') === false) {
 }
 
 if (get_option('berqwp_javascript_execution_mode') === false) {
-    update_option('berqwp_javascript_execution_mode', 4, false);
+    update_option('berqwp_javascript_execution_mode', 5, false);
 }
 
 if (get_option('berqwp_interaction_delay') === false) {
@@ -125,6 +125,22 @@ if (get_option('berqwp_optimize_post_types') === false) {
 // if (get_option('berq_exclude_js_css') === false) {
 //     update_option('berq_exclude_js_css', [], false);
 // }
+
+if (get_option('berqwp_heartbeat_mode') === false) {
+    update_option('berqwp_heartbeat_mode', 'default', false);
+}
+
+if (get_option('berqwp_db_schedule_frequency') === false) {
+    update_option('berqwp_db_schedule_frequency', 'weekly', false);
+}
+
+if (get_option('berqwp_db_revision_limit') === false) {
+    update_option('berqwp_db_revision_limit', 5, false);
+}
+
+if (get_option('berqwp_db_scheduled_tasks') === false) {
+    update_option('berqwp_db_scheduled_tasks', ['revisions', 'transients', 'spam_comments'], false);
+}
 
 
 

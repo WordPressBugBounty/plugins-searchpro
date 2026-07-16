@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza
 Tags: optimize, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.0
-Stable tag: 4.0.30
+Stable tag: 4.1.10
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -80,6 +80,10 @@ Since all popular page speed testing tools use similar methods, you'll get the s
 - **Supports Cloudflare Edge Cache:** BerqWP automatically configures the correct cache rules for your website, delivering page cache through Cloudflare's global network, significantly reducing server response time. Simply connect your Cloudflare account in the plugin settings to get started.
 
 - **Page Cache Rules:** Define rules to automatically flush a page’s cache when a specific post type is updated.
+
+- **Database Optimization:** Clean up post revisions, auto-drafts, trashed posts/comments, expired transients, and orphaned metadata, plus optimize your database tables. Schedule automatic cleanup daily, weekly, or monthly.
+
+- **Debloat:** Disable or limit unwanted WordPress functionality that slows your site down, including the Heartbeat API, emojis, embeds, XML-RPC, REST API discovery links, and self pingbacks.
 
 - **Much more!**
 
@@ -254,6 +258,13 @@ Data sent: Your license key and site URL, only when activating or refreshing a l
 
 **Plugins:** Yoast SEO, Rank Math, All in One SEO, WooCommerce, Elementor, Divi Builder, Polylang, WPML, TranslatePress, Cloudflare, Complianz, CookieYes
 
+== Other Products ==
+
+Also check out our other WordPress products.
+
+- [ElizaWP](https://elizawp.com/) – AI SEO agent that researches, writes, and publishes for WordPress.
+- [WP Replai](https://wpreplai.com/) – The skills-powered AI support agent that lives inside your site, answering questions, walking visitors through fixes, qualifying leads, and only escalating to your team when it truly should.
+
 == Screenshots ==
 1. Hero image
 2. Dashboard
@@ -264,6 +275,11 @@ Data sent: Your license key and site URL, only when activating or refreshing a l
 7. Integration
 
 == Changelog ==
+
+= 4.1.10 =
+* [New] Added a "Database" tab with manual cleanup actions (post revisions, auto-drafts & trashed posts, expired transients, spam & trashed comments, orphaned post meta, table optimization) and scheduled optimization via WP-Cron (daily/weekly/monthly, with a Next Run/Last Run status).
+* [New] Added a "Debloat" tab to disable/limit unwanted WordPress functionality: Heartbeat API control (restrict to post editor, throttle interval, or disable), emojis, embeds, XML-RPC, REST API discovery links, RSD/WLW/shortlink/generator tags, and self pingbacks.
+* [Enhancement] "Flora v2" is now the default JavaScript execution mode.
 
 = 4.0.30 =
 * [Enhancement] Bypass server-side cache for search engine crawlers.

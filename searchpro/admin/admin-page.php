@@ -132,6 +132,14 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                     <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-code-corner-icon lucide-file-code-corner"><path d="M4 12.15V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2h-3.35"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m5 16-3 3 3 3"/><path d="m9 22 3-3-3-3"/></svg></div>
                     <?php esc_html_e('Script Manager', 'searchpro'); ?>
                 </div>-->
+                <div class="berqwp-tab <?php bwp_is_tab_nav('database'); ?>" data-tab="database">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database-icon lucide-database"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg></div>
+                    <?php esc_html_e('Database', 'searchpro'); ?>
+                </div>
+                <div class="berqwp-tab <?php bwp_is_tab_nav('debloat'); ?>" data-tab="debloat">
+                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></div>
+                    <?php esc_html_e('Debloat', 'searchpro'); ?>
+                </div>
                 <div class="berqwp-tab <?php bwp_is_tab_nav('integration'); ?>" data-tab="integration">
                     <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-blocks-icon lucide-blocks"><path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"/><rect x="14" y="2" width="8" height="8" rx="1"/></svg></div>
                     <?php esc_html_e('Integration', 'searchpro'); ?>
@@ -161,6 +169,8 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                     require_once optifer_PATH . '/admin/tabs/media-optimization.php';
                     // require_once optifer_PATH . '/admin/tabs/script-manager.php';
                     require_once optifer_PATH . '/admin/tabs/integration.php';
+                    require_once optifer_PATH . '/admin/tabs/database.php';
+                    require_once optifer_PATH . '/admin/tabs/debloat.php';
                     require_once optifer_PATH . '/admin/tabs/activate-license.php';
 
                     ?>
@@ -458,6 +468,14 @@ if (function_exists('pll_current_language')) {
             }
         });
 
+        $('[name="berqwp_heartbeat_mode"]').on('change', function() {
+            if ($('[name="berqwp_heartbeat_mode"]:checked').val() === 'throttle') {
+                $('.berqwp-heartbeat-interval').show();
+            } else {
+                $('.berqwp-heartbeat-interval').hide();
+            }
+        });
+
         // $(document).ready(function () {
         //     const stickyDiv = $('.berqwp-dashbaord');
         //     const offset = stickyDiv.offset().top;
@@ -545,6 +563,51 @@ if (function_exists('pll_current_language')) {
                     error: function() {
                         loader.hide();
                         alert("Page compression test failed: Please check your internet connection.");
+                    }
+                });
+            })
+        })
+    })(jQuery)
+</script>
+<script>
+    (function($) {
+        $(document).ready(function() {
+            let berq_nounce = '<?php echo esc_html(wp_create_nonce('wp_rest')); ?>';
+
+            $('.berqwp-db-run-action').click(function(e) {
+                e.preventDefault();
+
+                let $btn = $(this);
+                let $action = $btn.closest('.berqwp-db-action');
+                let task = $action.data('task');
+                let limit = $action.find('input[name="berqwp_db_revision_limit"]').val();
+
+                $btn.addClass('disabled').text('Running...');
+
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'berqwp_db_run_action',
+                        task: task,
+                        limit: limit,
+                        nonce: berq_nounce,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-WP-Nonce', berq_nounce);
+                    },
+                    success: function(data) {
+                        if (data.success) {
+                            alert(data.data.message);
+                        } else {
+                            alert(data.data && data.data.message ? data.data.message : 'Something went wrong.');
+                        }
+                    },
+                    error: function() {
+                        alert('Request failed. Please check your internet connection.');
+                    },
+                    complete: function() {
+                        $btn.removeClass('disabled').text($btn.data('task') === 'optimize_tables' ? 'Optimize now' : 'Clean now');
                     }
                 });
             })

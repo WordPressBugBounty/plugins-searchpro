@@ -3,7 +3,7 @@
  * Plugin Name:       BerqWP
  * Plugin URI:        https://berqwp.com/
  * Description:       Automatically boost your WordPress website speed. Includes full-page caching, image optimization, CSS/JS delivery, and Core Web Vitals improvements.
- * Version:           4.0.30
+ * Version:           4.1.10
  * Requires at least: 5.3
  * Requires PHP:      7.4
  * Author:            BerqWP
@@ -18,7 +18,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!defined('BERQWP_VERSION')) {
-	define('BERQWP_VERSION', '4.0.30');
+	define('BERQWP_VERSION', '4.1.10');
 }
 
 if (!defined('optifer_PATH')) {
@@ -60,6 +60,7 @@ require_once optifer_PATH . '/BerqWP/vendor-prefixed/vendor/scoper-autoload.php'
 
 require_once optifer_PATH . '/inc/crawler/berqDetectCrawler.php';
 require_once optifer_PATH . '/inc/class-berqconfigs.php';
+require_once optifer_PATH . '/inc/class-berqdatabase.php';
 // require_once optifer_PATH . '/vendor/autoload.php';
 // require_once optifer_PATH . '/vendor/woocommerce/action-scheduler/action-scheduler.php';
 require_once optifer_PATH . '/inc/class-berqlogs.php';

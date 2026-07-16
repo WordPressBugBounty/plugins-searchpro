@@ -133,6 +133,23 @@ if (!class_exists('berqWP')) {
 			// Sync addons from cloud
 			add_action('init', [$this, 'sync_addons']);
 
+			// Debloat: WordPress feature toggles
+			if (get_option('berqwp_disable_emojis')) {
+				add_action('init', [$this, 'disable_emoji']);
+			}
+			add_action('init', [$this, 'apply_heartbeat_settings'], 1);
+			add_action('init', [$this, 'apply_debloat_settings'], 1);
+
+			// Database: manual cleanup AJAX actions
+			add_action('wp_ajax_berqwp_db_run_action', [$this, 'ajax_db_run_action']);
+
+			// Database: scheduled optimization via WP-Cron
+			add_filter('cron_schedules', [$this, 'add_monthly_cron_schedule']);
+			add_action('berqwp_db_scheduled_optimize', [$this, 'run_scheduled_db_optimize']);
+			add_action('berqwp_reschedule_db_cron', [$this, 'reschedule_db_cron']);
+			add_action('berqwp_activate_plugin', [$this, 'reschedule_db_cron']);
+			add_action('berqwp_deactivate_plugin', [$this, 'clear_db_cron']);
+
 			// Multisite support
 			if (function_exists('is_multisite') && is_multisite()) {
 				add_action('network_admin_menu', [$this, 'register_network_menu']);
@@ -1502,6 +1519,160 @@ if (!class_exists('berqWP')) {
 			} else {
 				return array();
 			}
+		}
+
+		// Apply the selected Heartbeat API mode (default / restrict / throttle / disable)
+		function apply_heartbeat_settings()
+		{
+			$mode = get_option('berqwp_heartbeat_mode', 'default');
+
+			if ($mode === 'default') {
+				return;
+			}
+
+			if ($mode === 'disable') {
+				wp_deregister_script('heartbeat');
+				return;
+			}
+
+			if ($mode === 'restrict') {
+				global $pagenow;
+				if (!in_array($pagenow, ['post.php', 'post-new.php'], true)) {
+					wp_deregister_script('heartbeat');
+				}
+				return;
+			}
+
+			if ($mode === 'throttle') {
+				add_filter('heartbeat_settings', [$this, 'throttle_heartbeat_interval']);
+			}
+		}
+
+		// Filter callback: clamp Heartbeat interval to the configured value
+		function throttle_heartbeat_interval($settings)
+		{
+			$settings['interval'] = max(15, min(300, (int) get_option('berqwp_heartbeat_interval', 60)));
+			return $settings;
+		}
+
+		// Apply the remaining Debloat toggles (embeds, XML-RPC, REST head links, head meta, self pingbacks)
+		function apply_debloat_settings()
+		{
+			if (get_option('berqwp_disable_embeds')) {
+				add_action('wp_footer', [$this, 'deregister_embed_script']);
+				remove_action('wp_head', 'wp_oembed_add_discovery_links');
+				remove_action('wp_head', 'wp_oembed_add_host_js');
+				add_filter('embed_oembed_discover', '__return_false');
+			}
+
+			if (get_option('berqwp_disable_xmlrpc')) {
+				add_filter('xmlrpc_enabled', '__return_false');
+			}
+
+			if (get_option('berqwp_remove_rest_head_links')) {
+				remove_action('wp_head', 'rest_output_link_wp_head');
+				remove_action('template_redirect', 'rest_output_link_header', 11);
+			}
+
+			if (get_option('berqwp_remove_head_meta')) {
+				remove_action('wp_head', 'rsd_link');
+				remove_action('wp_head', 'wlwmanifest_link');
+				remove_action('wp_head', 'wp_shortlink_wp_head');
+				remove_action('wp_head', 'wp_generator');
+			}
+
+			if (get_option('berqwp_disable_self_pingbacks')) {
+				add_action('pre_ping', [$this, 'remove_self_pingbacks']);
+			}
+		}
+
+		// Callback: deregister the embed.min.js frontend script
+		function deregister_embed_script()
+		{
+			wp_deregister_script('wp-embed');
+		}
+
+		// Callback: strip links pointing back to this site from the pingback target list
+		function remove_self_pingbacks(&$links)
+		{
+			$home = get_option('home');
+			foreach ($links as $key => $link) {
+				if (strpos($link, (string) $home) === 0) {
+					unset($links[$key]);
+				}
+			}
+		}
+
+		// AJAX: run a single Database tab cleanup action on demand
+		function ajax_db_run_action()
+		{
+			check_ajax_referer('wp_rest', 'nonce');
+
+			if (!current_user_can('manage_options')) {
+				wp_send_json_error(['message' => __('Permission denied.', 'searchpro')]);
+			}
+
+			$task = isset($_POST['task']) ? sanitize_text_field($_POST['task']) : '';
+			$limit = isset($_POST['limit']) ? max(0, (int) $_POST['limit']) : (int) get_option('berqwp_db_revision_limit', 5);
+
+			$result = berqDatabase::run_task($task, ['limit' => $limit]);
+
+			if ($result === false) {
+				wp_send_json_error(['message' => __('Unknown cleanup task.', 'searchpro')]);
+			}
+
+			wp_send_json_success($result);
+		}
+
+		// Register a "once monthly" WP-Cron interval (core only ships hourly/twicedaily/daily)
+		function add_monthly_cron_schedule($schedules)
+		{
+			$schedules['berqwp_monthly'] = [
+				'interval' => 30 * DAY_IN_SECONDS,
+				'display' => __('Once Monthly', 'searchpro'),
+			];
+			return $schedules;
+		}
+
+		// (Re)schedule the Database tab's recurring optimization cron event based on current settings
+		function reschedule_db_cron()
+		{
+			wp_clear_scheduled_hook('berqwp_db_scheduled_optimize');
+
+			if (!get_option('berqwp_db_schedule_enabled')) {
+				return;
+			}
+
+			$frequency = get_option('berqwp_db_schedule_frequency', 'weekly');
+			$recurrence = 'weekly';
+			if ($frequency === 'daily') {
+				$recurrence = 'daily';
+			} elseif ($frequency === 'monthly') {
+				$recurrence = 'berqwp_monthly';
+			}
+
+			if (!wp_next_scheduled('berqwp_db_scheduled_optimize')) {
+				wp_schedule_event(time(), $recurrence, 'berqwp_db_scheduled_optimize');
+			}
+		}
+
+		// Clear the Database tab's cron event (called on plugin deactivation)
+		function clear_db_cron()
+		{
+			wp_clear_scheduled_hook('berqwp_db_scheduled_optimize');
+		}
+
+		// WP-Cron callback: run every scheduled task and record the run timestamp
+		function run_scheduled_db_optimize()
+		{
+			$tasks = get_option('berqwp_db_scheduled_tasks', []);
+			$limit = (int) get_option('berqwp_db_revision_limit', 5);
+
+			foreach ((array) $tasks as $task) {
+				berqDatabase::run_task($task, ['limit' => $limit]);
+			}
+
+			update_option('berqwp_db_optimize_last_run', time());
 		}
 
 		// function clear_cache(WP_REST_Request $request)

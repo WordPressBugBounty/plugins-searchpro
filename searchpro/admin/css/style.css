@@ -219,7 +219,6 @@ a.berq-btn {
   font-style: normal;
   display: block;
   line-height: normal;
-  width: -moz-fit-content;
   width: fit-content;
   margin-bottom: 5px;
   border: 1px solid #dbe9fe;
@@ -240,9 +239,9 @@ label.berq-check {
   font-style: normal;
   font-weight: 600;
   line-height: normal;
-  width: -moz-fit-content;
   width: fit-content;
   -webkit-user-select: none;
+  -khtml-user-select: none;
   -moz-user-select: none;
   -o-user-select: none;
   user-select: none;
@@ -870,9 +869,6 @@ table.berq-image-settings {
   border: 1px solid #d7d7d7;
   width: 280px;
 }
-#berqwp-intro form.license-verification input[type=password]::-moz-placeholder {
-  color: #928e8e;
-}
 #berqwp-intro form.license-verification input[type=password]::placeholder {
   color: #928e8e;
 }
@@ -1034,7 +1030,6 @@ span.bwp-cache-tag {
   font-size: 14px;
   border-radius: 50px;
   line-height: 1;
-  width: -moz-fit-content;
   width: fit-content;
   white-space: nowrap;
 }
@@ -1079,7 +1074,6 @@ label.berq-check input[type=text] {
 
 .berqwp-cf-connected {
   background-color: #c4ffc4;
-  width: -moz-fit-content;
   width: fit-content;
   padding: 10px 20px;
   margin-top: 15px;
@@ -1414,4 +1408,76 @@ a.berq-stat-refresh svg {
 .berqwp-continue-free a {
   color: #acbbd5;
   text-decoration: none;
-}/*# sourceMappingURL=style.css.map */
+}
+
+.berqwp-db-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.berqwp-db-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border: 1px solid #e0e9fa;
+  border-radius: 8px;
+  background: #f8fafd;
+}
+.berqwp-db-action span {
+  color: #0c2d66;
+  font-size: 15px;
+  font-weight: 500;
+}
+.berqwp-db-action a.berq-btn {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+.berqwp-db-action a.berq-btn.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+input.berqwp-inline-number {
+  width: 60px;
+  padding: 4px 8px;
+  margin: 0 4px;
+  border: 1px solid #dbe9fe;
+  border-radius: 5px;
+  color: #0c2d66;
+  font-size: 14px;
+}
+
+.berqwp-db-scheduled-tasks {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 4px 20px;
+}
+.berqwp-db-scheduled-tasks label.berq-check {
+  margin-top: 0;
+}
+
+.berqwp-heartbeat-interval {
+  margin-top: 16px;
+}
+.berqwp-heartbeat-interval label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #0c2d66;
+  font-size: 14px;
+}
+.berqwp-heartbeat-interval input[type=number] {
+  width: 80px;
+  padding: 6px 10px;
+  border: 1px solid #dbe9fe;
+  border-radius: 5px;
+  color: #0c2d66;
+}
+
+/*# sourceMappingURL=style.css.map */
