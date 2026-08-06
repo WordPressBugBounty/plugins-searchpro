@@ -13,7 +13,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
     $plugin_name = defined('BERQWP_PLUGIN_NAME') ? BERQWP_PLUGIN_NAME : 'BerqWP';
 
     // if (!empty($_POST['berqwp_intro_page']) && !berqwp_is_license_managed_by_network()) {
-    if (!berqwp_is_license_managed_by_network()) {
+    if (!berqwp_is_license_managed_by_network() && !empty($_POST['berqwp_optimization_method'])) {
         $optimization_method = sanitize_text_field($_POST['berqwp_optimization_method']);
 
         if ($optimization_method == 'local') {

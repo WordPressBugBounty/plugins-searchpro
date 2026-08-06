@@ -1939,11 +1939,13 @@ function bwp_write_htaccess_rules($ignore_sandbox = false)
         '</IfModule>',
         '<IfModule mod_headers.c>',
         '    <FilesMatch "index\.html\.gz$">',
+        '        Header set X-BerqWP-Cache "HIT"',
         '        Header set X-Served "server"',
         '        Header set Content-Encoding "gzip"',
         '        Header set Vary "Accept-Encoding, Cookie"',
         '        Header set CDN-Cache-Control "max-age=2592000"',
-        '        Header set Cache-Control "public, max-age=0, s-maxage=3600, must-revalidate"',
+        '        Header set Cache-Control "public, max-age=600, s-maxage=2592000, stale-while-revalidate=86400"',
+        '        Header set Cache-Tag "%{HTTP_HOST}e"',
         '        Header set X-Content-Type-Options "nosniff"',
         '    </FilesMatch>',
         '</IfModule>',
@@ -2270,7 +2272,6 @@ function berqwp_sync_addons($license_key, $site_url)
 function berqwp_validate_url_array($urls)
 {
     $home_host = parse_url(home_url(), PHP_URL_HOST);
-    $home_scheme = parse_url(home_url(), PHP_URL_SCHEME);
 
     $urls = array_filter($urls, function ($url) use ($home_host) {
         $url_host = parse_url($url, PHP_URL_HOST);
@@ -2283,33 +2284,7 @@ function berqwp_validate_url_array($urls)
         return $url_host === $home_host;
     });
 
-    $urls = array_map(function ($url) use ($home_scheme) {
-        // Skip invalid URLs
-        if (!is_string($url) || $url === '') {
-            return $url;
-        }
-
-        $parts = parse_url($url);
-
-        // Relative URL → leave as-is
-        if (empty($parts['scheme'])) {
-            return $url;
-        }
-
-        // Rebuild URL with home scheme
-        $parts['scheme'] = $home_scheme;
-
-        $new_url  = $parts['scheme'] . '://';
-        $new_url .= $parts['host'] ?? '';
-        $new_url .= isset($parts['port']) ? ':' . $parts['port'] : '';
-        $new_url .= $parts['path'] ?? '';
-        $new_url .= isset($parts['query']) ? '?' . $parts['query'] : '';
-        $new_url .= isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
-
-        return $new_url;
-    }, $urls);
-
-    return $urls;
+    return array_values($urls);
 }
 
 function berqwp_render_toggle($name, $checked) {

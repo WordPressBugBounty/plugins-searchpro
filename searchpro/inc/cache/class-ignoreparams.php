@@ -346,7 +346,6 @@ class ignoreParams {
         'relatedposts_position',
         'remodel',
         'replytocom',
-        'rest_route',
         'reverse-paginate',
         'rid',
         'rnd',
@@ -455,6 +454,7 @@ class ignoreParams {
         'x',
         'zMoatImpID',
         'zarsrc',
-        'zeffdn'
+        'zeffdn',
+        'srsltid',
     ];
 }

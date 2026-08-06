@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza
 Tags: optimize, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.0
-Stable tag: 4.1.10
+Stable tag: 4.1.11
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -275,6 +275,11 @@ Also check out our other WordPress products.
 7. Integration
 
 == Changelog ==
+
+= 4.1.11 =
+* [New] Now serves X-BerqWP-Cache: HIT header
+* [Bug] Fixed cache being delivered for rest_route query paramter
+* [Bug] Fixed undefine key berqwp_optimization_method PHP warning
 
 = 4.1.10 =
 * [New] Added a "Database" tab with manual cleanup actions (post revisions, auto-drafts & trashed posts, expired transients, spam & trashed comments, orphaned post meta, table optimization) and scheduled optimization via WP-Cron (daily/weekly/monthly, with a Next Run/Last Run status).

@@ -93,9 +93,11 @@ if (!class_exists('berqCache')) {
             add_action('berqwp_activate_plugin',     'bwp_write_htaccess_rules');
             add_action('berqwp_flush_all_cache',     'bwp_write_htaccess_rules');
             add_action('berqwp_deactivate_plugin',   'bwp_remove_htaccess_rules');
+
             if (bwp_is_openlitespeed_server()) {
                 add_action('berqwp_activate_plugin', 'bwp_remove_htaccess_rules');
             }
+
             add_action('berqwp_on_update_sandbox_mode', 'bwp_sync_htaccess_on_sandbox_change');
 
             // Clear queue list on cloud
@@ -898,31 +900,38 @@ if (!class_exists('berqCache')) {
             warmup_cache_by_url($page_url);
         }
 
+        static function miss_cache_headers() {
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0', true);
+            header('CDN-Cache-Control: no-store', true);     // Cloudflare
+            header('Surrogate-Control: no-store', true);      // Varnish
+            header('X-Accel-Expires: 0', true);               // Nginx FastCGI
+            header("X-BerqWP-Cache: MISS");
+        }
+
         function html_cache()
         {
 
             // Bypass cache for Photon
             if (!empty($_COOKIE['berqwpnocache'])) {
-                header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0', true);
-                header('CDN-Cache-Control: no-store', true);     // Cloudflare
-                header('Surrogate-Control: no-store', true);      // Varnish
-                header('X-Accel-Expires: 0', true);               // Nginx FastCGI
-
+                self::miss_cache_headers();
                 return;
             }
 
             if (!self::should_cache()) {
+                self::miss_cache_headers();
                 return;
             }
 
             $page_url = self::get_page_url();
 
             if (empty($page_url)) {
+                self::miss_cache_headers();
                 return;
             }
 
             // Disable cache for unknown query parameters
             if (strpos($page_url, '?') !== false) {
+                self::miss_cache_headers();
                 return;
             }
 
@@ -930,6 +939,7 @@ if (!class_exists('berqCache')) {
                 $post_type = get_post_type();
 
                 if (empty($post_type) || !in_array($post_type, get_option('berqwp_optimize_post_types'))) {
+                    self::miss_cache_headers();
                     return;
                 }
             } elseif (is_archive()) {
@@ -939,6 +949,7 @@ if (!class_exists('berqCache')) {
                     $current_taxonomy = $queried_object->taxonomy;
 
                     if (!in_array($current_taxonomy, get_option('berqwp_optimize_taxonomies'))) {
+                        self::miss_cache_headers();
                         return;
                     }
                 }
@@ -948,6 +959,7 @@ if (!class_exists('berqCache')) {
             $status_code = http_response_code();
 
             if ($status_code !== 200) {
+                self::miss_cache_headers();
                 return;
             }
 
@@ -970,13 +982,19 @@ if (!class_exists('berqCache')) {
                 header('Content-Type: text/html; charset=utf-8');
                 header("X-served: WP Hook");
                 header('Vary: Accept-Encoding, Cookie');
+                header("X-BerqWP-Cache: HIT");
 
                 if ((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $lastModified) || (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag)) {
                     // The client's cache is still valid based on Last-Modified, respond with a 304 Not Modified
                     header('HTTP/1.1 304 Not Modified');
                     // header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-                    header("Expires: 0");
-                    header('Cache-Control: no-cache, must-revalidate');
+                    // header("Expires: 0");
+                    // header('Cache-Control: no-cache, must-revalidate');
+
+                    header('Cache-Control: public, max-age=600, s-maxage=2592000, stale-while-revalidate=86400', true);
+                    header('cdn-cache-control: max-age=2592000');
+                    header('Cache-Tag: ' . wp_parse_url(home_url())['host']);
+
                     exit();
                 }
 
@@ -989,7 +1007,9 @@ if (!class_exists('berqCache')) {
                     ob_end_clean();
                 }
 
-                header('Cache-Control: public, max-age=0, s-maxage=3600, must-revalidate', true);
+                header('Cache-Control: public, max-age=600, s-maxage=2592000, stale-while-revalidate=86400', true);
+                header('cdn-cache-control: max-age=2592000');
+                header('Cache-Tag: ' . wp_parse_url(home_url())['host']);
                 // header("Content-Security-Policy: script-src 'self' blob: 'unsafe-inline'");
                 header('Content-Encoding: gzip', true);
                 header('Content-Length: ' . filesize($cache_file), true);
@@ -997,10 +1017,7 @@ if (!class_exists('berqCache')) {
                 exit();
             }
 
-            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-            header('CDN-Cache-Control: no-store');     // Cloudflare
-            header('Surrogate-Control: no-store');      // Varnish
-            header('X-Accel-Expires: 0');               // Nginx FastCGI
+            self::miss_cache_headers();
 
             self::purge_page($page_url);
 

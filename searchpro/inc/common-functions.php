@@ -26,7 +26,11 @@ function bwp_pass_cookie_requirement() {
 }
 
 function bwp_get_request_url() {
-    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        $scheme = 'https://';
+    } else {
+        $scheme = (wp_parse_url(get_option('home'), PHP_URL_SCHEME) === 'https') ? 'https://' : 'http://';
+    }
     $host = isset($_SERVER['HTTP_HOST']) ? strip_tags(stripslashes($_SERVER['HTTP_HOST'])) : 'localhost';
     $uri = isset($_SERVER['REQUEST_URI']) ? strip_tags(stripslashes($_SERVER['REQUEST_URI'])) : '/';
     $url = $scheme . $host . $uri;
@@ -118,6 +122,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
         $compression_enabled = true;
         $accept_encoding = $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '';
         $supports_gzip = strpos($accept_encoding, 'gzip') !== false;
+        $domain = isset($_SERVER['HTTP_HOST']) ? strip_tags(stripslashes($_SERVER['HTTP_HOST'])) : '';
 
         if (berqwp_dropin_is_page_url_excluded($url)) {
             return;
@@ -146,6 +151,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
                 header('X-File-Size: ' . filesize($cache_file), true);
                 header('Content-Type: text/html; charset=utf-8');
                 header("X-served: $serve_from");
+                header("X-BerqWP-Cache: HIT");
                 // header('Vary: Cookie');
 
                 // Check if the client has a cached copy and if it's still valid using Last-Modified
@@ -153,8 +159,11 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
                     // The client's cache is still valid based on Last-Modified, respond with a 304 Not Modified
                     header('HTTP/1.1 304 Not Modified');
                     // header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-                    header("Expires: 0");
-                    header('Cache-Control: no-cache, must-revalidate');
+                    // header("Expires: 0");
+                    // header('Cache-Control: no-cache, must-revalidate');
+                    header('Cache-Control: public, max-age=600, s-maxage=2592000, stale-while-revalidate=86400', true);
+                    header('cdn-cache-control: max-age=2592000');
+                    header("Cache-Tag: $domain");
                     exit();
 
                 }
@@ -169,8 +178,10 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
                 }
 
                 // header('Cache-Control: public, max-age=0, s-maxage=3600, must-revalidate', true);
-                header('Cache-Control: public, max-age=60, s-maxage=3600, stale-while-revalidate=60, must-revalidate', true);
+                // header('Cache-Control: public, max-age=60, s-maxage=3600, stale-while-revalidate=60, must-revalidate', true);
+                header('Cache-Control: public, max-age=600, s-maxage=2592000, stale-while-revalidate=86400', true);
                 header('cdn-cache-control: max-age=2592000');
+                header("Cache-Tag: $domain");
                 // header("Content-Security-Policy: script-src 'self' blob: 'unsafe-inline'");
                 header('Vary: Accept-Encoding, Cookie');
                 header('Content-Encoding: gzip', true);

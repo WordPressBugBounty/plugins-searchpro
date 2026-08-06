@@ -148,10 +148,13 @@ $berqwp_can_use_cloud = berqwp_can_use_cloud();
                     <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings2-icon lucide-settings-2"><path d="M14 17H5"/><path d="M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg></div>
                     <?php esc_html_e('License', 'searchpro'); ?>
                 </div>
+
+                <?php if (!defined('BERQWP_HIDE_DOCS') || !BERQWP_HIDE_DOCS) { ?>
                 <a class="berqwp-tab tab-link" target="_blank" href="https://www.facebook.com/groups/1660827728253423">
                     <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="24"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 440 146.7 540.8 258.2 568.5L258.2 398.2L205.4 398.2L205.4 320L258.2 320L258.2 286.3C258.2 199.2 297.6 158.8 383.2 158.8C399.4 158.8 427.4 162 438.9 165.2L438.9 236C432.9 235.4 422.4 235 409.3 235C367.3 235 351.1 250.9 351.1 292.2L351.1 320L434.7 320L420.3 398.2L351 398.2L351 574.1C477.8 558.8 576 450.9 576 320z"/></svg></svg></div>
                     <?php esc_html_e('Join BerqWP Community', 'searchpro'); ?>
                 </a>
+                <?php } ?>
             </div>
             <div class="berqwp-tab-content">
                 <?php do_action('berqwp_notices'); ?>
