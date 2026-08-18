@@ -2,8 +2,8 @@
 Contributors: berqwp, thevisionofhamza
 Tags: optimize, cache, pagespeed, performance, speed
 Requires at least: 5.3
-Tested up to: 7.0
-Stable tag: 4.1.11
+Tested up to: 7.1
+Stable tag: 4.1.12
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -276,9 +276,12 @@ Also check out our other WordPress products.
 
 == Changelog ==
 
+= 4.1.12 =
+* [Bug] Fixed a blank screen issue after cache flush on Nginx.
+
 = 4.1.11 =
 * [New] Now serves X-BerqWP-Cache: HIT header
-* [Bug] Fixed cache being delivered for rest_route query paramter
+* [Bug] Fixed cache being delivered for rest_route query parameter
 * [Bug] Fixed undefine key berqwp_optimization_method PHP warning
 
 = 4.1.10 =
