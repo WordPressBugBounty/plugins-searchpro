@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza
 Tags: optimize, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.1
-Stable tag: 4.1.12
+Stable tag: 4.1.13
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -275,6 +275,10 @@ Also check out our other WordPress products.
 7. Integration
 
 == Changelog ==
+
+= 4.1.13 =
+* [Bug] Fixed undefined function wp_parse_url fatal error
+* [Bug] Fixed null cache-tag header for apache server side cache
 
 = 4.1.12 =
 * [Bug] Fixed a blank screen issue after cache flush on Nginx.

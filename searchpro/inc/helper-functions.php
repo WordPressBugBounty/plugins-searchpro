@@ -1921,6 +1921,8 @@ function bwp_write_htaccess_rules($ignore_sandbox = false)
     }
 
     $htaccess = get_home_path() . '.htaccess';
+    $cache_tag_host = parse_url(home_url(), PHP_URL_HOST);
+
     $rules = [
         '<IfModule mod_rewrite.c>',
         '    RewriteEngine On',
@@ -1945,7 +1947,7 @@ function bwp_write_htaccess_rules($ignore_sandbox = false)
         '        Header set Vary "Accept-Encoding, Cookie"',
         '        Header set CDN-Cache-Control "max-age=2592000"',
         '        Header set Cache-Control "public, max-age=600, s-maxage=2592000, stale-while-revalidate=86400"',
-        '        Header set Cache-Tag "%{HTTP_HOST}e"',
+        '        Header set Cache-Tag "' . $cache_tag_host . '"',
         '        Header set X-Content-Type-Options "nosniff"',
         '    </FilesMatch>',
         '</IfModule>',

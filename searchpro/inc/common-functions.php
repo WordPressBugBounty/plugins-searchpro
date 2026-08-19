@@ -25,12 +25,45 @@ function bwp_pass_cookie_requirement() {
     return true;
 }
 
+function bwp_request_is_https() {
+    if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') {
+        return true;
+    }
+
+    // Reverse proxy / load balancer terminating TLS upstream
+    if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+        // may be a comma-separated chain: "https,http" — first hop is the client
+        $proto = strtolower(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0]));
+        if ($proto === 'https') {
+            return true;
+        }
+    }
+
+    if (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on') {
+        return true;
+    }
+
+    if (!empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) === 'on') {
+        return true;
+    }
+
+    if (!empty($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443) {
+        return true;
+    }
+
+    return false;
+}
+
 function bwp_get_request_url() {
-    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+
+    $scheme = 'http://';
+
+    if (bwp_request_is_https()) {
         $scheme = 'https://';
-    } else {
+    } elseif (function_exists('wp_parse_url') && function_exists('get_option')) {
         $scheme = (wp_parse_url(get_option('home'), PHP_URL_SCHEME) === 'https') ? 'https://' : 'http://';
     }
+
     $host = isset($_SERVER['HTTP_HOST']) ? strip_tags(stripslashes($_SERVER['HTTP_HOST'])) : 'localhost';
     $uri = isset($_SERVER['REQUEST_URI']) ? strip_tags(stripslashes($_SERVER['REQUEST_URI'])) : '/';
     $url = $scheme . $host . $uri;
@@ -103,6 +136,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
     }
 
     if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'GET' && !bwp_is_user_logged_in() && !bwp_is_ajax() && !berqDetectCrawler::is_crawler() && bwp_pass_cookie_requirement()) {
+
         $berqconfigs = berqConfigs::getInstance();
         $configs = $berqconfigs->get_configs();
         $url = bwp_get_request_url();
@@ -127,6 +161,7 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
         if (berqwp_dropin_is_page_url_excluded($url)) {
             return;
         }
+
 
         if (file_exists($cache_file) && $cache_max_life > time()) {
             $file_content = @file_get_contents($cache_file);

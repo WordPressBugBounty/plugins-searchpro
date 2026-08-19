@@ -17,5 +17,7 @@ if (is_dir(optifer_PATH)) {
     require_once WP_CONTENT_DIR . '/plugins/searchpro/inc/common-functions.php';
     
     bwp_serve_advanced_cache('dropin');
+
+
 }
 
