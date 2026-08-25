@@ -28,6 +28,7 @@ if (!defined('ABSPATH'))
                 if (!$this->is_key_verified) { 
                 ?>
                 
+                <input type="hidden" name="berqwp_optimization_method" value="cloud">
                 <input type="password" placeholder="<?php esc_html_e('Enter your license key', 'searchpro'); ?>" name="berqwp_license_key">
                 <input type="submit" value="<?php esc_html_e('Activate', 'searchpro'); ?>">
                 

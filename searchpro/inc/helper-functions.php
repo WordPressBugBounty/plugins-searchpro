@@ -225,6 +225,7 @@ function berqwp_is_slug_excludable($slug)
         "/view-order/",
         "/redirect/",
         "/elementskit-content/",
+        "/checkout/",
     ];
 
     $exclude_items = apply_filters('berqwp_exclude_slug_match', $exclude_items);
