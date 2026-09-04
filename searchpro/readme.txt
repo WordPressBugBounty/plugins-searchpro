@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza
 Tags: optimize, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.1
-Stable tag: 4.1.14
+Stable tag: 4.1.15
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -275,6 +275,9 @@ Also check out our other WordPress products.
 7. Integration
 
 == Changelog ==
+
+= 4.1.15 - 4 Sep, 2026 =
+* Update onboarding page UI
 
 = 4.1.14 =
 * [Bug] Fixed an issue where license activation was not working on the License tab.

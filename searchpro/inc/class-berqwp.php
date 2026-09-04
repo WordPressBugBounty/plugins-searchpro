@@ -968,6 +968,14 @@ if (!class_exists('berqWP')) {
 				$berqconfigs = berqConfigs::getInstance();
 				$berqconfigs->update_configs(['optimization_method' => 'local']);
 
+				wp_remote_post(BerqWPCloud::$endpoint."free-user", [
+					'timeout' => 30,
+					'body' => [
+						'site_id' => $berqconfigs->get_configs()['site_id'],
+						'site_url' => get_option('home'),
+					]
+				]);
+
 				$location = get_admin_url() . 'admin.php?page=berqwp';
 				wp_safe_redirect($location);
 				exit;

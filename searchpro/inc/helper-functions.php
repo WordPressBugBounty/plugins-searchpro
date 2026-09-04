@@ -1938,6 +1938,7 @@ function bwp_write_htaccess_rules($ignore_sandbox = false)
         '    <FilesMatch "index\.html\.gz$">',
         '        ForceType text/html',
         '        AddEncoding gzip .gz',
+        '        AddDefaultCharset utf-8',
         '    </FilesMatch>',
         '</IfModule>',
         '<IfModule mod_headers.c>',

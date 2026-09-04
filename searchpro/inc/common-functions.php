@@ -135,6 +135,11 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
         return;
     }
 
+    if ( strpos( $_SERVER["REQUEST_URI"], "berqwp-ping" ) !== false ) {
+        echo "PONG";
+        exit();
+    }
+
     if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'GET' && !bwp_is_user_logged_in() && !bwp_is_ajax() && !berqDetectCrawler::is_crawler() && bwp_pass_cookie_requirement()) {
 
         $berqconfigs = berqConfigs::getInstance();

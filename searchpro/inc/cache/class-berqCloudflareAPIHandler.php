@@ -32,7 +32,9 @@ class BerqCloudflareAPIHandler
 
         if (!empty($rules)) {
             foreach ($rules as $rule) {
-                if (!empty($rule['action_parameters']['description']) && $rule['action_parameters']['description'] == 'BerqWP cache rules' && $rule['action_parameters']['enabled'] == true) {
+                // Cloudflare stores description and enabled on the rule object,
+                // not inside action_parameters.
+                if (isset($rule['description']) && $rule['description'] === 'BerqWP cache rules') {
                     $rule_found = true;
                     break;
                 }
@@ -40,7 +42,6 @@ class BerqCloudflareAPIHandler
         }
 
         if (!$rule_found) {
-            $this->delete_rule_by_description('BerqWP cache rules');
             $this->update_cache_rules();
         }
     }
@@ -86,13 +87,10 @@ class BerqCloudflareAPIHandler
             ];
         }
     
-        // Step 3: Prepare the updated ruleset payload
-        $ruleset['rules'] = $updatedRules;
-        unset($ruleset['last_updated']);
-    
-        // Step 4: Send the update request
+        // Step 3: Send only the rules array back to Cloudflare.
+        // Sending read-only fields (id, version, kind, phase) is non-idiomatic and fragile.
         $update_endpoint = "zones/{$this->zone_id}/rulesets/{$ruleset['id']}";
-        $update_response = $this->make_request($update_endpoint, 'PUT', $ruleset);
+        $update_response = $this->make_request($update_endpoint, 'PUT', ['rules' => $updatedRules]);
     
         // Step 5: Return result
         if (isset($update_response['success']) && $update_response['success']) {
@@ -115,17 +113,21 @@ class BerqCloudflareAPIHandler
             'purge_everything' => true
         ]);
         
-        if ($response['success']) {
+        if (is_array($response) && isset($response['success']) && $response['success']) {
             return [
                 'success' => true,
                 'message' => 'All cache purged successfully.',
             ];
-        } else {
-            return [
-                'success' => false,
-                'message' => 'Failed to purge cache: ' . implode(' ', array_column($response['errors'], 'message'))
-            ];
         }
+
+        $errors = is_array($response) && isset($response['errors'])
+            ? implode(' ', array_column($response['errors'], 'message'))
+            : 'Unknown error';
+
+        return [
+            'success' => false,
+            'message' => 'Failed to purge cache: ' . $errors,
+        ];
     }
 
     // Method to flush a specific URL from cache
@@ -135,37 +137,50 @@ class BerqCloudflareAPIHandler
             'files' => [$url]
         ]);
 
-        if ($response['success']) {
+        if (is_array($response) && isset($response['success']) && $response['success']) {
             return [
                 'success' => true,
                 'message' => "Cache for {$url} purged successfully."
             ];
-        } else {
-            return [
-                'success' => false,
-                'message' => 'Failed to purge URL: ' . implode(' ', array_column($response['errors'], 'message'))
-            ];
         }
+
+        $errors = is_array($response) && isset($response['errors'])
+            ? implode(' ', array_column($response['errors'], 'message'))
+            : 'Unknown error';
+
+        return [
+            'success' => false,
+            'message' => 'Failed to purge URL: ' . $errors,
+        ];
     }
 
     public function update_cache_rules()
     {
         $endpoint = "zones/{$this->zone_id}/rulesets/phases/http_request_cache_settings/entrypoint";
 
-        $cache_rules = [
-            'rules' => [
-                [
-                    'expression' => 'not (http.cookie contains "wordpress_logged_in_") and not (http.request.uri.path contains ".xml" or http.request.uri.path contains ".txt" or http.request.uri.path contains ".gz" or http.request.uri.path contains "sitemap")',
-                    'action' => 'set_cache_settings',
-                    'action_parameters' => [
-                        'cache' => true,
-                    ],
-                    'description' => 'BerqWP cache rules',
-                ],
+        // GET existing rules so we don't wipe other CF cache rules in the zone.
+        $existing = $this->get_cache_ruleset();
+        $existing_rules = !empty($existing['result']['rules']) ? $existing['result']['rules'] : [];
+
+        // Remove any old BerqWP rule, keep everything else.
+        $merged = [];
+        foreach ($existing_rules as $rule) {
+            if (!isset($rule['description']) || $rule['description'] !== 'BerqWP cache rules') {
+                $merged[] = $rule;
+            }
+        }
+
+        // Append the canonical BerqWP cache rule.
+        $merged[] = [
+            'expression' => 'not (http.request.method ne "GET" or http.cookie contains "wordpress_logged_in_" or http.request.uri.path contains "/wp-admin" or http.request.uri.path contains ".xml" or http.request.uri.path contains ".txt" or http.request.uri.path contains ".gz" or http.request.uri.path contains "sitemap" or http.request.uri.query ne "")',
+            'action' => 'set_cache_settings',
+            'action_parameters' => [
+                'cache' => true,
             ],
+            'description' => 'BerqWP cache rules',
         ];
 
-        $response = $this->make_request($endpoint, 'PUT', $cache_rules);
+        $response = $this->make_request($endpoint, 'PUT', ['rules' => $merged]);
 
         if (is_array($response) && isset($response['success']) && $response['success']) {
             return [

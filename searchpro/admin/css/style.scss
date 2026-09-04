@@ -1,5 +1,6 @@
 body {
-    background-color: #f7faff !important;
+    // background-color: #f7faff !important;
+    background-color: #fff !important;
 }
 
 .berqwp-dashbaord {
@@ -805,21 +806,27 @@ table.berq-image-settings {
 
 #berqwp-intro {
     // min-height: 80vh;
-    background-color: #f7faff;
+    // background-color: #f7faff;
+    background-color: transparent;
     border-radius: 20px;
-    border: 1px solid #e6e6e6;
+    // border: 1px solid #e6e6e6;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    -webkit-font-smoothing: antialiased;
+    // -webkit-font-smoothing: antialiased;
     padding: 70px 20px;
     padding-bottom: 100px;
     max-width: 800px;
     margin: 0 auto;
-    box-shadow: 0px 3px 5px 0px rgba(83, 113, 167, 0.05);
+    // box-shadow: 0px 3px 5px 0px rgba(83, 113, 167, 0.05);
     padding-bottom: 30px;
     margin-top: 50px;
+
+    img.logo {
+        width: 140px;
+        margin-bottom: 30px;
+    }
 
     h2.title {
         font-size: 35px;
@@ -854,7 +861,7 @@ table.berq-image-settings {
             padding: 10px 13px;
             border: 1px solid #1f71ff;
             border-radius: 8px;
-            font-weight: 500;
+            // font-weight: 500;
             font-size: 14px;
             cursor: pointer;
             color: #fff;
@@ -970,7 +977,7 @@ table.berq-image-settings {
         gap: 10px;
         justify-content: center;
         align-items: center;
-        margin-top: 60px;
+        margin-top: 30px;
 
         a.btn {
             background: #1f71ff;
@@ -986,6 +993,16 @@ table.berq-image-settings {
             &:hover {
                 background-color: #2067e3;
             }
+
+            &.secondary {
+                background: #edeef1;
+                color: #222;
+
+                &:hover {
+                    background-color: #e0e1e5;
+                }
+            }
+
         }
     }
 }

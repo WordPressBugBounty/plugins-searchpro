@@ -13,7 +13,30 @@ do_action('berqwp_notices');
     <h1 style="display:none">BerqWP</h1>
     <div></div>
     <div id="berqwp-intro">
+        <img src="<?php echo esc_attr(optifer_URL . '/admin/img/logo.png'); ?>" alt="BerqWP" class="logo">
         <h2 class="title">Automate performance optimization with just a few clicks</h2>
+
+        <div class="cta-btns">
+            <a href="https://berqwp.com/pricing/?source=plugin-intro-page" class="btn" target="_blank">
+                <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 8L15 13.2L18 10.5L17.3 14H6.7L6 10.5L9 13.2L12 8ZM12 4L8.5 10L3 5L5 16H19L21 5L15.5 10L12 4ZM19 18H5V19C5 19.6 5.4 20 6 20H18C18.6 20 19 19.6 19 19V18Z"
+                        fill="white" />
+                </svg>
+                Get Premium
+            </a>
+            <a href="<?php echo esc_attr(admin_url('admin.php?page=berqwp&activate-free')); ?>" class="btn secondary">
+                <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H5.17L4 17.17V4H20V16Z"
+                        fill="#222" />
+                    <path d="M12 15L13.57 11.57L17 10L13.57 8.43L12 5L10.43 8.43L7 10L10.43 11.57L12 15Z"
+                        fill="#222" />
+                </svg>
+
+                Continue Free
+            </a>
+        </div>
 
         <?php if (berqwp_is_license_managed_by_network()): ?>
             <div style="text-align: center; padding: 20px;">
@@ -80,7 +103,7 @@ do_action('berqwp_notices');
             </form>
 
         <?php endif; ?>
-        <div class="cta-btns">
+        <!-- <div class="cta-btns">
             <a href="https://berqwp.com/pricing/?source=plugin-intro-page" class="btn" target="_blank">
                 <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -100,11 +123,11 @@ do_action('berqwp_notices');
 
                 Get Free License
             </a>
-        </div>
+        </div> -->
 
-        <div class="berqwp-continue-free">
+        <!-- <div class="berqwp-continue-free">
             <a href="<?php echo esc_attr(admin_url('admin.php?page=berqwp&activate-free')); ?>">Continue self-hosted</a>
-        </div>
+        </div> -->
     </div>
 </div>
 <!--<script src="<?php echo esc_attr(optifer_URL . '/admin/js/bootstrap-slider.js?v=' . BERQWP_VERSION); ?>"></script>-->
