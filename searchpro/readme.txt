@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza
 Tags: optimize, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.1
-Stable tag: 4.1.15
+Stable tag: 4.1.16
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -275,6 +275,10 @@ Also check out our other WordPress products.
 7. Integration
 
 == Changelog ==
+
+= 4.1.16 - 11 Sep, 2026 =
+* If advanced-cache.php file is not setup already, use plugin's index file to serve valid cache
+* Protect free account onboarding condition with admin rights check
 
 = 4.1.15 - 4 Sep, 2026 =
 * Update onboarding page UI

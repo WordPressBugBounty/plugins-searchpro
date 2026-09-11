@@ -46,11 +46,7 @@ if (isset($_POST['berqwp_save_nonce'])) {
             $site_id = $berqwp_configs['site_id'];
 
             if (empty($site_id)) {
-                $blog_id     = get_current_blog_id();
-                $network_id  = function_exists('get_current_network_id') ? get_current_network_id() : 1;
-                $siteurl     = get_option('siteurl');
-                $site_id = md5("berqwp|$network_id|$blog_id|$siteurl");
-
+                $site_id = berqwp_generate_site_id();
                 $berqconfigs->update_configs(['site_id' => $site_id]);
             }
 

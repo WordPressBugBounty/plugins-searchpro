@@ -964,14 +964,24 @@ if (!class_exists('berqWP')) {
 		function save_settings()
 		{
 
-			if (!empty($_GET['page']) && $_GET['page'] == 'berqwp' && isset($_GET['activate-free'])) {
+			if (current_user_can('manage_options') && !empty($_GET['page']) && $_GET['page'] == 'berqwp' && isset($_GET['activate-free'])) {
 				$berqconfigs = berqConfigs::getInstance();
-				$berqconfigs->update_configs(['optimization_method' => 'local']);
+				$configs = $berqconfigs->get_configs();
+				$site_id = $configs['site_id'];
 
+				if (empty($site_id)) {
+					$site_id = berqwp_generate_site_id();
+				}
+
+				$berqconfigs->update_configs([
+					'site_id' => $site_id,
+					'optimization_method' => 'local'
+				]);
+					
 				wp_remote_post(BerqWPCloud::$endpoint."free-user", [
 					'timeout' => 30,
 					'body' => [
-						'site_id' => $berqconfigs->get_configs()['site_id'],
+						'site_id' => $site_id,
 						'site_url' => get_option('home'),
 					]
 				]);

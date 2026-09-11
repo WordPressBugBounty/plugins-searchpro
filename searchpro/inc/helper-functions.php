@@ -2351,3 +2351,10 @@ function berqwp_can_use_cloud() {
 
     return !empty($configs['site_id']) && !empty($configs['secret']) && !empty($configs['optimization_method']) && $configs['optimization_method'] == 'cloud' && !empty($license_key);
 }
+
+function berqwp_generate_site_id() {
+    $blog_id     = get_current_blog_id();
+    $network_id  = function_exists('get_current_network_id') ? get_current_network_id() : 1;
+    $siteurl     = get_option('siteurl');
+    return md5("berqwp|$network_id|$blog_id|$siteurl");
+}
