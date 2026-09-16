@@ -239,6 +239,11 @@ function berqwp_is_slug_excludable($slug)
     return false;
 }
 
+
+function berqwp_home_url() {
+	return untrailingslashit(apply_filters('berqwp_site_url', home_url()));
+}
+
 function berqwp_get_page_params($page_url, $is_forced = false)
 {
 
@@ -263,17 +268,20 @@ function berqwp_get_page_params($page_url, $is_forced = false)
         $optimization_mode = 'basic';
     }
 
+	$home_url = berqwp_home_url();
+
     // Data to send as POST parameters
     $post_data = array(
         'site_id'                   => $berqwp_configs['site_id'],
         'license_key'               => berqwp_get_license_key(),
         'page_url'                  => $page_url,
         'page_slug'                 => $page_slug,
-        'site_url'                  => home_url(),
+        'site_url'                  => $home_url,
         'webp_max_width'            => (int) get_option('berqwp_webp_max_width'),
         'webp_quality'              => (int) get_option('berqwp_webp_quality'),
         'fluid_images'              => get_option('berqwp_fluid_images'),
         'enable_critical_css'       => get_option('berqwp_enable_critical_css'),
+        'enable_used_css'           => get_option('berqwp_enable_used_css'),
         'force_include_critical_css'=> get_option('berqwp_force_include_critical_css', []),
         'exclude_css'               => get_option('berqwp_exclude_css', []),
         'exclude_js'                => get_option('berqwp_exclude_js', []),
@@ -1302,7 +1310,7 @@ function bwp_isGzipEncoded()
 function bwp_sluguri_into_path($slug_uri)
 {
     $is_multisite = function_exists('is_multisite') && is_multisite();
-    $home_path = parse_url(home_url(), PHP_URL_PATH);
+    $home_path = parse_url(berqwp_home_url(), PHP_URL_PATH);
 
     // if (berqwp_is_sub_dir_wp() && !$is_multisite) {
     if (!$is_multisite && $home_path !== null) {
@@ -1325,7 +1333,7 @@ function bwp_url_into_path($url)
     $parsed_url = parse_url($url);
     $path = isset($parsed_url['path']) ? $parsed_url['path'] : '';
     $query = isset($parsed_url['query']) ? $parsed_url['query'] : '';
-    $homeurl = home_url();
+    $homeurl = berqwp_home_url();
 
     if (!empty($query)) {
         $path = $path . '?' . $query;
@@ -1451,7 +1459,7 @@ function bwp_get_sitemap()
         $posts_per_page = 10000; // Adjust this based on server capacity
 
         // Get current page from query string (for pagination)
-        $paged = isset($_GET['paged']) ? intval($_GET['paged']) : 1;
+		$paged = isset($_GET['paged']) ? intval($_GET['paged']) : 1;
 
         // Build the query arguments with pagination
         $args = array(
@@ -2162,6 +2170,38 @@ function berqwp_prependHtmlToHead($buffer, $htmlToPrepend)
     return $buffer;
 }
 
+function berqwp_earlyHeadHtml($buffer, $htmlToInsert)
+{
+    // Locate <head> opening tag
+    if (!preg_match('/<head(\s[^>]*)?>/i', $buffer, $headMatch, PREG_OFFSET_CAPTURE)) {
+        return berqwp_prependHtmlToHead($buffer, $htmlToInsert);
+    }
+
+    $headStart = $headMatch[0][1] + strlen($headMatch[0][0]);
+
+    // Bound the search to content inside <head>...</head>
+    $headEndPos = stripos($buffer, '</head>', $headStart);
+    if ($headEndPos === false) {
+        return berqwp_prependHtmlToHead($buffer, $htmlToInsert);
+    }
+
+    $headContent = substr($buffer, $headStart, $headEndPos - $headStart);
+
+    // Find first <script, <link, or <style in the head
+    // if (preg_match('/<(script|link|style)[\s>\/]/i', $headContent, $tagMatch, PREG_OFFSET_CAPTURE)) {
+
+    $regex = "/<(script|link[^>]+rel=['\"]+(modulepreload|stylesheet|preload)['\"]|style)[\s>\/]/i";
+
+    if (preg_match($regex, $headContent, $tagMatch, PREG_OFFSET_CAPTURE)) {
+        $insertPos = $headStart + $tagMatch[0][1];
+        return substr_replace($buffer, $htmlToInsert . PHP_EOL, $insertPos, 0);
+    }
+
+    // Fallback: no matching tag in head
+    return berqwp_prependHtmlToHead($buffer, $htmlToInsert);
+}
+
+
 function berqwp_setup_dropin()
 {
     if (defined('BERQWP_ADVANCED_CACHE_PATH')) {
@@ -2335,7 +2375,7 @@ function bwp_clear_recently_optimized_log()
 
 function bwp_remove_recently_optimized_entry($page_url)
 {
-    if (empty($page_url)) return;
+	if (empty($page_url)) return;
 
     $log = json_decode(get_option('berqwp_recently_optimized', '[]'), true);
     if (!is_array($log)) return;

@@ -8,7 +8,16 @@ class berqPolylang extends berqIntegrations
     function __construct()
     {
         add_filter('berqwp_page_translation_urls', [$this, 'get_page_translations'], 10, 2);
+        add_filter('berqwp_site_url', [$this, 'set_home_url'], 10);
     }
+
+	function set_home_url($home_url) {
+		if (function_exists('pll_home_url')) {
+			return pll_home_url();
+		}
+		return $home_url;
+	}
+
 
     function get_page_translations($translated_urls, $post_url)
     {

@@ -8,6 +8,7 @@ class berqPageOptimizer {
     public $page_slug = null;
     public $page_url = null;
     public $settings = null;
+    public $early_head_html = '';
 
     function __construct() {
 
@@ -1338,7 +1339,8 @@ class berqPageOptimizer {
                 $prelaod_html .= '>'.PHP_EOL;
             }
 
-            $buffer = berqwp_prependHtmlToHead($buffer, $prelaod_html);
+            /* $buffer = berqwp_prependHtmlToHead($buffer, $prelaod_html); */
+            $this->early_head_html .= $preload_html;
 
         }
 
@@ -1551,11 +1553,13 @@ class berqPageOptimizer {
             $critical_css = $critical_css->process_css($buffer);
             $critical_css = sprintf('<style data-berqwp-exclude id="berqwp-used-css">%s</style>', $critical_css);
     
-            $buffer = berqwp_prependHtmlToHead($buffer, $critical_css);
+            /* $buffer = berqwp_prependHtmlToHead($buffer, $critical_css); */
+            $this->early_head_html .= $critical_css;
             $buffer = $this->delay_styles($buffer);
 
         }
 
+        $buffer = berqwp_earlyHeadHtml($buffer, $this->early_head_html);
 
         $buffer = $this->restore_template_scripts( $buffer, $template_placeholders );
 

@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza
 Tags: optimize, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.1
-Stable tag: 4.1.16
+Stable tag: 4.1.17
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ BerqWP automatically applies modern speed optimization techniques recommended by
 
 Since all popular page speed testing tools use similar methods, you'll get the same results across tools like [Google PageSpeed Insights](https://pagespeed.web.dev/), [GTmetrix](https://gtmetrix.com/), [Pingdom](https://tools.pingdom.com/), and others.
 
-## 💙 Why do people love BerqWP?
+## 💙 Why do people love BerqWP
 
 - **Automatically applies Google ([web.dev](https://web.dev/performance)) recommended optimizations to your website.**
 - **100% automatic (no configuration needed)**
@@ -275,6 +275,10 @@ Also check out our other WordPress products.
 7. Integration
 
 == Changelog ==
+
+= 4.1.17 - 16 Sep, 2026 =
+* [Bug] Fixed BerqWP not picking up Polylang's updated home URL.
+* [Enhancement] Moved used css after charset meta tag for self-hosted optimization.
 
 = 4.1.16 - 11 Sep, 2026 =
 * If advanced-cache.php file is not setup already, use plugin's index file to serve valid cache
