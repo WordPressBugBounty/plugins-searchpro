@@ -244,6 +244,45 @@ function berqwp_home_url() {
 	return untrailingslashit(apply_filters('berqwp_site_url', home_url()));
 }
 
+function bwp_canonicalize_page_url($url) {
+    $permalink_structure = get_option('permalink_structure');
+
+    if (!$permalink_structure) {
+        return $url;
+    }
+
+    $path = parse_url($url, PHP_URL_PATH) ?? '/';
+
+    if ($path === '/') {
+        return $url;
+    }
+
+    $uses_trailing_slash = substr(rtrim($permalink_structure), -1) === '/';
+    $has_trailing_slash  = substr($path, -1) === '/';
+
+    if ($uses_trailing_slash && !$has_trailing_slash) {
+        return trailingslashit($url);
+    }
+
+    if (!$uses_trailing_slash && $has_trailing_slash) {
+        return untrailingslashit($url);
+    }
+
+    return $url;
+}
+
+function bwp_sync_permalink_config() {
+    $permalink_structure = get_option('permalink_structure');
+    $trailing_slash = empty($permalink_structure) ? null : (substr(rtrim($permalink_structure), -1) === '/');
+
+    $berqconfigs = berqConfigs::getInstance();
+    $current = $berqconfigs->get_configs();
+
+    if ($current === false || !array_key_exists('permalink_trailing_slash', $current) || $current['permalink_trailing_slash'] !== $trailing_slash) {
+        $berqconfigs->update_configs(['permalink_trailing_slash' => $trailing_slash]);
+    }
+}
+
 function berqwp_get_page_params($page_url, $is_forced = false)
 {
 
@@ -1890,6 +1929,14 @@ function bwp_lock_cache_directory()
         wp_mkdir_p($cache_dir);
     }
 
+    if (!function_exists('got_mod_rewrite')) {
+        require_once ABSPATH . 'wp-admin/includes/misc.php';
+    }
+
+    if (!got_mod_rewrite()) {
+        return;
+    }
+
     $rules = <<<HTACCESS
 Order allow,deny
 Deny from all
@@ -1917,6 +1964,27 @@ HTACCESS;
     if (!file_exists($index_stub)) {
         file_put_contents($index_stub, '<?php // Silence is golden');
     }
+
+}
+
+function bwp_delete_php_files_in_cache()
+{
+    $cache_dir = optifer_cache;
+    if (!is_dir($cache_dir)) {
+        return;
+    }
+
+    $php_extensions = ['php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar'];
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($cache_dir, RecursiveDirectoryIterator::SKIP_DOTS)
+    );
+
+    foreach ($iterator as $file) {
+        if ($file->isFile() && in_array(strtolower($file->getExtension()), $php_extensions, true)) {
+            @unlink($file->getRealPath());
+        }
+    }
 }
 
 function bwp_write_htaccess_rules($ignore_sandbox = false)
@@ -1932,13 +2000,23 @@ function bwp_write_htaccess_rules($ignore_sandbox = false)
     $htaccess = get_home_path() . '.htaccess';
     $cache_tag_host = parse_url(home_url(), PHP_URL_HOST);
 
-    $rules = [
+    // Match the cache-serving RewriteCond to the site's actual permalink convention,
+    // so caching works whether the site uses trailing slashes or not.
+    $permalink_structure = get_option('permalink_structure');
+    $uses_trailing_slash = empty($permalink_structure) || substr(rtrim($permalink_structure), -1) === '/';
+
+    $slash_conds = $uses_trailing_slash
+        ? ['    RewriteCond %{REQUEST_URI} /$']
+        : ['    RewriteCond %{REQUEST_URI} ^/$ [OR]', '    RewriteCond %{REQUEST_URI} !/$'];
+
+    $rules = array_merge([
         '<IfModule mod_rewrite.c>',
         '    RewriteEngine On',
         '    RewriteCond %{REQUEST_METHOD} !POST',
         '    RewriteCond %{QUERY_STRING} ^$',
         '    RewriteCond %{HTTP_COOKIE} !(wp\-postpass|wordpress_logged_in|comment_author|woocommerce_cart_hash|edd_items_in_cart) [NC]',
         '    RewriteCond %{HTTP_USER_AGENT} !(Googlebot|Google-InspectionTool|Bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Applebot|AhrefsBot|SemrushBot|MJ12bot|DotBot|PetalBot|BLEXBot|archive\.org_bot|UptimeRobot|Pingdom|ChatGPT-User|GPTBot|ClaudeBot|Bytespider) [NC]',
+    ], $slash_conds, [
         '    RewriteCond %{DOCUMENT_ROOT}/wp-content/cache/berqwp/html/%{HTTP_HOST}%{REQUEST_URI}/index.html.gz -f',
         '    RewriteRule .* /wp-content/cache/berqwp/html/%{HTTP_HOST}%{REQUEST_URI}/index.html.gz [L]',
         '</IfModule>',
@@ -1992,7 +2070,7 @@ function bwp_write_htaccess_rules($ignore_sandbox = false)
         '        Header set Access-Control-Allow-Origin "*"',
         '    </FilesMatch>',
         '</IfModule>',
-    ];
+    ]);
 
     // Must appear before the WordPress block so Apache processes it first
     $marker     = 'BerqWP Cache';

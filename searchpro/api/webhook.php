@@ -74,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && berqwp_can_use_cloud()) {
         // Allow other plugins to modify cache html
         $html = apply_filters('berqwp_cache_buffer', $html);
 
+        $page_url = bwp_canonicalize_page_url($page_url);
         $cache = new Cache(null, bwp_get_cache_dir());
         $cache->store_cache($page_url, $html);
 

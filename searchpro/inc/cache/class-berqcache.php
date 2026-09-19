@@ -92,7 +92,13 @@ if (!class_exists('berqCache')) {
             // Apache htaccess cache rules (skip on LiteSpeed — remove any existing rules)
             add_action('berqwp_activate_plugin',     'bwp_write_htaccess_rules');
             add_action('berqwp_flush_all_cache',     'bwp_write_htaccess_rules');
+            add_action('berqwp_flush_all_cache',     'bwp_delete_php_files_in_cache');
             add_action('berqwp_deactivate_plugin',   'bwp_remove_htaccess_rules');
+
+            // Keep the dropin's cached permalink convention in sync with WordPress
+            add_action('init', 'bwp_sync_permalink_config');
+            add_action('update_option_permalink_structure', 'bwp_sync_permalink_config');
+            add_action('berqwp_activate_plugin', 'bwp_sync_permalink_config');
 
             if (bwp_is_openlitespeed_server()) {
                 add_action('berqwp_activate_plugin', 'bwp_remove_htaccess_rules');
@@ -182,6 +188,9 @@ if (!class_exists('berqCache')) {
 
             self::stale_cloud_assets();
             $this->purge_critical_css_cache();
+            
+            // trigger cache warmup
+            do_action('berqwp_cache_warmup');
 
         }
 
@@ -242,6 +251,7 @@ if (!class_exists('berqCache')) {
                 update_option('berqwp_raw_home', $raw_home);
                 delete_transient('berq_lic_response_cache');
                 delete_transient('berqwp_lic_response_cache');
+                delete_transient('berqwp_warmup_running');
             }
         }
 
@@ -935,6 +945,15 @@ if (!class_exists('berqCache')) {
                 return;
             }
 
+            // Redirect non-canonical URLs (wrong trailing slash) the same way WordPress would,
+            // before ever touching the cache — works for both trailing-slash and non-trailing-slash
+            // permalink structures.
+            $canonical_url = bwp_canonicalize_page_url($page_url);
+            if ($canonical_url !== $page_url) {
+                wp_safe_redirect($canonical_url, 301);
+                exit();
+            }
+
             if (is_singular()) {
                 $post_type = get_post_type();
 
@@ -1002,7 +1021,7 @@ if (!class_exists('berqCache')) {
                 if (ini_get('zlib.output_compression')) {
                     ini_set('zlib.output_compression', 'Off');
                 }
-                
+
                 while (ob_get_level()) {
                     ob_end_clean();
                 }

@@ -129,6 +129,34 @@ function bwp_build_cache_path($url) {
     return $host . $path . '/q-' . $query_hash;
 }
 
+/**
+ * Redirect a mismatched-trailing-slash request to its canonical form, the same
+ * way WordPress's redirect_canonical() would — but without needing WordPress
+ * to boot first. Used by the advanced-cache.php dropin, which runs before the
+ * DB connection is available.
+ */
+function bwp_redirect_to_canonical_slash($wants_trailing_slash) {
+    $uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
+    $parts = explode('?', $uri, 2);
+    $path = $parts[0];
+    $query = isset($parts[1]) ? '?' . $parts[1] : '';
+
+    if ($wants_trailing_slash) {
+        $path = rtrim($path, '/') . '/';
+    } else {
+        $path = rtrim($path, '/');
+        if ($path === '') {
+            $path = '/';
+        }
+    }
+
+    $scheme = bwp_request_is_https() ? 'https://' : 'http://';
+    $host = isset($_SERVER['HTTP_HOST']) ? strip_tags(stripslashes($_SERVER['HTTP_HOST'])) : '';
+
+    header('Location: ' . $scheme . $host . $path . $query, true, 301);
+    exit();
+}
+
 function bwp_serve_advanced_cache($serve_from = 'plugin') {
     
     if (php_sapi_name() === 'cli' || (defined('WP_CLI') && WP_CLI)) {
@@ -167,6 +195,13 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
             return;
         }
 
+        $request_path = parse_url($url, PHP_URL_PATH) ?? '/';
+        if ($request_path !== '/' && isset($configs['permalink_trailing_slash']) && $configs['permalink_trailing_slash'] !== null) {
+            $has_trailing_slash = substr($request_path, -1) === '/';
+            if ($configs['permalink_trailing_slash'] !== $has_trailing_slash) {
+                bwp_redirect_to_canonical_slash($configs['permalink_trailing_slash']);
+            }
+        }
 
         if (file_exists($cache_file) && $cache_max_life > time()) {
             $file_content = @file_get_contents($cache_file);

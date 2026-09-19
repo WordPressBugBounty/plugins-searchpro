@@ -17,7 +17,7 @@ do_action('berqwp_notices');
         <h2 class="title">Automate performance optimization with just a few clicks</h2>
 
         <div class="cta-btns">
-            <a href="https://berqwp.com/pricing/?source=plugin-intro-page" class="btn" target="_blank">
+            <a href="https://berqwp.com/pricing/?utm_source=plugin-intro-page&utm_medium=get_premium" class="btn" target="_blank">
                 <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M12 8L15 13.2L18 10.5L17.3 14H6.7L6 10.5L9 13.2L12 8ZM12 4L8.5 10L3 5L5 16H19L21 5L15.5 10L12 4ZM19 18H5V19C5 19.6 5.4 20 6 20H18C18.6 20 19 19.6 19 19V18Z"
@@ -25,7 +25,7 @@ do_action('berqwp_notices');
                 </svg>
                 Get Premium
             </a>
-            <a href="<?php echo esc_attr(admin_url('admin.php?page=berqwp&activate-free')); ?>" class="btn secondary">
+            <a href="https://berqwp.com/free-account/?utm_source=plugin-intro-page&utm_medium=continue_free" class="btn secondary" target="_blank">
                 <svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H5.17L4 17.17V4H20V16Z"
@@ -98,7 +98,7 @@ do_action('berqwp_notices');
                         echo wp_kses_post('<p style="color:red">' . $error . '</p>');
                     }
                     ?>
-                    <p class="license-msg" style="text-align: center;">Create an account to obtain a <a href="https://berqwp.com/pricing/?source=plugin-intro-page" target="_blank">BerqWP license key</a>.</p>
+                    <p class="license-msg" style="text-align: center;">Create an account to obtain a BerqWP license key.</p>
                 </div>
             </form>
 

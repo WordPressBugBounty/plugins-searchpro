@@ -8,6 +8,8 @@ use BerqWP\BerqWP;
 if (!class_exists('berqWarmup')) {
     class berqWarmup
     {
+        public $cache_warmup_fired = false;
+
         function __construct()
         {
 
@@ -42,6 +44,19 @@ if (!class_exists('berqWarmup')) {
             if (!berqwp_can_use_cloud()) {
                 return;
             }
+
+            if ($this->cache_warmup_fired) {
+                return;
+            }
+
+            // Debounce across separate requests (e.g. several plugin updates in a row)
+            if (get_transient('berqwp_warmup_running')) {
+                return;
+            }
+
+            set_transient('berqwp_warmup_running', true, 5 * MINUTE_IN_SECONDS);
+
+            $this->cache_warmup_fired = true;
 
             global $berq_log;
             $berq_log->info("Warming cache using sitemap.");

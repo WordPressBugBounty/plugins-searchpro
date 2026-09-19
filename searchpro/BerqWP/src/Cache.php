@@ -117,7 +117,6 @@ class Cache
 
     function store_cache($page_url, $html)
     {
-
         // Create the cache directory if it doesn't exist
         if (!file_exists($this->cache_directory)) {
             mkdir($this->cache_directory, 0755, true);

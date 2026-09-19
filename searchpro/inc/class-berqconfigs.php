@@ -12,6 +12,7 @@ class berqConfigs {
         'exclude_urls'          => [],
         'cache_lifespan'        => MONTH_IN_SECONDS,
         'page_compression'      => false,
+        'permalink_trailing_slash' => null,
     ];
 
     private static $cached_config = null;

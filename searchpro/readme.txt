@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza
 Tags: optimize, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.1
-Stable tag: 4.1.17
+Stable tag: 4.1.18
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -275,6 +275,13 @@ Also check out our other WordPress products.
 7. Integration
 
 == Changelog ==
+
+= 4.1.18 - 19 Sep, 2026 =
+* [New] Cache is now automatically warmed up after a plugin, theme, or core update completes.
+* [Enhancement] Added GoDaddy Managed WordPress hosting cache compatibility — flushes GoDaddy's cache automatically when BerqWP flushes or stores cache.
+* [Enhancement] Hardened the cache directory by removing any PHP files from it on every full cache flush.
+* [Bug] Fixed cache being served for non-canonical URLs (wrong trailing slash), bypassing WordPress's redirect to the canonical URL — resolved for both trailing-slash and non-trailing-slash permalink structures.
+* [Bug] Prevented .htaccess cache rules from being written on servers without mod_rewrite enabled.
 
 = 4.1.17 - 16 Sep, 2026 =
 * [Bug] Fixed BerqWP not picking up Polylang's updated home URL.

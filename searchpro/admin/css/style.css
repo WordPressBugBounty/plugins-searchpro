@@ -219,7 +219,6 @@ a.berq-btn {
   font-style: normal;
   display: block;
   line-height: normal;
-  width: -moz-fit-content;
   width: fit-content;
   margin-bottom: 5px;
   border: 1px solid #dbe9fe;
@@ -240,9 +239,9 @@ label.berq-check {
   font-style: normal;
   font-weight: 600;
   line-height: normal;
-  width: -moz-fit-content;
   width: fit-content;
   -webkit-user-select: none;
+  -khtml-user-select: none;
   -moz-user-select: none;
   -o-user-select: none;
   user-select: none;
@@ -790,7 +789,7 @@ table.berq-image-settings {
 #berqwp-intro .inner input[type=email],
 #berqwp-intro .inner input[type=password] {
   background-color: #fff;
-  padding: 10px 13px;
+  padding: 11px 15px;
   border: 1px solid #dad2ff;
   border-radius: 8px;
   font-size: 14px;
@@ -798,7 +797,7 @@ table.berq-image-settings {
 }
 #berqwp-intro .inner button[type=submit] {
   background-color: #1f71ff;
-  padding: 10px 13px;
+  padding: 12px 16px;
   border: 1px solid #1f71ff;
   border-radius: 8px;
   font-size: 14px;
@@ -870,9 +869,6 @@ table.berq-image-settings {
   border: 1px solid #d7d7d7;
   width: 280px;
 }
-#berqwp-intro form.license-verification input[type=password]::-moz-placeholder {
-  color: #928e8e;
-}
 #berqwp-intro form.license-verification input[type=password]::placeholder {
   color: #928e8e;
 }
@@ -909,9 +905,10 @@ table.berq-image-settings {
   border-radius: 9px;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 4px;
   color: #fff;
   padding: 12px 20px;
+  padding-left: 17px;
   font-size: 15px;
   text-decoration: none;
 }
@@ -919,13 +916,12 @@ table.berq-image-settings {
   background-color: #2067e3;
 }
 #berqwp-intro .cta-btns a.btn.secondary {
-  background: #edeef1;
+  background: #fff;
   color: #222;
+  border: 1px solid #dad2ff;
+  padding: 11px 19px;
+  padding-left: 17px;
 }
-#berqwp-intro .cta-btns a.btn.secondary:hover {
-  background-color: #e0e1e5;
-}
-
 p.below-settings-panel {
   text-align: center;
   font-size: 16px;
@@ -1041,7 +1037,6 @@ span.bwp-cache-tag {
   font-size: 14px;
   border-radius: 50px;
   line-height: 1;
-  width: -moz-fit-content;
   width: fit-content;
   white-space: nowrap;
 }
@@ -1086,7 +1081,6 @@ label.berq-check input[type=text] {
 
 .berqwp-cf-connected {
   background-color: #c4ffc4;
-  width: -moz-fit-content;
   width: fit-content;
   padding: 10px 20px;
   margin-top: 15px;
@@ -1491,4 +1485,6 @@ input.berqwp-inline-number {
   border: 1px solid #dbe9fe;
   border-radius: 5px;
   color: #0c2d66;
-}/*# sourceMappingURL=style.css.map */
+}
+
+/*# sourceMappingURL=style.css.map */

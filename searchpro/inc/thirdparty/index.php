@@ -9,6 +9,7 @@ require_once optifer_PATH . '/inc/thirdparty/hosting/Pagely.php';
 require_once optifer_PATH . '/inc/thirdparty/hosting/Pantheon.php';
 require_once optifer_PATH . '/inc/thirdparty/hosting/Pressable.php';
 require_once optifer_PATH . '/inc/thirdparty/hosting/StackCDN.php';
+require_once optifer_PATH . '/inc/thirdparty/hosting/GoDaddy.php';
 
 // Plugin
 require_once optifer_PATH . '/inc/thirdparty/plugin/CloudflarePageCache.php';

@@ -705,6 +705,7 @@ class berqUpload
                 // Allow other plugins to modify cache html
                 $html = apply_filters('berqwp_cache_buffer', $html);
 
+                $item['url'] = bwp_canonicalize_page_url($item['url']);
                 $cache = new Cache(null, bwp_get_cache_dir());
                 $cache->store_cache($item['url'], $html);
 

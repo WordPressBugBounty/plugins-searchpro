@@ -1194,7 +1194,7 @@ class berqPageOptimizer {
     function store_cache($buffer) {
         // Define the cache directory
         $cache_directory = bwp_get_cache_dir();
-        $url = $this->page_url;
+        $url = bwp_canonicalize_page_url($this->page_url);
 
         // Create the cache directory if it doesn't exist
         if (!file_exists($cache_directory)) {
