@@ -3,7 +3,7 @@ Contributors: berqwp, thevisionofhamza
 Tags: optimize, cache, pagespeed, performance, speed
 Requires at least: 5.3
 Tested up to: 7.1
-Stable tag: 4.1.18
+Stable tag: 4.1.19
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -275,6 +275,9 @@ Also check out our other WordPress products.
 7. Integration
 
 == Changelog ==
+
+= 4.1.19 - 21 Sep, 2026 =
+* [Bug] Fixed redirection loop for URLs with file extension
 
 = 4.1.18 - 19 Sep, 2026 =
 * [New] Cache is now automatically warmed up after a plugin, theme, or core update completes.

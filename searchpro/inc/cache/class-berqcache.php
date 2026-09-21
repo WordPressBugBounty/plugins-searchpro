@@ -251,7 +251,6 @@ if (!class_exists('berqCache')) {
                 update_option('berqwp_raw_home', $raw_home);
                 delete_transient('berq_lic_response_cache');
                 delete_transient('berqwp_lic_response_cache');
-                delete_transient('berqwp_warmup_running');
             }
         }
 
@@ -944,6 +943,7 @@ if (!class_exists('berqCache')) {
                 self::miss_cache_headers();
                 return;
             }
+
 
             // Redirect non-canonical URLs (wrong trailing slash) the same way WordPress would,
             // before ever touching the cache — works for both trailing-slash and non-trailing-slash

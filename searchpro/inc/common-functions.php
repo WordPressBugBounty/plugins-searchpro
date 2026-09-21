@@ -196,6 +196,13 @@ function bwp_serve_advanced_cache($serve_from = 'plugin') {
         }
 
         $request_path = parse_url($url, PHP_URL_PATH) ?? '/';
+        $extension = strtolower(pathinfo($request_path, PATHINFO_EXTENSION));
+        $allowed_extension = ['html', 'htm'];
+
+        if (!empty($extension) && !in_array($extension, $allowed_extension)) {
+            return;
+        }
+
         if ($request_path !== '/' && isset($configs['permalink_trailing_slash']) && $configs['permalink_trailing_slash'] !== null) {
             $has_trailing_slash = substr($request_path, -1) === '/';
             if ($configs['permalink_trailing_slash'] !== $has_trailing_slash) {
