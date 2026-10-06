@@ -1936,6 +1936,12 @@ function bwp_lock_cache_directory()
     if (!got_mod_rewrite()) {
         return;
     }
+    
+    $htaccess_path = $cache_dir . '.htaccess';
+
+    if (!is_writable($htaccess_path)) {
+        return;
+    }
 
     $rules = <<<HTACCESS
 Order allow,deny
@@ -1957,7 +1963,7 @@ Deny from all
 </FilesMatch>
 HTACCESS;
 
-    file_put_contents($cache_dir . '.htaccess', $rules);
+    file_put_contents($htaccess_path, $rules);
 
     // Suppress directory listing
     $index_stub = $cache_dir . 'index.php';
@@ -1999,6 +2005,10 @@ function bwp_write_htaccess_rules($ignore_sandbox = false)
 
     $htaccess = get_home_path() . '.htaccess';
     $cache_tag_host = parse_url(home_url(), PHP_URL_HOST);
+
+    if (!is_writable($htaccess)) {
+        return;
+    }
 
     // Match the cache-serving RewriteCond to the site's actual permalink convention,
     // so caching works whether the site uses trailing slashes or not.
